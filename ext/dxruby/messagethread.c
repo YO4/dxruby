@@ -453,7 +453,7 @@ static DWORD WINAPI MessageThreadProc( LPVOID lpParameter )
 /*--------------------------------------------------------------------
    （内部関数）ウィンドウプロシージャ
  ---------------------------------------------------------------------*/
-LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, UINT wParam, LONG lParam )
+LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
     RECT rect;
     VALUE temp;

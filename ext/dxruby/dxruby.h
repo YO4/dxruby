@@ -122,7 +122,7 @@ struct DXRubyWindowInfo {
 };
 
 /* ピクチャ配列 */
-static struct DXRubyPictureList {
+struct DXRubyPictureList {
     float z;                        /* ピクチャのZ座標 */
     struct DXRubyPicture *picture;    /* ピクチャ構造体へのポインタ */
 };
@@ -174,7 +174,7 @@ struct DXRubyRenderTarget {
 };
 
 struct DXRubyPicture_drawLine {
-    void (*func)(void*);
+    void (*func)(struct DXRubyPicture_drawLine *);
     VALUE value;
     unsigned char blendflag; /* 半透明(000)、加算合成1(100)、加算合成2(101)、減算合成1(110)、減算合成2(111)のフラグ */
     unsigned char alpha;     /* アルファ（透明）値 */
@@ -189,7 +189,7 @@ struct DXRubyPicture_drawLine {
 };
 
 struct DXRubyPicture_drawCircle {
-    void (*func)(void*);
+    void (*func)(struct DXRubyPicture_drawCircle *);
     VALUE value;
     unsigned char blendflag; /* 半透明(000)、加算合成1(100)、加算合成2(101)、減算合成1(110)、減算合成2(111)のフラグ */
     unsigned char alpha;     /* アルファ（透明）値 */
@@ -203,7 +203,7 @@ struct DXRubyPicture_drawCircle {
 };
 
 struct DXRubyPicture_draw {
-    void (*func)(void*);
+    void (*func)(struct DXRubyPicture_draw *);
     VALUE value;
     unsigned char blendflag; /* 半透明(000)、加算合成1(100)、加算合成2(101)、減算合成1(110)、減算合成2(111)のフラグ */
     unsigned char alpha;     /* アルファ（透明）値 */
@@ -215,7 +215,7 @@ struct DXRubyPicture_draw {
 };
 
 struct DXRubyPicture_drawEx {
-    void (*func)(void*);
+    void (*func)(struct DXRubyPicture_drawEx *);
     VALUE value;
     unsigned char blendflag; /* 半透明(000)、加算合成1(100)、加算合成2(101)、減算合成1(110)、減算合成2(111)のフラグ */
     unsigned char alpha;     /* アルファ（透明）値 */
@@ -232,7 +232,7 @@ struct DXRubyPicture_drawEx {
 };
 
 struct DXRubyPicture_drawFont {
-    void (*func)(void*);
+    void (*func)(struct DXRubyPicture_drawFont *);
     VALUE value;
     unsigned char blendflag; /* 半透明(000)、加算合成1(100)、加算合成2(101)、減算合成1(110)、減算合成2(111)のフラグ */
     unsigned char alpha;     /* アルファ（透明）値 */
@@ -250,7 +250,7 @@ struct DXRubyPicture_drawFont {
 };
 
 struct DXRubyPicture_drawMorph {
-    void (*func)(void*);
+    void (*func)(struct DXRubyPicture_drawMorph *);
     VALUE value;
     unsigned char blendflag; /* 半透明(000)、加算合成1(100)、加算合成2(101)、減算合成1(110)、減算合成2(111)のフラグ */
     unsigned char alpha;     /* アルファ（透明）値 */
@@ -271,7 +271,7 @@ struct DXRubyPicture_drawMorph {
 };
 
 struct DXRubyPicture_drawTile {
-    void (*func)(void*);
+    void (*func)(struct DXRubyPicture_drawTile *);
     VALUE value;
     unsigned char blendflag; /* 半透明(000)、加算合成1(100)、加算合成2(101)、減算合成1(110)、減算合成2(111)のフラグ */
     unsigned char alpha;     /* アルファ（透明）値 */

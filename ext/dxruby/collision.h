@@ -23,6 +23,7 @@ int make_volume_ary( VALUE vary, struct DXRubyCollisionGroup *collision );
 int make_volume( VALUE vsprite, struct DXRubyCollisionGroup *collision );
 void make_volume_sub( VALUE vsprite, VALUE vcol, struct DXRubyCollision *collision );
 void collision_init(void);
+void collision_clear(void);
 int get_volume_count( VALUE vary );
 
 

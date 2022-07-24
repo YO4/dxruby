@@ -11,6 +11,7 @@
 
 #include "dxruby.h"
 #include "messagethread.h"
+#include "input.h"
 #include "font.h"
 #include "imm.h"
 

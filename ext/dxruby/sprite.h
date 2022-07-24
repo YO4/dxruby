@@ -26,4 +26,5 @@ struct DXRubySprite {
 
 void Sprite_release( struct DXRubySprite *sprite );
 void Sprite_internal_draw( VALUE self, VALUE vrt );
+void Init_dxruby_Sprite();
 

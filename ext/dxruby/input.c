@@ -12,6 +12,7 @@
 
 #define DXRUBY_EXTERN 1
 #include "dxruby.h"
+#include "messagethread.h"
 #include "input.h"
 #ifdef DXRUBY15
 #include "font.h"

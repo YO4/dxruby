@@ -2499,7 +2499,7 @@ void Init_dxruby_Input( void )
     rb_define_const( mIME, "ATTR_TARGET_NOTCONVERTED"       , INT2FIX(ATTR_TARGET_NOTCONVERTED) );
     rb_define_const( mIME, "ATTR_INPUT_ERROR"       , INT2FIX(ATTR_INPUT_ERROR) );
 
-    cCompInfo = rb_struct_define( NULL, "comp_str", "comp_attr", "cursor_pos", "can_list", "selection", "selection_total", "page_size", "total", 0 );
+    cCompInfo = rb_struct_define( NULL, "comp_str", "comp_attr", "cursor_pos", "can_list", "selection", "selection_total", "page_size", "total", NULL );
     rb_define_const( mIME, "CompInfo", cCompInfo );
 
     {

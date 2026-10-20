@@ -1,4 +1,4 @@
-#define WINVER 0x0500                                  /* ƒo[ƒWƒ‡ƒ“’è‹` Windows2000ˆÈã */
+#define WINVER 0x0500                                  /* ãƒãƒ¼ã‚¸ãƒ§ãƒ³å®šç¾© Windows2000ä»¥ä¸Š */
 #define _WIN32_WINNT WINVER
 
 #include "ruby.h"
@@ -18,12 +18,12 @@
 #include "sprite.h"
 #include "messagethread.h"
 
-VALUE mDXRuby;       /* DXRubyƒ‚ƒWƒ…[ƒ‹     */
-VALUE eDXRubyError;  /* —áŠO                 */
-VALUE mWindow;       /* ƒEƒBƒ“ƒhƒEƒ‚ƒWƒ…[ƒ‹ */
-VALUE cRenderTarget; /* ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒgƒNƒ‰ƒX */
-VALUE cShaderCore;   /* ƒVƒF[ƒ_ƒRƒAƒNƒ‰ƒX   */
-VALUE cShader;   /* ƒVƒF[ƒ_ƒNƒ‰ƒX       */
+VALUE mDXRuby;       /* DXRubyãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«     */
+VALUE eDXRubyError;  /* ä¾‹å¤–                 */
+VALUE mWindow;       /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ« */
+VALUE cRenderTarget; /* ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚¯ãƒ©ã‚¹ */
+VALUE cShaderCore;   /* ã‚·ã‚§ãƒ¼ãƒ€ã‚³ã‚¢ã‚¯ãƒ©ã‚¹   */
+VALUE cShader;   /* ã‚·ã‚§ãƒ¼ãƒ€ã‚¯ãƒ©ã‚¹       */
 
 extern VALUE cImage;
 
@@ -36,48 +36,48 @@ extern rb_data_type_t Vector_data_type;
 #endif
 #endif
 
-/* ƒOƒ[ƒoƒ‹•Ï”‚½‚¿ */
-HINSTANCE             g_hInstance   = NULL; /* ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒCƒ“ƒXƒ^ƒ“ƒX   */
-HANDLE                g_hWnd        = NULL; /* ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹             */
-LPDIRECT3D9           g_pD3D        = NULL; /* Direct3DƒCƒ“ƒ^[ƒtƒFƒCƒX       */
-LPDIRECT3DDEVICE9     g_pD3DDevice  = NULL; /* Direct3DDeviceƒCƒ“ƒ^[ƒtƒFƒCƒX */
-D3DPRESENT_PARAMETERS g_D3DPP;              /* D3DDevice‚Ìİ’è                */
+/* ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ãŸã¡ */
+HINSTANCE             g_hInstance   = NULL; /* ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹   */
+HANDLE                g_hWnd        = NULL; /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«             */
+LPDIRECT3D9           g_pD3D        = NULL; /* Direct3Dã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹       */
+LPDIRECT3DDEVICE9     g_pD3DDevice  = NULL; /* Direct3DDeviceã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ */
+D3DPRESENT_PARAMETERS g_D3DPP;              /* D3DDeviceã®è¨­å®š                */
 LPD3DXSPRITE          g_pD3DXSprite = NULL; /* D3DXSprite                     */
 
-int g_iRefAll = 1; /* ƒCƒ“ƒ^[ƒtƒF[ƒX‚ÌQÆƒJƒEƒ“ƒg */
+int g_iRefAll = 1; /* ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã®å‚ç…§ã‚«ã‚¦ãƒ³ãƒˆ */
 
-/* ƒtƒŒ[ƒ€’²®—p */
-static __int64 g_OneSecondCount       = 0;         /* ˆê•bŠÔ‚ÉƒJƒEƒ“ƒ^‚ª”‚¦‚é”         */
-static int     g_isPerformanceCounter = 0;         /* ƒpƒtƒH[ƒ}ƒ“ƒXƒJƒEƒ“ƒ^‚ª‚ ‚Á‚½‚ç‚P */
-static __int64 g_OldTime              = 0;         /* ‘O‰ñ‚ÌƒtƒŒ[ƒ€‚ªI‚í‚Á‚½ŠÔ       */
-static __int64 g_OneFrameCount        = 0;         /* ‚PƒtƒŒ[ƒ€‚Ìˆ—‚É‚©‚©‚Á‚½ŠÔ     */
-static __int64 g_DrawEndTime          = 0;         /* •`‰æŠ®—¹ŠÔ                       */
-static __int64 g_StartTime            = 0;         /* Window.loop‚ğÅ‰‚ÉÀs‚µ‚½ŠÔ    */
-static __int64 g_RunningTime          = 0;         /* ÀsŒo‰ßŠÔ(Å‰‚ÌWindow.loop‚©‚ç)*/
-static int g_skip                     = 0;         /* ƒXƒLƒbƒv‚µ‚½ƒtƒŒ[ƒ€‚Í1‚É‚È‚é      */
-int g_sync                     = 0;         /* ‚’¼“¯Šúƒ‚[ƒh = 1                 */
+/* ãƒ•ãƒ¬ãƒ¼ãƒ èª¿æ•´ç”¨ */
+static __int64 g_OneSecondCount       = 0;         /* ä¸€ç§’é–“ã«ã‚«ã‚¦ãƒ³ã‚¿ãŒæ•°ãˆã‚‹æ•°         */
+static int     g_isPerformanceCounter = 0;         /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã‚«ã‚¦ãƒ³ã‚¿ãŒã‚ã£ãŸã‚‰ï¼‘ */
+static __int64 g_OldTime              = 0;         /* å‰å›ã®ãƒ•ãƒ¬ãƒ¼ãƒ ãŒçµ‚ã‚ã£ãŸæ™‚é–“       */
+static __int64 g_OneFrameCount        = 0;         /* ï¼‘ãƒ•ãƒ¬ãƒ¼ãƒ ã®å‡¦ç†ã«ã‹ã‹ã£ãŸæ™‚é–“     */
+static __int64 g_DrawEndTime          = 0;         /* æç”»å®Œäº†æ™‚é–“                       */
+static __int64 g_StartTime            = 0;         /* Window.loopã‚’æœ€åˆã«å®Ÿè¡Œã—ãŸæ™‚é–“    */
+static __int64 g_RunningTime          = 0;         /* å®Ÿè¡ŒçµŒéæ™‚é–“(æœ€åˆã®Window.loopã‹ã‚‰)*/
+static int g_skip                     = 0;         /* ã‚¹ã‚­ãƒƒãƒ—ã—ãŸãƒ•ãƒ¬ãƒ¼ãƒ ã¯1ã«ãªã‚‹      */
+int g_sync                     = 0;         /* å‚ç›´åŒæœŸãƒ¢ãƒ¼ãƒ‰ = 1                 */
 int retry_flag = 0;
 static HCURSOR mouse_cursor;
 BYTE g_byMouseState_L_buf;
 BYTE g_byMouseState_M_buf;
 BYTE g_byMouseState_R_buf;
 
-/* ƒGƒ“ƒR[ƒfƒBƒ“ƒOî•ñ */
+/* ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°æƒ…å ± */
 rb_encoding *g_enc_sys;
 rb_encoding *g_enc_utf16;
 rb_encoding *g_enc_utf8;
 
-/* ƒVƒXƒeƒ€ƒGƒ“ƒR[ƒh */
+/* ã‚·ã‚¹ãƒ†ãƒ ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ */
 char sys_encode[256];
 
-/* ƒEƒBƒ“ƒhƒEî•ñ */
+/* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦æƒ…å ± */
 struct DXRubyWindowInfo g_WindowInfo;
 
-/* PictureŒnŠî’ê\‘¢‘Ì */
+/* Pictureç³»åŸºåº•æ§‹é€ ä½“ */
 struct DXRubyPicture {
     void (*func)(void*);
     VALUE value;
-    unsigned char blendflag; /* ”¼“§–¾(000)A‰ÁZ‡¬1(100)A‰ÁZ‡¬2(101)AŒ¸Z‡¬1(110)AŒ¸Z‡¬2(111)‚Ìƒtƒ‰ƒO */
+    unsigned char blendflag; /* åŠé€æ˜(000)ã€åŠ ç®—åˆæˆ1(100)ã€åŠ ç®—åˆæˆ2(101)ã€æ¸›ç®—åˆæˆ1(110)ã€æ¸›ç®—åˆæˆ2(111)ã®ãƒ•ãƒ©ã‚° */
     char reserve1;
     char reserve2;
     char reserve3;
@@ -94,14 +94,14 @@ typedef struct tag_dx_TLVERTEX2 {
     D3DCOLOR        color;
 }TLVERTX2;
 
-/* ƒfƒoƒCƒXƒƒXƒg‚Å‰ğ•úE•œŒ³‚·‚é‚à‚Ì */
+/* ãƒ‡ãƒã‚¤ã‚¹ãƒ­ã‚¹ãƒˆã§è§£æ”¾ãƒ»å¾©å…ƒã™ã‚‹ã‚‚ã® */
 struct DXRubyLostList {
     void **pointer;
     int allocate_size;
     int count;
 } g_RenderTargetList, g_ShaderCoreList;
 
-/* ƒVƒ“ƒ{ƒ‹ */
+/* ã‚·ãƒ³ãƒœãƒ« */
 VALUE symbol_blend   = Qundef;
 VALUE symbol_angle   = Qundef;
 VALUE symbol_alpha   = Qundef;
@@ -143,7 +143,7 @@ VALUE symbol_discard = Qundef;
 VALUE symbol_aa = Qundef;
 VALUE symbol_call = Qundef;
 
-/* ƒvƒƒgƒ^ƒCƒvéŒ¾ */
+/* ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€ */
 static void InitWindow( void );
 static void InitDXGraphics( void );
 LRESULT CALLBACK MainWndProc( HWND hWnd,UINT msg,UINT wParam,LONG lParam );
@@ -182,11 +182,11 @@ static void Window_createCircleFillShader(void);
 static void CleanRenderTargetList( void );
 
 /*********************************************************************
- * Windowƒ‚ƒWƒ…[ƒ‹
- * ƒEƒBƒ“ƒhƒE‚ÌŠÇ—E•`‰æ‚ğs‚¤B
+ * Windowãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«
+ * ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç®¡ç†ãƒ»æç”»ã‚’è¡Œã†ã€‚
  *********************************************************************/
 /*--------------------------------------------------------------------
-   ‰æ–ÊƒNƒŠƒAFæ“¾
+   ç”»é¢ã‚¯ãƒªã‚¢è‰²å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Window_get_bgcolor( VALUE obj )
 {
@@ -196,7 +196,7 @@ static VALUE Window_get_bgcolor( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ‰æ–ÊƒNƒŠƒAFw’è
+   ç”»é¢ã‚¯ãƒªã‚¢è‰²æŒ‡å®š
  ---------------------------------------------------------------------*/
 static VALUE Window_set_bgcolor( VALUE obj, VALUE array )
 {
@@ -223,7 +223,7 @@ static VALUE Window_set_bgcolor( VALUE obj, VALUE array )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi’Êí•`‰æj
+   æç”»è¨­å®šï¼ˆé€šå¸¸æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_draw( int argc, VALUE *argv, VALUE obj )
 {
@@ -232,7 +232,7 @@ static VALUE Window_draw( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi“_•`‰æj
+   æç”»è¨­å®šï¼ˆç‚¹æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawPixel( int argc, VALUE *argv, VALUE obj )
 {
@@ -241,7 +241,7 @@ static VALUE Window_drawPixel( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiü•`‰æj
+   æç”»è¨­å®šï¼ˆç·šæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawLine( int argc, VALUE *argv, VALUE obj )
 {
@@ -250,7 +250,7 @@ static VALUE Window_drawLine( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èilŠpŒ`•`‰æj
+   æç”»è¨­å®šï¼ˆå››è§’å½¢æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawBox( int argc, VALUE *argv, VALUE obj )
 {
@@ -259,7 +259,7 @@ static VALUE Window_drawBox( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi“h‚è’×‚µlŠpŒ`•`‰æj
+   æç”»è¨­å®šï¼ˆå¡—ã‚Šæ½°ã—å››è§’å½¢æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawBoxFill( int argc, VALUE *argv, VALUE obj )
 {
@@ -268,7 +268,7 @@ static VALUE Window_drawBoxFill( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi“h‚è’×‚µ‰~•`‰æj
+   æç”»è¨­å®šï¼ˆå¡—ã‚Šæ½°ã—å††æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawCircleFill( int argc, VALUE *argv, VALUE obj )
 {
@@ -277,7 +277,7 @@ static VALUE Window_drawCircleFill( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi‰~•`‰æj
+   æç”»è¨­å®šï¼ˆå††æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawCircle( int argc, VALUE *argv, VALUE obj )
 {
@@ -286,7 +286,7 @@ static VALUE Window_drawCircle( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi”¼“§–¾•`‰æj
+   æç”»è¨­å®šï¼ˆåŠé€æ˜æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawAlpha( int argc, VALUE *argv, VALUE obj )
 {
@@ -296,7 +296,7 @@ static VALUE Window_drawAlpha( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi‰ÁZ‡¬•`‰æj
+   æç”»è¨­å®šï¼ˆåŠ ç®—åˆæˆæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawAdd( int argc, VALUE *argv, VALUE obj )
 {
@@ -306,7 +306,7 @@ static VALUE Window_drawAdd( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiŒ¸Z‡¬•`‰æj
+   æç”»è¨­å®šï¼ˆæ¸›ç®—åˆæˆæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawSub( int argc, VALUE *argv, VALUE obj )
 {
@@ -316,7 +316,7 @@ static VALUE Window_drawSub( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiƒVƒF[ƒ_•`‰æj
+   æç”»è¨­å®šï¼ˆã‚·ã‚§ãƒ¼ãƒ€æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawShader( int argc, VALUE *argv, VALUE obj )
 {
@@ -326,7 +326,7 @@ static VALUE Window_drawShader( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiŠg‘åk¬•`‰æj
+   æç”»è¨­å®šï¼ˆæ‹¡å¤§ç¸®å°æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawScale( int argc, VALUE *argv, VALUE obj )
 {
@@ -335,7 +335,7 @@ static VALUE Window_drawScale( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi‰ñ“]•`‰æj
+   æç”»è¨­å®šï¼ˆå›è»¢æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawRot( int argc, VALUE *argv, VALUE obj )
 {
@@ -344,7 +344,7 @@ static VALUE Window_drawRot( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiƒtƒ‹ƒIƒvƒVƒ‡ƒ“j
+   æç”»è¨­å®šï¼ˆãƒ•ãƒ«ã‚ªãƒ—ã‚·ãƒ§ãƒ³ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawEx( int argc, VALUE *argv, VALUE obj )
 {
@@ -354,7 +354,7 @@ static VALUE Window_drawEx( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒtƒHƒ“ƒg•`‰æ
+   ãƒ•ã‚©ãƒ³ãƒˆæç”»
  ---------------------------------------------------------------------*/
 static VALUE Window_drawFont( int argc, VALUE *argv, VALUE obj )
 {
@@ -363,7 +363,7 @@ static VALUE Window_drawFont( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   ‚•i¿ƒtƒHƒ“ƒg•`‰æ
+   é«˜å“è³ªãƒ•ã‚©ãƒ³ãƒˆæç”»
  ---------------------------------------------------------------------*/
 static VALUE Window_drawFontEx( int argc, VALUE *argv, VALUE obj )
 {
@@ -373,7 +373,7 @@ static VALUE Window_drawFontEx( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi4“_w’èj
+   æç”»è¨­å®šï¼ˆ4ç‚¹æŒ‡å®šï¼‰
  ---------------------------------------------------------------------*/
 static VALUE Window_drawMorph( int argc, VALUE *argv, VALUE obj )
 {
@@ -383,7 +383,7 @@ static VALUE Window_drawMorph( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒbƒv•`‰æ
+   ãƒãƒƒãƒ—æç”»
  ---------------------------------------------------------------------*/
 static VALUE Window_drawTile( int argc, VALUE *argv, VALUE obj )
 {
@@ -393,7 +393,7 @@ static VALUE Window_drawTile( int argc, VALUE *argv, VALUE obj )
 
 
 ///*--------------------------------------------------------------------
-//   Sprite•`‰æ
+//   Spriteæç”»
 // ---------------------------------------------------------------------*/
 //static VALUE Window_drawSprite( VALUE obj, VALUE varg )
 //{
@@ -409,7 +409,7 @@ static VALUE Window_create( VALUE klass )
         WindowCreateMessage();
         g_WindowInfo.requestclose = 0;
 
-        /* ƒtƒŒ[ƒ€’²®ˆ—‰Šú‰» */
+        /* ãƒ•ãƒ¬ãƒ¼ãƒ èª¿æ•´å‡¦ç†åˆæœŸåŒ– */
         g_StartTime = GetSystemCounter();
         g_RunningTime = 0;
     }
@@ -436,10 +436,10 @@ static VALUE Window_loop( int argc, VALUE *argv, VALUE obj )
         Window_create( obj );
     }
 
-    /* I—¹ğŒ‚ª–³‚¢ */
+    /* çµ‚äº†æ¡ä»¶ãŒç„¡ã„ */
     while( 1 )
     {
-        /* ©“®“I‚É•Â‚¶‚éê‡‚Íxƒ{ƒ^ƒ“‚Å•Â‚¶‚é */
+        /* è‡ªå‹•çš„ã«é–‰ã˜ã‚‹å ´åˆã¯xãƒœã‚¿ãƒ³ã§é–‰ã˜ã‚‹ */
         if( g_WindowInfo.requestclose == 1 )
         {
             if( !RTEST( vclose_cancel ) )
@@ -451,29 +451,29 @@ static VALUE Window_loop( int argc, VALUE *argv, VALUE obj )
             }
         }
 
-        /* ƒƒbƒZ[ƒW‚ª–³‚¢ */
-        /* “ü—Íó‘ÔXV */
+        /* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒç„¡ã„æ™‚ */
+        /* å…¥åŠ›çŠ¶æ…‹æ›´æ–° */
         inputupdate_internal();
 
-        /* before_callˆ— */
+        /* before_callå‡¦ç† */
         rb_hash_foreach( g_WindowInfo.before_call, Window_autocall_foreach, obj );
 
-        /* ƒuƒƒbƒNÀs */
+        /* ãƒ–ãƒ­ãƒƒã‚¯å®Ÿè¡Œ */
         rb_yield( obj );
 
-        /* ƒuƒƒbƒNI—¹‚ÉƒEƒBƒ“ƒhƒE‚ª•Â‚¶‚ç‚ê‚Ä‚¢‚½‚çI—¹‚·‚é */
+        /* ãƒ–ãƒ­ãƒƒã‚¯çµ‚äº†æ™‚ã«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒé–‰ã˜ã‚‰ã‚Œã¦ã„ãŸã‚‰çµ‚äº†ã™ã‚‹ */
         if( !g_WindowInfo.created )
         {
             break;
         }
 
-        /* after_callˆ— */
+        /* after_callå‡¦ç† */
         rb_hash_foreach( g_WindowInfo.after_call, Window_autocall_foreach, obj );
 
-        /* fps’²® */
+        /* fpsèª¿æ•´ */
         Window_sync( obj );
 
-        /* •`‰æ */
+        /* æç”» */
         Window_update( Qnil );
     }
 
@@ -502,7 +502,7 @@ static VALUE Window_get_closed( VALUE klass )
 }
 
 /*--------------------------------------------------------------------
-   ‰æ–ÊXV
+   ç”»é¢æ›´æ–°
  ---------------------------------------------------------------------*/
 static VALUE Window_update( VALUE obj )
 {
@@ -515,7 +515,7 @@ static VALUE Window_update( VALUE obj )
         rb_hash_foreach( g_WindowInfo.after_call, Window_autocall_foreach, obj );
     }
 
-    if( g_sync == 0 ) // ”ñ“¯Šúƒ‚[ƒh
+    if( g_sync == 0 ) // éåŒæœŸãƒ¢ãƒ¼ãƒ‰
     {
         if( g_skip == 0 )
         {
@@ -527,7 +527,7 @@ static VALUE Window_update( VALUE obj )
             }
         }
     }
-    else // “¯Šúƒ‚[ƒh
+    else // åŒæœŸãƒ¢ãƒ¼ãƒ‰
     {
         if( g_skip == 0 )
         {
@@ -541,9 +541,9 @@ static VALUE Window_update( VALUE obj )
 
             g_OneFrameCount = GetSystemCounter() - g_OldTime;
 
-            if( GetSystemCounter() > g_OldTime + g_OneSecondCount / g_WindowInfo.fps * 1.5 ) // ƒtƒŒ[ƒ€“à‚Éû‚Ü‚ç‚È‚©‚Á‚½
+            if( GetSystemCounter() > g_OldTime + g_OneSecondCount / g_WindowInfo.fps * 1.5 ) // ãƒ•ãƒ¬ãƒ¼ãƒ å†…ã«åã¾ã‚‰ãªã‹ã£ãŸ
             {
-                // ŸƒtƒŒ[ƒ€‚ÍƒXƒLƒbƒv
+                // æ¬¡ãƒ•ãƒ¬ãƒ¼ãƒ ã¯ã‚¹ã‚­ãƒƒãƒ—
                 g_skip = 1;
             }
 
@@ -551,13 +551,13 @@ static VALUE Window_update( VALUE obj )
         }
         else
         {
-            // ƒXƒLƒbƒv‚µ‚½‚çŸ‚Í•’Ê‚ÉB
+            // ã‚¹ã‚­ãƒƒãƒ—ã—ãŸã‚‰æ¬¡ã¯æ™®é€šã«ã€‚
             g_skip = 0;
             g_OldTime += g_OneSecondCount / g_WindowInfo.fps;
         }
     }
 
-    // ƒfƒoƒCƒXƒƒXƒg‚©‚ç•œ‹A‚µ‚½
+    // ãƒ‡ãƒã‚¤ã‚¹ãƒ­ã‚¹ãƒˆã‹ã‚‰å¾©å¸°ã—ãŸ
     if( ret == 0 )
     {
         rb_gc_start();
@@ -567,7 +567,7 @@ static VALUE Window_update( VALUE obj )
             {
                 struct DXRubyRenderTarget *rt = (struct DXRubyRenderTarget *)g_RenderTargetList.pointer[i];
 #ifdef DXRUBY15
-                // Ä¶¬Proc‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡
+                // å†ç”ŸæˆProcãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆ
                 if( rt->vregenerate_proc != Qnil )
                 {
                     rb_funcall( rt->vregenerate_proc, SYM2ID( symbol_call ), 0 );
@@ -578,7 +578,7 @@ static VALUE Window_update( VALUE obj )
         }
     }
 
-    // Window‚ÉŠÖ˜A•t‚¯‚ç‚ê‚½“à•”¶¬Image‚Ì”jŠü
+    // Windowã«é–¢é€£ä»˜ã‘ã‚‰ã‚ŒãŸå†…éƒ¨ç”ŸæˆImageã®ç ´æ£„
     {
         struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, g_WindowInfo.render_target );
         rt->PictureCount = 0;
@@ -601,7 +601,7 @@ static VALUE Window_update( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-  i“à•”ŠÖ”jƒtƒŒ[ƒ€’²®
+  ï¼ˆå†…éƒ¨é–¢æ•°ï¼‰ãƒ•ãƒ¬ãƒ¼ãƒ èª¿æ•´
  ---------------------------------------------------------------------*/
 static VALUE Window_sync( VALUE obj )
 {
@@ -614,17 +614,17 @@ static VALUE Window_sync( VALUE obj )
 
     NowTime = GetSystemCounter();
 
-    /* ”ñ“¯Šúƒ‚[ƒh */
+    /* éåŒæœŸãƒ¢ãƒ¼ãƒ‰æ™‚ */
     if( g_sync == 0 )
     {
         g_OneFrameCount = NowTime - g_OldTime;
-        if ( g_WindowInfo.fps > 0 ) /* fpsw’è‚ªnil or 0‚Ì‚ÍWaitˆ—‚µ‚È‚¢ */
+        if ( g_WindowInfo.fps > 0 ) /* fpsæŒ‡å®šãŒnil or 0ã®æ™‚ã¯Waitå‡¦ç†ã—ãªã„ */
         {
             __int64 SleepTime;
 
             WaitTime = g_OneSecondCount / g_WindowInfo.fps;
 
-            /* Œë·•â³ */
+            /* èª¤å·®è£œæ­£ */
             mod += g_OneSecondCount % g_WindowInfo.fps;
             if( mod >= g_WindowInfo.fps )
             {
@@ -632,19 +632,19 @@ static VALUE Window_sync( VALUE obj )
                 WaitTime += 1;
             }
 
-            /* ‚à‚¤Šù‚É‘O‰ñ‚©‚ç‚PƒtƒŒ[ƒ€•ª‚ÌŠÔ‚ªŒo‚Á‚Ä‚¢‚½‚ç */
+            /* ã‚‚ã†æ—¢ã«å‰å›ã‹ã‚‰ï¼‘ãƒ•ãƒ¬ãƒ¼ãƒ åˆ†ã®æ™‚é–“ãŒçµŒã£ã¦ã„ãŸã‚‰ */
             if( g_OldTime + WaitTime < NowTime && g_skip == 0 )
             {
-                /* ƒRƒ}—‚¿§Œä‚µ‚È‚¢ê‡ */
+                /* ã‚³ãƒè½ã¡åˆ¶å¾¡ã—ãªã„å ´åˆ */
                 if( g_WindowInfo.frameskip == Qfalse )
                 {
                     fps++;
                     g_OldTime = NowTime;
                 }
-                else /* ‚·‚éê‡ */
+                else /* ã™ã‚‹å ´åˆ */
                 {
                     struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, g_WindowInfo.render_target );
-                    /* ¡‰ñ‚ÍƒEƒFƒCƒg‚à•`‰æ‚à‚µ‚È‚¢ */
+                    /* ä»Šå›ã¯ã‚¦ã‚§ã‚¤ãƒˆã‚‚æç”»ã‚‚ã—ãªã„ */
                     g_skip = 1;
                     rt->PictureCount = 0;
                     rt->PictureSize = 0;
@@ -655,23 +655,23 @@ static VALUE Window_sync( VALUE obj )
             }
             else
             {
-                /* ‘O‰ñ•`‰æ‚ğ”ò‚Î‚µ‚½‚Ì‚É¡‰ñ‚àŠÔ‚É‡‚Á‚Ä‚È‚¢ê‡ */
+                /* å‰å›æç”»ã‚’é£›ã°ã—ãŸã®ã«ä»Šå›ã‚‚é–“ã«åˆã£ã¦ãªã„å ´åˆ */
                 if( g_OldTime + WaitTime < NowTime && g_skip == 1 )
                 {
-                    /* ’ú‚ß‚Äˆ——‚¿ */
+                    /* è«¦ã‚ã¦å‡¦ç†è½ã¡ */
                     g_OldTime = NowTime;
                 }
                 else
                 {
                     __int64 TempTime;
-                    /* ‚¨‚¨‚Ü‚©‚ÈŠÔ‚ğSleep‚Å‘Ò‚Â */
+                    /* ãŠãŠã¾ã‹ãªæ™‚é–“ã‚’Sleepã§å¾…ã¤ */
                     while( (WaitTime - (GetSystemCounter() - g_OldTime)) * 1000 / g_OneSecondCount > 2 )
                     {
 //                        Sleep(1);
                         rb_thread_wait_for(rb_time_interval(rb_float_new(1.0 / 1000.0)));
                     }
 
-                    /* ƒ‹[ƒv‚ÅŒµ–§‚Éˆ—‚ğ‚·‚é */
+                    /* ãƒ«ãƒ¼ãƒ—ã§å³å¯†ã«å‡¦ç†ã‚’ã™ã‚‹ */
                     for ( ; ; )
                     {
                         TempTime = GetSystemCounter();
@@ -693,7 +693,7 @@ static VALUE Window_sync( VALUE obj )
             fps++;
         }
     }
-    else // “¯Šúƒ‚[ƒh
+    else // åŒæœŸãƒ¢ãƒ¼ãƒ‰
     {
         if( g_skip == 0 )
         {
@@ -701,7 +701,7 @@ static VALUE Window_sync( VALUE obj )
         }
     }
 
-    /* FPS’lİ’è */
+    /* FPSå€¤è¨­å®š */
     if( (NowTime - BeforeSecond) >= g_OneSecondCount )
     {
         BeforeSecond = NowTime;
@@ -713,7 +713,7 @@ static VALUE Window_sync( VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-  i“à•”ŠÖ”jƒtƒŒ[ƒ€’²®—pƒJƒEƒ“ƒ^’læ“¾
+  ï¼ˆå†…éƒ¨é–¢æ•°ï¼‰ãƒ•ãƒ¬ãƒ¼ãƒ èª¿æ•´ç”¨ã‚«ã‚¦ãƒ³ã‚¿å€¤å–å¾—
  ---------------------------------------------------------------------*/
 static __int64 GetSystemCounter( void )
 {
@@ -732,25 +732,25 @@ static __int64 GetSystemCounter( void )
 
 
 /*--------------------------------------------------------------------
-   I—¹‚ÉÀs‚·‚é
+   çµ‚äº†æ™‚ã«å®Ÿè¡Œã™ã‚‹
  ---------------------------------------------------------------------*/
 static void Window_shutdown( VALUE obj )
 {
     struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, g_WindowInfo.render_target );
 
-    /* ƒAƒCƒRƒ“ƒŠƒ\[ƒX‰ğ•ú */
+    /* ã‚¢ã‚¤ã‚³ãƒ³ãƒªã‚½ãƒ¼ã‚¹è§£æ”¾ */
     if( g_WindowInfo.hIcon != 0 )
     {
         DestroyIcon(g_WindowInfo.hIcon);
     }
 
-    /* ƒ}ƒEƒXó‘Ô•œŒ³ */
+    /* ãƒã‚¦ã‚¹çŠ¶æ…‹å¾©å…ƒ */
     if( !g_WindowInfo.enablemouse )
     {
         ShowCursorMessage();
     }
 
-    /* ƒŠƒXƒg‰ğ•ú */
+    /* ãƒªã‚¹ãƒˆè§£æ”¾ */
     free( rt->PictureList );
     free( rt->PictureStruct );
     rt->PictureCount = 0;
@@ -759,19 +759,19 @@ static void Window_shutdown( VALUE obj )
 #endif
     ExitMessageThread();
 
-    /* ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ğ–ß‚· */
+    /* ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã‚’æˆ»ã™ */
     SetCursor( mouse_cursor );
 
-    /* ƒtƒŒ[ƒ€’²®‚ÌŒãn–– */
+    /* ãƒ•ãƒ¬ãƒ¼ãƒ èª¿æ•´ã®å¾Œå§‹æœ« */
     timeEndPeriod( 1 );
 
-    /* Image‚ÌI—¹ˆ— */
+    /* Imageã®çµ‚äº†å‡¦ç† */
     finalize_dxruby_Image();
 }
 
 
 /*--------------------------------------------------------------------
-    Œo‰ßŠÔæ“¾
+    çµŒéæ™‚é–“å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Window_running_time( VALUE klass )
 {
@@ -785,7 +785,7 @@ static VALUE Window_running_time( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚ğ•ÏX‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_resize( VALUE klass, VALUE vwidth, VALUE vheight )
 {
@@ -801,7 +801,7 @@ static VALUE Window_resize( VALUE klass, VALUE vwidth, VALUE vheight )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚Ìƒ‚[ƒhiƒEƒBƒ“ƒhƒE/‘S‰æ–Êj‚ğİ’è‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒ¢ãƒ¼ãƒ‰ï¼ˆã‚¦ã‚£ãƒ³ãƒ‰ã‚¦/å…¨ç”»é¢ï¼‰ã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_setwindowed( VALUE klass, VALUE vwindowed )
 {
@@ -821,7 +821,7 @@ static VALUE Window_setwindowed( VALUE klass, VALUE vwindowed )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚Ìƒ‚[ƒhiƒEƒBƒ“ƒhƒE/‘S‰æ–Êj‚ğİ’è‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒ¢ãƒ¼ãƒ‰ï¼ˆã‚¦ã‚£ãƒ³ãƒ‰ã‚¦/å…¨ç”»é¢ï¼‰ã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_setfullscreen( VALUE klass, VALUE vfullscreen )
 {
@@ -841,7 +841,7 @@ static VALUE Window_setfullscreen( VALUE klass, VALUE vfullscreen )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚Ìƒ‚[ƒhiƒEƒBƒ“ƒhƒE/‘S‰æ–Êj‚ğæ“¾‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒ¢ãƒ¼ãƒ‰ï¼ˆã‚¦ã‚£ãƒ³ãƒ‰ã‚¦/å…¨ç”»é¢ï¼‰ã‚’å–å¾—ã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_getwindowed( VALUE klass )
 {
@@ -850,7 +850,7 @@ static VALUE Window_getwindowed( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚Ìƒ‚[ƒhiƒEƒBƒ“ƒhƒE/‘S‰æ–Êj‚ğæ“¾‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒ¢ãƒ¼ãƒ‰ï¼ˆã‚¦ã‚£ãƒ³ãƒ‰ã‚¦/å…¨ç”»é¢ï¼‰ã‚’å–å¾—ã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_getfullscreen( VALUE klass )
 {
@@ -859,7 +859,7 @@ static VALUE Window_getfullscreen( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚ÌˆÊ’uixÀ•Wj‚ğİ’è‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ï¼ˆxåº§æ¨™ï¼‰ã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_setx( VALUE klass, VALUE x )
 {
@@ -874,7 +874,7 @@ static VALUE Window_setx( VALUE klass, VALUE x )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚ÌˆÊ’uiyÀ•Wj‚ğİ’è‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ï¼ˆyåº§æ¨™ï¼‰ã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_sety( VALUE klass , VALUE y )
 {
@@ -889,7 +889,7 @@ static VALUE Window_sety( VALUE klass , VALUE y )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒYi•j‚ğİ’è‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºï¼ˆå¹…ï¼‰ã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_setwidth( VALUE klass, VALUE vwidth )
 {
@@ -912,7 +912,7 @@ static VALUE Window_setwidth( VALUE klass, VALUE vwidth )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒYi‚‚³j‚ğİ’è‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºï¼ˆé«˜ã•ï¼‰ã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_setheight( VALUE klass , VALUE vheight)
 {
@@ -935,7 +935,7 @@ static VALUE Window_setheight( VALUE klass , VALUE vheight)
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚ÌˆÊ’uixÀ•Wj‚ğ•Ô‚·B
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ï¼ˆxåº§æ¨™ï¼‰ã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_x( VALUE klass )
 {
@@ -944,7 +944,7 @@ static VALUE Window_x( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚ÌˆÊ’uiyÀ•Wj‚ğ•Ô‚·B
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ï¼ˆyåº§æ¨™ï¼‰ã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_y( VALUE klass )
 {
@@ -953,7 +953,7 @@ static VALUE Window_y( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒYi•j‚ğ•Ô‚·B
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºï¼ˆå¹…ï¼‰ã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_width( VALUE klass )
 {
@@ -962,7 +962,7 @@ static VALUE Window_width( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒYi‚‚³j‚ğ•Ô‚·B
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºï¼ˆé«˜ã•ï¼‰ã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_height( VALUE klass )
 {
@@ -971,7 +971,7 @@ static VALUE Window_height( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚Ì•`‰æŠJnˆÊ’ux‚ğ•Ô‚·B
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®æç”»é–‹å§‹ä½ç½®xã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_getOx( VALUE self )
 {
@@ -981,7 +981,7 @@ static VALUE Window_getOx( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚Ì•`‰æŠJnˆÊ’uy‚ğ•Ô‚·B
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®æç”»é–‹å§‹ä½ç½®yã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_getOy( VALUE self )
 {
@@ -991,7 +991,7 @@ static VALUE Window_getOy( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚Ì•`‰æŠJnˆÊ’ux‚ğİ’è‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®æç”»é–‹å§‹ä½ç½®xã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_setOx( VALUE self, VALUE vox )
 {
@@ -1002,7 +1002,7 @@ static VALUE Window_setOx( VALUE self, VALUE vox )
 
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚Ì•`‰æŠJnˆÊ’uy‚ğİ’è‚·‚éB
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®æç”»é–‹å§‹ä½ç½®yã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Window_setOy( VALUE self, VALUE voy )
 {
@@ -1013,7 +1013,7 @@ static VALUE Window_setOy( VALUE self, VALUE voy )
 
 
 /*--------------------------------------------------------------------
-  ƒEƒBƒ“ƒhƒEƒ^ƒCƒgƒ‹æ“¾
+  ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¿ã‚¤ãƒˆãƒ«å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Window_getCaption( VALUE klass )
 {
@@ -1035,7 +1035,7 @@ static VALUE Window_getCaption( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-  ƒEƒBƒ“ƒhƒEƒ^ƒCƒgƒ‹İ’è
+  ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¿ã‚¤ãƒˆãƒ«è¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE Window_setCaption( VALUE klass, VALUE vcaption )
 {
@@ -1060,7 +1060,7 @@ static VALUE Window_setCaption( VALUE klass, VALUE vcaption )
 
 
 /*--------------------------------------------------------------------
-  ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY”{—¦‚ğæ“¾‚·‚é
+  ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºå€ç‡ã‚’å–å¾—ã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_getScale( VALUE klass )
 {
@@ -1069,7 +1069,7 @@ static VALUE Window_getScale( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-  ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY”{—¦‚ğİ’è‚·‚é
+  ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºå€ç‡ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_setScale( VALUE klass, VALUE vscale )
 {
@@ -1080,7 +1080,7 @@ static VALUE Window_setScale( VALUE klass, VALUE vscale )
 
 
 /*--------------------------------------------------------------------
-  fps’l‚ğİ’è‚·‚é
+  fpså€¤ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_getrealfps( VALUE obj )
 {
@@ -1089,7 +1089,7 @@ static VALUE Window_getrealfps( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-  fps’l‚ğæ“¾‚·‚é
+  fpså€¤ã‚’å–å¾—ã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_getfps( VALUE obj )
 {
@@ -1098,7 +1098,7 @@ static VALUE Window_getfps( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-  fps’l‚ğİ’è‚·‚é
+  fpså€¤ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_setfps( VALUE obj, VALUE vfps )
 {
@@ -1109,7 +1109,7 @@ static VALUE Window_setfps( VALUE obj, VALUE vfps )
 
 
 /*--------------------------------------------------------------------
-   k¬ƒtƒBƒ‹ƒ^æ“¾
+   ç¸®å°ãƒ•ã‚£ãƒ«ã‚¿å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Window_getMinFilter( VALUE obj )
 {
@@ -1119,7 +1119,7 @@ static VALUE Window_getMinFilter( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   k¬ƒtƒBƒ‹ƒ^İ’è
+   ç¸®å°ãƒ•ã‚£ãƒ«ã‚¿è¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE Window_setMinFilter( VALUE obj, VALUE vminfilter )
 {
@@ -1130,7 +1130,7 @@ static VALUE Window_setMinFilter( VALUE obj, VALUE vminfilter )
 
 
 /*--------------------------------------------------------------------
-   Šg‘åƒtƒBƒ‹ƒ^æ“¾
+   æ‹¡å¤§ãƒ•ã‚£ãƒ«ã‚¿å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Window_getMagFilter( VALUE obj )
 {
@@ -1140,7 +1140,7 @@ static VALUE Window_getMagFilter( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Šg‘åƒtƒBƒ‹ƒ^İ’è
+   æ‹¡å¤§ãƒ•ã‚£ãƒ«ã‚¿è¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE Window_setMagFilter( VALUE obj, VALUE vmagfilter )
 {
@@ -1151,7 +1151,7 @@ static VALUE Window_setMagFilter( VALUE obj, VALUE vmagfilter )
 
 
 /*--------------------------------------------------------------------
-   •`‰æ—\–ñŠm’è
+   æç”»äºˆç´„ç¢ºå®š
  ---------------------------------------------------------------------*/
 static VALUE Window_decide( VALUE obj )
 {
@@ -1163,7 +1163,7 @@ static VALUE Window_decide( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   •`‰æ—\–ñ”jŠü
+   æç”»äºˆç´„ç ´æ£„
  ---------------------------------------------------------------------*/
 static VALUE Window_discard( VALUE obj )
 {
@@ -1175,7 +1175,7 @@ static VALUE Window_discard( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-  1ƒtƒŒ[ƒ€‚Ìˆ—•‰‰×‚ğ“‚Åæ“¾‚·‚é
+  1ãƒ•ãƒ¬ãƒ¼ãƒ ã®å‡¦ç†è² è·ã‚’ï¼…ã§å–å¾—ã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_getload( VALUE obj )
 {
@@ -1188,7 +1188,7 @@ static VALUE Window_getload( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-  ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚é
+  ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«ã‚’å–å¾—ã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_gethWnd( VALUE obj )
 {
@@ -1197,7 +1197,7 @@ static VALUE Window_gethWnd( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-  ƒtƒŒ[ƒ€ƒXƒLƒbƒvon/off‚ğæ“¾‚·‚é
+  ãƒ•ãƒ¬ãƒ¼ãƒ ã‚¹ã‚­ãƒƒãƒ—on/offã‚’å–å¾—ã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_getframeskip( VALUE obj )
 {
@@ -1206,7 +1206,7 @@ static VALUE Window_getframeskip( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-  ƒtƒŒ[ƒ€ƒXƒLƒbƒvon/off‚ğİ’è‚·‚é
+  ãƒ•ãƒ¬ãƒ¼ãƒ ã‚¹ã‚­ãƒƒãƒ—on/offã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_setframeskip( VALUE obj, VALUE vskip )
 {
@@ -1217,7 +1217,7 @@ static VALUE Window_setframeskip( VALUE obj, VALUE vskip )
 
 
 /*--------------------------------------------------------------------
-  ƒEƒBƒ“ƒhƒE‚ÌƒAƒNƒeƒBƒuó‘Ô‚ğæ“¾
+  ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹ã‚’å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Window_get_active( VALUE obj )
 {
@@ -1226,7 +1226,7 @@ static VALUE Window_get_active( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-  ƒEƒBƒ“ƒhƒEƒAƒCƒRƒ“‚ğİ’è‚·‚é
+  ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¢ã‚¤ã‚³ãƒ³ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_loadIcon( VALUE obj, VALUE vfilename )
 {
@@ -1242,7 +1242,7 @@ static VALUE Window_loadIcon( VALUE obj, VALUE vfilename )
         vsjisstr = vfilename;
     }
 
-    /* ƒAƒCƒRƒ“ƒŠƒ\[ƒX‰ğ•ú */
+    /* ã‚¢ã‚¤ã‚³ãƒ³ãƒªã‚½ãƒ¼ã‚¹è§£æ”¾ */
     if( g_WindowInfo.hIcon != 0 )
     {
         DestroyIcon(g_WindowInfo.hIcon);
@@ -1261,7 +1261,7 @@ static VALUE Window_loadIcon( VALUE obj, VALUE vfilename )
 
 
 /*--------------------------------------------------------------------
-  ƒtƒ@ƒCƒ‹ƒI[ƒvƒ“ƒ_ƒCƒAƒƒO‚ğ•\¦‚·‚é
+  ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_openDialog(VALUE obj, VALUE vfilter, VALUE vtitle)
 {
@@ -1346,7 +1346,7 @@ static VALUE Window_openDialog(VALUE obj, VALUE vfilter, VALUE vtitle)
 
 
 /*--------------------------------------------------------------------
-  ƒtƒ@ƒCƒ‹ƒZ[ƒuƒ_ƒCƒAƒƒO‚ğ•\¦‚·‚é
+  ãƒ•ã‚¡ã‚¤ãƒ«ã‚»ãƒ¼ãƒ–ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_saveDialog(VALUE obj, VALUE vfilter, VALUE vtitle)
 {
@@ -1430,7 +1430,7 @@ static VALUE Window_saveDialog(VALUE obj, VALUE vfilter, VALUE vtitle)
 
 
 /*--------------------------------------------------------------------
-  ƒtƒHƒ‹ƒ_‘I‘ğƒ_ƒCƒAƒƒO‚ğ•\¦‚·‚é
+  ãƒ•ã‚©ãƒ«ãƒ€é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã™ã‚‹
  ---------------------------------------------------------------------*/
 int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
@@ -1489,7 +1489,7 @@ static VALUE Window_folderDialog( int argc, VALUE *argv, VALUE obj )
 
     bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_DONTGOBELOWDOMAIN | BIF_NEWDIALOGSTYLE;
     bi.iImage = 0;
-    //ƒ_ƒCƒAƒƒO‚ğ•\¦
+    //ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤º
     idl = SHBrowseForFolder( &bi );
     if( idl == NULL )
     {
@@ -1498,7 +1498,7 @@ static VALUE Window_folderDialog( int argc, VALUE *argv, VALUE obj )
 
     SHGetPathFromIDList( idl, szTmp );
 
-    //PIDL‚ğ‰ğ•ú‚·‚é
+    //PIDLã‚’è§£æ”¾ã™ã‚‹
     pMalloc->lpVtbl->Free( pMalloc, idl );
     pMalloc->lpVtbl->Release( pMalloc );
 
@@ -1517,7 +1517,7 @@ static VALUE Window_folderDialog( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒXƒNƒŠ[ƒ“ƒVƒ‡ƒbƒg‚ğB‚é
+   ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚·ãƒ§ãƒƒãƒˆã‚’æ’®ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_getScreenShot( int argc, VALUE *argv, VALUE obj )
 {
@@ -1537,14 +1537,14 @@ static VALUE Window_getScreenShot( int argc, VALUE *argv, VALUE obj )
 
     Check_Type( vfilename, T_STRING );
 
-    /* Œ»İ‚ÌƒfƒBƒXƒvƒŒƒC‚ÌƒtƒH[ƒ}ƒbƒg‚È‚Ç‚ğæ“¾ */
+    /* ç¾åœ¨ã®ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãªã©ã‚’å–å¾— */
 	hr = g_pD3D->lpVtbl->GetAdapterDisplayMode(g_pD3D, D3DADAPTER_DEFAULT, &dmode);
 	if( FAILED( hr ) )
 	{
         rb_raise( eDXRubyError, "Failure to capture - GetAdapterDisplayMode" );
     }
 
-	/* ƒLƒƒƒvƒ`ƒƒ—pƒT[ƒtƒFƒXì¬ */
+	/* ã‚­ãƒ£ãƒ—ãƒãƒ£ç”¨ã‚µãƒ¼ãƒ•ã‚§ã‚¹ä½œæˆ */
 	hr = g_pD3DDevice->lpVtbl->CreateOffscreenPlainSurface(g_pD3DDevice,
 			dmode.Width,
 			dmode.Height,
@@ -1554,7 +1554,7 @@ static VALUE Window_getScreenShot( int argc, VALUE *argv, VALUE obj )
 	{
         rb_raise( eDXRubyError, "Failure to capture - CreateOffscreenPlainSurface" );
     }
-	/* ƒLƒƒƒvƒ`ƒƒ */
+	/* ã‚­ãƒ£ãƒ—ãƒãƒ£ */
 	hr = g_pD3DDevice->lpVtbl->GetFrontBufferData(g_pD3DDevice, 0, pSurface);
 	if( FAILED( hr ) )
 	{
@@ -1562,11 +1562,11 @@ static VALUE Window_getScreenShot( int argc, VALUE *argv, VALUE obj )
         rb_raise( eDXRubyError, "Failure to capture - GetFrontBufferData" );
 	}
 
-    /* ƒT[ƒtƒFƒX‚Ì•Û‘¶ */
+    /* ã‚µãƒ¼ãƒ•ã‚§ã‚¹ã®ä¿å­˜ */
     if( g_D3DPP.Windowed )
     {
         POINT p = { 0, 0 };
-        /* ƒEƒBƒ“ƒhƒE¶ã‚Ìİ’è */
+        /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å·¦ä¸Šã®è¨­å®š */
         ClientToScreen(g_hWnd  , &p);
         if( p.x < 0 )
         {
@@ -1577,7 +1577,7 @@ static VALUE Window_getScreenShot( int argc, VALUE *argv, VALUE obj )
             p.y = 0;
         }
         rect.left = p.x; rect.top = p.y;
-        /* ƒEƒBƒ“ƒhƒE‰E‰º‚Ìİ’è */
+        /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å³ä¸‹ã®è¨­å®š */
         p.x = (LONG)(g_D3DPP.BackBufferWidth * g_WindowInfo.scale);
         p.y = (LONG)(g_D3DPP.BackBufferHeight * g_WindowInfo.scale);
         ClientToScreen(g_hWnd, &p);
@@ -1632,11 +1632,11 @@ static VALUE Window_getScreenShot( int argc, VALUE *argv, VALUE obj )
     }
 
     hr = D3DXSaveSurfaceToFile(
-            RSTRING_PTR( vsjisstr ),                            /* •Û‘¶ƒtƒ@ƒCƒ‹–¼ */
-            f,                                                  /* ƒtƒ@ƒCƒ‹ƒtƒH[ƒ}ƒbƒg */
-            pSurface,                                           /* •Û‘¶‚·‚éƒT[ƒtƒFƒX */
-            NULL,                                               /* ƒpƒŒƒbƒg */
-            g_D3DPP.Windowed ? &rect : NULL);                   /* •Û‘¶—Ìˆæ */
+            RSTRING_PTR( vsjisstr ),                            /* ä¿å­˜ãƒ•ã‚¡ã‚¤ãƒ«å */
+            f,                                                  /* ãƒ•ã‚¡ã‚¤ãƒ«ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ */
+            pSurface,                                           /* ä¿å­˜ã™ã‚‹ã‚µãƒ¼ãƒ•ã‚§ã‚¹ */
+            NULL,                                               /* ãƒ‘ãƒ¬ãƒƒãƒˆ */
+            g_D3DPP.Windowed ? &rect : NULL);                   /* ä¿å­˜é ˜åŸŸ */
     RELEASE(pSurface);
 	if( FAILED( hr ) )
 	{
@@ -1648,7 +1648,7 @@ static VALUE Window_getScreenShot( int argc, VALUE *argv, VALUE obj )
 
 
 ///*--------------------------------------------------------------------
-//   Window‚ÌƒoƒbƒNƒoƒbƒtƒ@‚ğImageƒIƒuƒWƒFƒNƒg‚É‚µ‚Ä•Ô‚·
+//   Windowã®ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã‚’Imageã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã—ã¦è¿”ã™
 // ---------------------------------------------------------------------*/
 //static VALUE Window_to_image( VALUE klass )
 //{
@@ -1675,22 +1675,22 @@ static VALUE Window_getScreenShot( int argc, VALUE *argv, VALUE obj )
 //    image = DXRUBY_GET_STRUCT( Image, vimage );
 //
 //    DXRUBY_RETRY_START;
-//    /* ƒeƒNƒXƒ`ƒƒƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é */
+//    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹ */
 //    hr = D3DXCreateTexture( g_pD3DDevice, (UINT)g_WindowInfo.width, (UINT)g_WindowInfo.height,
 //                                      1, 0, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM,
 //                                      &pD3DTexture);
 //    DXRUBY_RETRY_END;
-//    if( FAILED( hr ) ) rb_raise( eDXRubyError, "ƒeƒNƒXƒ`ƒƒ‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½ - Window_to_image" );
+//    if( FAILED( hr ) ) rb_raise( eDXRubyError, "ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸ - Window_to_image" );
 //
-//    /* ƒeƒNƒXƒ`ƒƒ‚ÌƒT[ƒtƒFƒCƒX‚ğæ“¾ */
+//    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’å–å¾— */
 //    hr = pD3DTexture->lpVtbl->GetSurfaceLevel( pD3DTexture, 0, &surface );
-//    if( FAILED( hr ) ) rb_raise( eDXRubyError, "ƒT[ƒtƒFƒCƒX‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½ - Window_to_image" );
+//    if( FAILED( hr ) ) rb_raise( eDXRubyError, "ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸ - Window_to_image" );
 //
-//    /* ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒCƒ[ƒWæ“¾ */
+//    /* ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚¤ãƒ¡ãƒ¼ã‚¸å–å¾— */
 //    hr = g_pD3DDevice->lpVtbl->GetBackBuffer( g_pD3DDevice, 0, 0, D3DBACKBUFFER_TYPE_MONO , &surface );
-//    if( FAILED( hr ) ) rb_raise( eDXRubyError, "ƒCƒ[ƒW‚Ìæ“¾‚É¸”s‚µ‚Ü‚µ‚½ - Window_to_image" );
+//    if( FAILED( hr ) ) rb_raise( eDXRubyError, "ã‚¤ãƒ¡ãƒ¼ã‚¸ã®å–å¾—ã«å¤±æ•—ã—ã¾ã—ãŸ - Window_to_image" );
 //
-//    /* ƒCƒ[ƒW‚ÌƒRƒs[ */
+//    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ã‚³ãƒ”ãƒ¼ */
 //    srect.left = 0;
 //    srect.top = 0;
 //    srect.right = g_WindowInfo.width;
@@ -1724,7 +1724,7 @@ static VALUE Window_getScreenShot( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   g—p‰Â”\‚ÈƒXƒNƒŠ[ƒ“ƒTƒCƒY‚ğæ“¾‚·‚é
+   ä½¿ç”¨å¯èƒ½ãªã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_getScreenModes( VALUE obj )
 {
@@ -1752,7 +1752,7 @@ static VALUE Window_getScreenModes( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Œ»İ‚ÌƒXƒNƒŠ[ƒ“ƒTƒCƒY‚ğæ“¾‚·‚é
+   ç¾åœ¨ã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Window_getCurrentMode( VALUE obj )
 {
@@ -1772,7 +1772,7 @@ static VALUE Window_getCurrentMode( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   before_callƒnƒbƒVƒ…‚ğ•Ô‚·
+   before_callãƒãƒƒã‚·ãƒ¥ã‚’è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Window_before_call( VALUE obj )
 {
@@ -1780,7 +1780,7 @@ static VALUE Window_before_call( VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   after_callƒnƒbƒVƒ…‚ğ•Ô‚·
+   after_callãƒãƒƒã‚·ãƒ¥ã‚’è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Window_after_call( VALUE obj )
 {
@@ -1790,7 +1790,7 @@ static VALUE Window_after_call( VALUE obj )
 
 #ifdef DXRUBY15
 /*--------------------------------------------------------------------
-   ƒfƒoƒCƒXƒƒXƒg‚Ì‚æ‚¤‚È“®ì‚ğÄŒ»‚·‚éƒeƒXƒgƒƒ\ƒbƒh
+   ãƒ‡ãƒã‚¤ã‚¹ãƒ­ã‚¹ãƒˆã®ã‚ˆã†ãªå‹•ä½œã‚’å†ç¾ã™ã‚‹ãƒ†ã‚¹ãƒˆãƒ¡ã‚½ãƒƒãƒ‰
  ---------------------------------------------------------------------*/
 static VALUE Window_test_device_lost( VALUE obj )
 {
@@ -1803,7 +1803,7 @@ static VALUE Window_test_device_lost( VALUE obj )
         g_pD3DDevice->lpVtbl->Clear( g_pD3DDevice, 0, NULL, D3DCLEAR_TARGET,
                                      D3DCOLOR_ARGB( 255, 0, 0, 0 ), 1.0f, 0 );
 
-        // Ä¶¬Proc‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡
+        // å†ç”ŸæˆProcãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆ
         if( rt->vregenerate_proc != Qnil )
         {
             rb_funcall( rt->vregenerate_proc, SYM2ID( symbol_call ), 0 );
@@ -1816,16 +1816,16 @@ static VALUE Window_test_device_lost( VALUE obj )
 
 
 /*********************************************************************
- * ShaderCoreƒNƒ‰ƒX
+ * ShaderCoreã‚¯ãƒ©ã‚¹
  *
- * ƒVƒF[ƒ_ƒvƒƒOƒ‰ƒ€‚ğŠÇ—‚·‚éB
+ * ã‚·ã‚§ãƒ¼ãƒ€ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ç®¡ç†ã™ã‚‹ã€‚
  *********************************************************************/
 
 static void AddShaderCoreList( struct DXRubyShaderCore *core )
 {
     if( g_ShaderCoreList.allocate_size <= g_ShaderCoreList.count )
     {
-        g_ShaderCoreList.allocate_size = g_ShaderCoreList.allocate_size * 3 / 2; /* 1.5”{‚É‚·‚é */
+        g_ShaderCoreList.allocate_size = g_ShaderCoreList.allocate_size * 3 / 2; /* 1.5å€ã«ã™ã‚‹ */
         g_ShaderCoreList.pointer = realloc( g_ShaderCoreList.pointer, sizeof( void* ) * g_ShaderCoreList.allocate_size );
     }
 
@@ -1858,7 +1858,7 @@ static void DeleteShaderCoreList( struct DXRubyShaderCore *rt )
 }
 
 /*--------------------------------------------------------------------
-   QÆ‚³‚ê‚È‚­‚È‚Á‚½‚Æ‚«‚ÉGC‚©‚çŒÄ‚Î‚ê‚éŠÖ”
+   å‚ç…§ã•ã‚Œãªããªã£ãŸã¨ãã«GCã‹ã‚‰å‘¼ã°ã‚Œã‚‹é–¢æ•°
  ---------------------------------------------------------------------*/
 static void ShaderCore_free( struct DXRubyShaderCore *core)
 {
@@ -1876,7 +1876,7 @@ void ShaderCore_release( struct DXRubyShaderCore *core )
 }
 
 /*--------------------------------------------------------------------
-   GC‚©‚çŒÄ‚Î‚ê‚éƒ}[ƒNŠÖ”
+   GCã‹ã‚‰å‘¼ã°ã‚Œã‚‹ãƒãƒ¼ã‚¯é–¢æ•°
  ---------------------------------------------------------------------*/
 static void ShaderCore_mark( struct DXRubyShaderCore* core )
 {
@@ -1896,7 +1896,7 @@ const rb_data_type_t ShaderCore_data_type = {
 #endif
 
 /*--------------------------------------------------------------------
-   ShaderCoreƒNƒ‰ƒX‚ÌdisposeB
+   ShaderCoreã‚¯ãƒ©ã‚¹ã®disposeã€‚
  ---------------------------------------------------------------------*/
 static VALUE ShaderCore_dispose( VALUE self )
 {
@@ -1907,7 +1907,7 @@ static VALUE ShaderCore_dispose( VALUE self )
 }
 
 /*--------------------------------------------------------------------
-   ShaderCoreƒNƒ‰ƒX‚Ìdisposed?B
+   ShaderCoreã‚¯ãƒ©ã‚¹ã®disposed?ã€‚
  ---------------------------------------------------------------------*/
 static VALUE ShaderCore_check_disposed( VALUE self )
 {
@@ -1920,14 +1920,14 @@ static VALUE ShaderCore_check_disposed( VALUE self )
 }
 
 /*--------------------------------------------------------------------
-   ShaderCoreƒNƒ‰ƒX‚ÌallocateBƒƒ‚ƒŠ‚ğŠm•Û‚·‚éˆ×‚Éinitialize‘O‚ÉŒÄ‚Î‚ê‚éB
+   ShaderCoreã‚¯ãƒ©ã‚¹ã®allocateã€‚ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã™ã‚‹ç‚ºã«initializeå‰ã«å‘¼ã°ã‚Œã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE ShaderCore_allocate( VALUE klass )
 {
     VALUE obj;
     struct DXRubyShaderCore *core;
 
-    /* DXRubyShaderCore‚Ìƒƒ‚ƒŠæ“¾•ShaderCoreƒIƒuƒWƒFƒNƒg¶¬ */
+    /* DXRubyShaderCoreã®ãƒ¡ãƒ¢ãƒªå–å¾—ï¼†ShaderCoreã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ */
     core = malloc( sizeof( struct DXRubyShaderCore ) );
     if( core == NULL ) rb_raise( eDXRubyError, "Out of memory - ShaderCore_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
@@ -1935,7 +1935,7 @@ static VALUE ShaderCore_allocate( VALUE klass )
 #else
     obj = Data_Wrap_Struct( klass, ShaderCore_mark, ShaderCore_release, core );
 #endif
-    /* ‚Æ‚è‚ ‚¦‚¸ŠeƒIƒuƒWƒFƒNƒg‚ÍNULL‚É‚µ‚Ä‚¨‚­ */
+    /* ã¨ã‚Šã‚ãˆãšå„ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯NULLã«ã—ã¦ãŠã */
     core->pD3DXEffect = NULL;
     core->vtype = Qnil;
 
@@ -1943,7 +1943,7 @@ static VALUE ShaderCore_allocate( VALUE klass )
 }
 
 /*--------------------------------------------------------------------
-   ShaderCoreƒNƒ‰ƒX‚ÌgetParamB
+   ShaderCoreã‚¯ãƒ©ã‚¹ã®getParamã€‚
  ---------------------------------------------------------------------*/
 static VALUE ShaderCore_getParam( VALUE self )
 {
@@ -1954,7 +1954,7 @@ static VALUE ShaderCore_getParam( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ShaderCoreƒNƒ‰ƒX‚ÌInitialize
+   ShaderCoreã‚¯ãƒ©ã‚¹ã®Initialize
  ---------------------------------------------------------------------*/
  static VALUE ShaderCore_initialize( int argc, VALUE *argv, VALUE self )
 {
@@ -1979,7 +1979,7 @@ static VALUE ShaderCore_getParam( VALUE self )
         g_pD3DDevice, RSTRING_PTR( vhlsl ), RSTRING_LEN( vhlsl ), NULL, NULL,
         0 , NULL, &core->pD3DXEffect, &pErr )))
     {
-        // ƒVƒF[ƒ_‚Ì“Ç‚İ‚İ‚Ì¸”s
+        // ã‚·ã‚§ãƒ¼ãƒ€ã®èª­ã¿è¾¼ã¿ã®å¤±æ•—
 //        rb_raise( eDXRubyError, pErr->lpVtbl->GetBufferPointer( pErr ) );
         rb_raise( eDXRubyError, pErr ? pErr->lpVtbl->GetBufferPointer( pErr ) : "D3DXCreateEffect failed");
     }
@@ -1994,13 +1994,13 @@ static VALUE ShaderCore_getParam( VALUE self )
 
 
 /*********************************************************************
- * ShaderƒNƒ‰ƒX
+ * Shaderã‚¯ãƒ©ã‚¹
  *
- * ShaderCoreƒIƒuƒWƒFƒNƒg‚ÆƒVƒF[ƒ_ƒpƒ‰ƒ[ƒ^‚ğŠÖ˜A•t‚¯‚ÄŠÇ—‚·‚éB
+ * ShaderCoreã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨ã‚·ã‚§ãƒ¼ãƒ€ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’é–¢é€£ä»˜ã‘ã¦ç®¡ç†ã™ã‚‹ã€‚
  *********************************************************************/
 
 /*--------------------------------------------------------------------
-   QÆ‚³‚ê‚È‚­‚È‚Á‚½‚Æ‚«‚ÉGC‚©‚çŒÄ‚Î‚ê‚éŠÖ”
+   å‚ç…§ã•ã‚Œãªããªã£ãŸã¨ãã«GCã‹ã‚‰å‘¼ã°ã‚Œã‚‹é–¢æ•°
  ---------------------------------------------------------------------*/
 void Shader_release( struct DXRubyShader *shader )
 {
@@ -2008,7 +2008,7 @@ void Shader_release( struct DXRubyShader *shader )
 }
 
 /*--------------------------------------------------------------------
-   GC‚©‚çŒÄ‚Î‚ê‚éƒ}[ƒNŠÖ”
+   GCã‹ã‚‰å‘¼ã°ã‚Œã‚‹ãƒãƒ¼ã‚¯é–¢æ•°
  ---------------------------------------------------------------------*/
 static void Shader_mark( struct DXRubyShader *shader )
 {
@@ -2030,14 +2030,14 @@ const rb_data_type_t Shader_data_type = {
 #endif
 
 /*--------------------------------------------------------------------
-   ShaderƒNƒ‰ƒX‚ÌallocateBƒƒ‚ƒŠ‚ğŠm•Û‚·‚éˆ×‚Éinitialize‘O‚ÉŒÄ‚Î‚ê‚éB
+   Shaderã‚¯ãƒ©ã‚¹ã®allocateã€‚ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã™ã‚‹ç‚ºã«initializeå‰ã«å‘¼ã°ã‚Œã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Shader_allocate( VALUE klass )
 {
     VALUE obj;
     struct DXRubyShader *shader;
 
-    /* DXRubyShader‚Ìƒƒ‚ƒŠæ“¾•ShaderCoreƒIƒuƒWƒFƒNƒg¶¬ */
+    /* DXRubyShaderã®ãƒ¡ãƒ¢ãƒªå–å¾—ï¼†ShaderCoreã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ */
     shader = malloc( sizeof( struct DXRubyShader ) );
     if( shader == NULL ) rb_raise( eDXRubyError, "Out of memory - Shader_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
@@ -2046,7 +2046,7 @@ static VALUE Shader_allocate( VALUE klass )
     obj = Data_Wrap_Struct( klass, Shader_mark, Shader_release, shader );
 #endif
 
-    /* ‚Æ‚è‚ ‚¦‚¸ŠeƒIƒuƒWƒFƒNƒg‚ÍNULL‚É‚µ‚Ä‚¨‚­ */
+    /* ã¨ã‚Šã‚ãˆãšå„ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯NULLã«ã—ã¦ãŠã */
     shader->vcore = Qnil;
     shader->vparam = Qnil;
     shader->vname = Qnil;
@@ -2054,14 +2054,14 @@ static VALUE Shader_allocate( VALUE klass )
     return obj;
 }
 
-/* “®“I¶¬‚µ‚½Getter */
+/* å‹•çš„ç”Ÿæˆã—ãŸGetter */
 static VALUE Shader_ref( VALUE self )
 {
     struct DXRubyShader *shader = DXRUBY_GET_STRUCT( Shader, self );
     return hash_lookup( shader->vparam, ID2SYM( rb_frame_this_func() ) );
 }
 
-/* “®“I¶¬‚µ‚½Setter */
+/* å‹•çš„ç”Ÿæˆã—ãŸSetter */
 static VALUE Shader_set( VALUE self, VALUE val )
 {
     struct DXRubyShader *shader = DXRUBY_GET_STRUCT( Shader, self );
@@ -2070,7 +2070,7 @@ static VALUE Shader_set( VALUE self, VALUE val )
 }
 
 /*--------------------------------------------------------------------
-   ShaderƒNƒ‰ƒX‚ÌInitialize
+   Shaderã‚¯ãƒ©ã‚¹ã®Initialize
  ---------------------------------------------------------------------*/
 static int Shader_foreach( VALUE key, VALUE value, VALUE self )
 {
@@ -2117,14 +2117,14 @@ static VALUE Shader_initialize( int argc, VALUE *argv, VALUE self )
     return self;
 }
 
-/* technique–¼æ“¾ */
+/* techniqueåå–å¾— */
 static VALUE Shader_getTechnique( VALUE self )
 {
     struct DXRubyShader *shader = DXRUBY_GET_STRUCT( Shader, self );
     return hash_lookup( shader->vparam, symbol_technique );
 }
 
-/* technique–¼İ’è */
+/* techniqueåè¨­å®š */
 static VALUE Shader_setTechnique( VALUE self, VALUE vtech )
 {
     struct DXRubyShader *shader = DXRUBY_GET_STRUCT( Shader, self );
@@ -2135,17 +2135,17 @@ static VALUE Shader_setTechnique( VALUE self, VALUE vtech )
 
 
 /*********************************************************************
- * RenderTargetƒNƒ‰ƒX
+ * RenderTargetã‚¯ãƒ©ã‚¹
  *
- * ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚É‚È‚ê‚éImageƒNƒ‰ƒXB
- * ’¼Ú•ÒW‹@”\‚Í–³‚¢‚ªAdrawŒnƒƒ\ƒbƒh‚Åƒn[ƒhƒEƒFƒA•`‰æ‚ª‚Å‚«‚éB
+ * ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã«ãªã‚Œã‚‹Imageã‚¯ãƒ©ã‚¹ã€‚
+ * ç›´æ¥ç·¨é›†æ©Ÿèƒ½ã¯ç„¡ã„ãŒã€drawç³»ãƒ¡ã‚½ãƒƒãƒ‰ã§ãƒãƒ¼ãƒ‰ã‚¦ã‚§ã‚¢æç”»ãŒã§ãã‚‹ã€‚
  *********************************************************************/
 
 static void AddRenderTargetList( struct DXRubyRenderTarget *rt )
 {
     if( g_RenderTargetList.allocate_size <= g_RenderTargetList.count )
     {
-        g_RenderTargetList.allocate_size = g_RenderTargetList.allocate_size * 3 / 2; /* 1.5”{‚É‚·‚é */
+        g_RenderTargetList.allocate_size = g_RenderTargetList.allocate_size * 3 / 2; /* 1.5å€ã«ã™ã‚‹ */
         g_RenderTargetList.pointer = realloc( g_RenderTargetList.pointer, sizeof( void* ) * g_RenderTargetList.allocate_size );
     }
 
@@ -2190,7 +2190,7 @@ static void CleanRenderTargetList( void )
 
 
 /*--------------------------------------------------------------------
-   QÆ‚³‚ê‚È‚­‚È‚Á‚½‚Æ‚«‚ÉGC‚©‚çŒÄ‚Î‚ê‚éŠÖ”
+   å‚ç…§ã•ã‚Œãªããªã£ãŸã¨ãã«GCã‹ã‚‰å‘¼ã°ã‚Œã‚‹é–¢æ•°
  ---------------------------------------------------------------------*/
 static void RenderTarget_free( struct DXRubyRenderTarget *rt )
 {
@@ -2215,7 +2215,7 @@ static void RenderTarget_free( struct DXRubyRenderTarget *rt )
 
 void RenderTarget_release( struct DXRubyRenderTarget *rt )
 {
-    /* ƒeƒNƒXƒ`ƒƒƒIƒuƒWƒFƒNƒg‚ÌŠJ•ú */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é–‹æ”¾ */
     if( rt->texture )
     {
         RenderTarget_free( rt );
@@ -2231,7 +2231,7 @@ void RenderTarget_release( struct DXRubyRenderTarget *rt )
 }
 
 /*--------------------------------------------------------------------
-   RenderTargetƒNƒ‰ƒX‚Ìmark
+   RenderTargetã‚¯ãƒ©ã‚¹ã®mark
  ---------------------------------------------------------------------*/
 static void RenderTarget_mark( struct DXRubyRenderTarget *rt )
 {
@@ -2260,7 +2260,7 @@ const rb_data_type_t RenderTarget_data_type = {
 #endif
 
 /*--------------------------------------------------------------------
-   RenderTargetƒNƒ‰ƒX‚ÌdisposeB
+   RenderTargetã‚¯ãƒ©ã‚¹ã®disposeã€‚
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_dispose( VALUE self )
 {
@@ -2271,7 +2271,7 @@ static VALUE RenderTarget_dispose( VALUE self )
 }
 
 /*--------------------------------------------------------------------
-   RenderTargetƒNƒ‰ƒX‚Ìdisposed?B
+   RenderTargetã‚¯ãƒ©ã‚¹ã®disposed?ã€‚
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_check_disposed( VALUE self )
 {
@@ -2284,7 +2284,7 @@ static VALUE RenderTarget_check_disposed( VALUE self )
 }
 
 /*--------------------------------------------------------------------
- RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é(“à•”—p)
+ RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹(å†…éƒ¨ç”¨)
  ---------------------------------------------------------------------*/
 static void RenderTerget_auto_update( VALUE vrt )
 {
@@ -2307,26 +2307,26 @@ static void RenderTerget_auto_update( VALUE vrt )
 }
 
 /*--------------------------------------------------------------------
-   RenderTargetƒNƒ‰ƒX‚ÌallocateBƒƒ‚ƒŠ‚ğŠm•Û‚·‚éˆ×‚Éinitialize‘O‚ÉŒÄ‚Î‚ê‚éB
+   RenderTargetã‚¯ãƒ©ã‚¹ã®allocateã€‚ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã™ã‚‹ç‚ºã«initializeå‰ã«å‘¼ã°ã‚Œã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_allocate( VALUE klass )
 {
     VALUE obj;
     struct DXRubyRenderTarget *rt;
 
-    /* DXRubyRenderTarget‚Ìƒƒ‚ƒŠæ“¾•RenderTargetƒIƒuƒWƒFƒNƒg¶¬ */
+    /* DXRubyRenderTargetã®ãƒ¡ãƒ¢ãƒªå–å¾—ï¼†RenderTargetã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ */
     rt = malloc(sizeof(struct DXRubyRenderTarget));
-    if( rt == NULL ) rb_raise( eDXRubyError, "ƒƒ‚ƒŠ‚Ìæ“¾‚É¸”s‚µ‚Ü‚µ‚½ - RenderTarget_allocate" );
+    if( rt == NULL ) rb_raise( eDXRubyError, "ãƒ¡ãƒ¢ãƒªã®å–å¾—ã«å¤±æ•—ã—ã¾ã—ãŸ - RenderTarget_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
     obj = TypedData_Wrap_Struct( klass, &RenderTarget_data_type, rt );
 #else
     obj = Data_Wrap_Struct(klass, RenderTarget_mark, RenderTarget_release, rt);
 #endif
-    /* ‚Æ‚è‚ ‚¦‚¸ƒeƒNƒXƒ`ƒƒƒIƒuƒWƒFƒNƒg‚ÍNULL‚É‚µ‚Ä‚¨‚­ */
+    /* ã¨ã‚Šã‚ãˆãšãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯NULLã«ã—ã¦ãŠã */
     rt->texture = NULL;
     rt->surface = NULL;
 
-    /* ƒsƒNƒ`ƒƒ\‘¢‘Ì‚Ì‰Šú’lİ’è */
+    /* ãƒ”ã‚¯ãƒãƒ£æ§‹é€ ä½“ã®åˆæœŸå€¤è¨­å®š */
     rt->PictureCount = 0;
     rt->PictureAllocateCount = 128;
     rt->PictureSize = 0;
@@ -2357,7 +2357,7 @@ static VALUE RenderTarget_allocate( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-   RenderTargetƒNƒ‰ƒX‚ÌInitialize
+   RenderTargetã‚¯ãƒ©ã‚¹ã®Initialize
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_initialize( int argc, VALUE *argv, VALUE self )
 {
@@ -2380,7 +2380,7 @@ static VALUE RenderTarget_initialize( int argc, VALUE *argv, VALUE self )
         rb_raise( eDXRubyError, "Argument error(width<=0 or height<=0) - RenderTarget_initialize" );
     }
 
-    /* ƒeƒNƒXƒ`ƒƒƒƒ‚ƒŠæ“¾ */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¡ãƒ¢ãƒªå–å¾— */
     texture = (struct  DXRubyTexture *)malloc( sizeof( struct DXRubyTexture ) );
 
     if( texture == NULL )
@@ -2389,7 +2389,7 @@ static VALUE RenderTarget_initialize( int argc, VALUE *argv, VALUE self )
     }
 
     DXRUBY_RETRY_START;
-    /* ƒeƒNƒXƒ`ƒƒƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹ */
     hr = D3DXCreateTexture( g_pD3DDevice, width, height,
                                       1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
                                       &texture->pD3DTexture);
@@ -2439,7 +2439,7 @@ static VALUE RenderTarget_initialize( int argc, VALUE *argv, VALUE self )
 
 
 /*--------------------------------------------------------------------
-   RenderTargetƒNƒ‰ƒX‚ÌResize
+   RenderTargetã‚¯ãƒ©ã‚¹ã®Resize
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_resize( VALUE self, VALUE vwidth, VALUE vheight )
 {
@@ -2462,7 +2462,7 @@ static VALUE RenderTarget_resize( VALUE self, VALUE vwidth, VALUE vheight )
     RELEASE( texture->pD3DTexture );
 
     DXRUBY_RETRY_START;
-    /* ƒeƒNƒXƒ`ƒƒƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹ */
     hr = D3DXCreateTexture( g_pD3DDevice, width, height,
                                       1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
                                       &texture->pD3DTexture);
@@ -2493,7 +2493,7 @@ static VALUE RenderTarget_resize( VALUE self, VALUE vwidth, VALUE vheight )
 
 
 /*--------------------------------------------------------------------
-   RenderTargetƒNƒ‰ƒX‚ÌImageƒIƒuƒWƒFƒNƒg‰»
+   RenderTargetã‚¯ãƒ©ã‚¹ã®Imageã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåŒ–
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_to_image( VALUE self )
 {
@@ -2515,7 +2515,7 @@ static VALUE RenderTarget_to_image( VALUE self )
 
     DXRUBY_CHECK_DISPOSE( rt, surface );
 
-    /* •`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     if( rt->clearflag == 0 && rt->PictureCount == 0 )
     {
         g_pD3DDevice->lpVtbl->SetRenderTarget( g_pD3DDevice, 0, rt->surface );
@@ -2535,22 +2535,22 @@ static VALUE RenderTarget_to_image( VALUE self )
     image = DXRUBY_GET_STRUCT( Image, vimage );
 
     DXRUBY_RETRY_START;
-    /* ƒeƒNƒXƒ`ƒƒƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹ */
     hr = D3DXCreateTexture( g_pD3DDevice, (UINT)rt->texture->width, (UINT)rt->texture->height,
                                       1, 0, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM,
                                       &pD3DTexture);
     DXRUBY_RETRY_END;
     if( FAILED( hr ) ) rb_raise( eDXRubyError, "Create texture failed - RenderTarget_to_image" );
 
-    /* ƒeƒNƒXƒ`ƒƒ‚ÌƒT[ƒtƒFƒCƒX‚ğæ“¾ */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’å–å¾— */
     hr = pD3DTexture->lpVtbl->GetSurfaceLevel( pD3DTexture, 0, &surface );
     if( FAILED( hr ) ) rb_raise( eDXRubyError, "Get surface failed - RenderTarget_to_image" );
 
-    /* ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒCƒ[ƒWæ“¾ */
+    /* ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚¤ãƒ¡ãƒ¼ã‚¸å–å¾— */
     hr = g_pD3DDevice->lpVtbl->GetRenderTargetData( g_pD3DDevice, rt->surface, surface );
     if( FAILED( hr ) ) rb_raise( eDXRubyError, "Get image data failed - RenderTarget_to_image" );
 
-    /* ƒCƒ[ƒW‚ÌƒRƒs[ */
+    /* ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ã‚³ãƒ”ãƒ¼ */
     srect.left = rt->x;
     srect.top = rt->y;
     srect.right = rt->width;
@@ -2584,7 +2584,7 @@ static VALUE RenderTarget_to_image( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒTƒCƒYi•j‚ğ•Ô‚·B
+   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚µã‚¤ã‚ºï¼ˆå¹…ï¼‰ã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_getWidth( VALUE self )
 {
@@ -2595,7 +2595,7 @@ static VALUE RenderTarget_getWidth( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚ÌƒTƒCƒYi‚‚³j‚ğ•Ô‚·B
+   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ã‚µã‚¤ã‚ºï¼ˆé«˜ã•ï¼‰ã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_getHeight( VALUE self )
 {
@@ -2606,7 +2606,7 @@ static VALUE RenderTarget_getHeight( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•`‰æŠJnˆÊ’ux‚ğ•Ô‚·B
+   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æç”»é–‹å§‹ä½ç½®xã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_getOx( VALUE self )
 {
@@ -2617,7 +2617,7 @@ static VALUE RenderTarget_getOx( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•`‰æŠJnˆÊ’uy‚ğ•Ô‚·B
+   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æç”»é–‹å§‹ä½ç½®yã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_getOy( VALUE self )
 {
@@ -2628,7 +2628,7 @@ static VALUE RenderTarget_getOy( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•`‰æŠJnˆÊ’ux‚ğİ’è‚·‚éB
+   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æç”»é–‹å§‹ä½ç½®xã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_setOx( VALUE self, VALUE vox )
 {
@@ -2640,7 +2640,7 @@ static VALUE RenderTarget_setOx( VALUE self, VALUE vox )
 
 
 /*--------------------------------------------------------------------
-   ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•`‰æŠJnˆÊ’uy‚ğİ’è‚·‚éB
+   ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æç”»é–‹å§‹ä½ç½®yã‚’è¨­å®šã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_setOy( VALUE self, VALUE voy )
 {
@@ -2652,7 +2652,7 @@ static VALUE RenderTarget_setOy( VALUE self, VALUE voy )
 
 
 /*--------------------------------------------------------------------
-   ƒsƒNƒ`ƒƒƒŠƒXƒg‚Ìƒƒ‚ƒŠŠm•Û
+   ãƒ”ã‚¯ãƒãƒ£ãƒªã‚¹ãƒˆã®ãƒ¡ãƒ¢ãƒªç¢ºä¿
  ---------------------------------------------------------------------*/
 void *RenderTarget_AllocPictureList( struct DXRubyRenderTarget *rt, int size )
 {
@@ -2664,7 +2664,7 @@ void *RenderTarget_AllocPictureList( struct DXRubyRenderTarget *rt, int size )
     if( rt->PictureSize > rt->PictureAllocateSize )
     {
         char *temp = rt->PictureStruct;
-        rt->PictureAllocateSize = rt->PictureAllocateSize * 3 / 2; /* 1.5”{‚É‚·‚é */
+        rt->PictureAllocateSize = rt->PictureAllocateSize * 3 / 2; /* 1.5å€ã«ã™ã‚‹ */
         rt->PictureStruct = realloc( rt->PictureStruct, rt->PictureAllocateSize );
         if( rt->PictureStruct == NULL ) rb_raise(eDXRubyError, "Out of memory - RenderTarget_draw");
         for( i = 0; i < rt->PictureCount; i++)
@@ -2677,7 +2677,7 @@ void *RenderTarget_AllocPictureList( struct DXRubyRenderTarget *rt, int size )
 
     if( rt->PictureCount >= rt->PictureAllocateCount )
     {
-        rt->PictureAllocateCount = rt->PictureAllocateCount * 3 / 2; /* 1.5”{‚É‚·‚é */
+        rt->PictureAllocateCount = rt->PictureAllocateCount * 3 / 2; /* 1.5å€ã«ã™ã‚‹ */
         rt->PictureList = realloc( rt->PictureList, rt->PictureAllocateCount * sizeof(struct DXRubyPictureList) );
         if( rt->PictureList == NULL ) rb_raise(eDXRubyError, "Out of memory - RenderTarget_draw");
     }
@@ -2686,7 +2686,7 @@ void *RenderTarget_AllocPictureList( struct DXRubyRenderTarget *rt, int size )
 }
 
 
-/* ƒ}[ƒWƒ\[ƒg */
+/* ãƒãƒ¼ã‚¸ã‚½ãƒ¼ãƒˆ */
 void merge( struct DXRubyPictureList *list, struct DXRubyPictureList *temp, int left, int mid, int right )
 {
     int left_end, num_elements, tmp_pos;
@@ -2754,7 +2754,7 @@ void RenderTarget_SortPictureList( struct DXRubyRenderTarget *rt )
 
 
 /*--------------------------------------------------------------------
-   ‰æ–ÊƒNƒŠƒAFæ“¾
+   ç”»é¢ã‚¯ãƒªã‚¢è‰²å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_get_bgcolor( VALUE self )
 {
@@ -2765,7 +2765,7 @@ static VALUE RenderTarget_get_bgcolor( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ‰æ–ÊƒNƒŠƒAFw’è
+   ç”»é¢ã‚¯ãƒªã‚¢è‰²æŒ‡å®š
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_set_bgcolor( VALUE self, VALUE array )
 {
@@ -2796,7 +2796,7 @@ void RenderTarget_drawLine_func( struct DXRubyPicture_drawLine *picture )
 {
     TLVERTX2 VertexDataTbl[2];
 
-    /* ’¸“_‚P‚Æ‚Q‚Ìx */
+    /* é ‚ç‚¹ï¼‘ã¨ï¼’ã®x */
     if( picture->x1 == picture->x2 )
     {
         VertexDataTbl[0].x = (float)picture->x1;
@@ -2813,7 +2813,7 @@ void RenderTarget_drawLine_func( struct DXRubyPicture_drawLine *picture )
         VertexDataTbl[1].x = (float)picture->x2 + 1.0f;
     }
 
-    /* ’¸“_‚P‚Æ‚Q‚Ìy */
+    /* é ‚ç‚¹ï¼‘ã¨ï¼’ã®y */
     if( picture->y1 == picture->y2 )
     {
         VertexDataTbl[0].y = (float)picture->y1;
@@ -2830,23 +2830,23 @@ void RenderTarget_drawLine_func( struct DXRubyPicture_drawLine *picture )
         VertexDataTbl[1].y = (float)picture->y2 + 1.0f;
     }
 
-    /* ’¸“_F */
+    /* é ‚ç‚¹è‰² */
     VertexDataTbl[0].color = VertexDataTbl[1].color = picture->col;
-    /* ‚yÀ•W */
+    /* ï¼ºåº§æ¨™ */
     VertexDataTbl[0].z = VertexDataTbl[1].z = picture->z;
 
-    /* ƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetTexture(g_pD3DDevice, 0, (IDirect3DBaseTexture9*)NULL);
 
-    /* ƒfƒoƒCƒX‚Ég—p‚·‚é’¸“_ƒtƒH[ƒ}ƒbƒg‚ğƒZƒbƒg */
+    /* ãƒ‡ãƒã‚¤ã‚¹ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetFVF( g_pD3DDevice, D3DFVF_XYZ | D3DFVF_DIFFUSE );
 
-    /* •`‰æ */
+    /* æç”» */
     g_pD3DDevice->lpVtbl->DrawPrimitiveUP(g_pD3DDevice, D3DPT_LINELIST , 1, VertexDataTbl, sizeof(TLVERTX2));
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi“_•`‰æj
+   æç”»è¨­å®šï¼ˆç‚¹æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawPixel( int argc, VALUE *argv, VALUE obj )
 {
@@ -2864,7 +2864,7 @@ static VALUE RenderTarget_drawPixel( int argc, VALUE *argv, VALUE obj )
 
     picture = (struct DXRubyPicture_drawLine *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawLine ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawLine_func;
     picture->x1 = NUM2INT( argv[0] ) - rt->ox;
     picture->y1 = NUM2INT( argv[1] ) - rt->oy;
@@ -2875,7 +2875,7 @@ static VALUE RenderTarget_drawPixel( int argc, VALUE *argv, VALUE obj )
     picture->blendflag = 0;
     picture->col = col;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 6 || argv[3] == Qnil ? 0.0f : NUM2FLOAT( argv[3] );
     rt->PictureList[rt->PictureCount].z = z;
@@ -2886,7 +2886,7 @@ static VALUE RenderTarget_drawPixel( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiü•`‰æj
+   æç”»è¨­å®šï¼ˆç·šæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawLine( int argc, VALUE *argv, VALUE obj )
 {
@@ -2904,7 +2904,7 @@ static VALUE RenderTarget_drawLine( int argc, VALUE *argv, VALUE obj )
 
     picture = (struct DXRubyPicture_drawLine *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawLine ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawLine_func;
     picture->x1 = NUM2INT( argv[0] ) - rt->ox;
     picture->y1 = NUM2INT( argv[1] ) - rt->oy;
@@ -2915,7 +2915,7 @@ static VALUE RenderTarget_drawLine( int argc, VALUE *argv, VALUE obj )
     picture->blendflag = 0;
     picture->col = col;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 6 || argv[5] == Qnil ? 0.0f : NUM2FLOAT( argv[5] );
     rt->PictureList[rt->PictureCount].z = z;
@@ -2926,7 +2926,7 @@ static VALUE RenderTarget_drawLine( int argc, VALUE *argv, VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiBox•`‰æj
+   æç”»è¨­å®šï¼ˆBoxæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawBox( int argc, VALUE *argv, VALUE obj )
 {
@@ -2947,11 +2947,11 @@ static VALUE RenderTarget_drawBox( int argc, VALUE *argv, VALUE obj )
     x2 = NUM2INT( argv[2] );
     y2 = NUM2INT( argv[3] );
 
-    if( x1 == x2 || y1 == y2 ) /* ‰¡‚à‚µ‚­‚Íc‚Ìü‚©A“_‚Ìê‡ */
+    if( x1 == x2 || y1 == y2 ) /* æ¨ªã‚‚ã—ãã¯ç¸¦ã®ç·šã‹ã€ç‚¹ã®å ´åˆ */
     {
         picture = (struct DXRubyPicture_drawLine *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawLine ));
 
-        /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+        /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
         picture->func = RenderTarget_drawLine_func;
         picture->x1 = x1 - rt->ox;
         picture->y1 = y1 - rt->oy;
@@ -2962,7 +2962,7 @@ static VALUE RenderTarget_drawBox( int argc, VALUE *argv, VALUE obj )
         picture->blendflag = 0;
         picture->col = col;
 
-        /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+        /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
         rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
         z = argc < 6 || argv[5] == Qnil ? 0.0f : NUM2FLOAT( argv[5] );
         rt->PictureList[rt->PictureCount].z = z;
@@ -2984,7 +2984,7 @@ static VALUE RenderTarget_drawBox( int argc, VALUE *argv, VALUE obj )
             y2 = temp;
         }
 
-        /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+        /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
         picture = (struct DXRubyPicture_drawLine *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawLine ) );
         picture->func = RenderTarget_drawLine_func;
         picture->x1 = x1 - rt->ox + 1;
@@ -2996,14 +2996,14 @@ static VALUE RenderTarget_drawBox( int argc, VALUE *argv, VALUE obj )
         picture->blendflag = 0;
         picture->col = col;
 
-        /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+        /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
         rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
         z = argc < 6 || argv[5] == Qnil ? 0.0f : NUM2FLOAT( argv[5] );
         rt->PictureList[rt->PictureCount].z = z;
         picture->z = z;
         rt->PictureCount++;
 
-        /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+        /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
         picture = (struct DXRubyPicture_drawLine *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawLine ) );
         picture->func = RenderTarget_drawLine_func;
         picture->x1 = x1 - rt->ox;
@@ -3015,14 +3015,14 @@ static VALUE RenderTarget_drawBox( int argc, VALUE *argv, VALUE obj )
         picture->blendflag = 0;
         picture->col = col;
 
-        /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+        /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
         rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
         z = argc < 6 || argv[5] == Qnil ? 0.0f : NUM2FLOAT( argv[5] );
         rt->PictureList[rt->PictureCount].z = z;
         picture->z = z;
         rt->PictureCount++;
 
-        /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+        /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
         picture = (struct DXRubyPicture_drawLine *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawLine ) );
         picture->func = RenderTarget_drawLine_func;
         picture->x1 = x1 - rt->ox;
@@ -3034,14 +3034,14 @@ static VALUE RenderTarget_drawBox( int argc, VALUE *argv, VALUE obj )
         picture->blendflag = 0;
         picture->col = col;
 
-        /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+        /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
         rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
         z = argc < 6 || argv[5] == Qnil ? 0.0f : NUM2FLOAT( argv[5] );
         rt->PictureList[rt->PictureCount].z = z;
         picture->z = z;
         rt->PictureCount++;
 
-        /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+        /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
         picture = (struct DXRubyPicture_drawLine *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawLine ) );
         picture->func = RenderTarget_drawLine_func;
         picture->x1 = x2 - rt->ox;
@@ -3053,7 +3053,7 @@ static VALUE RenderTarget_drawBox( int argc, VALUE *argv, VALUE obj )
         picture->blendflag = 0;
         picture->col = col;
 
-        /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+        /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
         rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
         z = argc < 6 || argv[5] == Qnil ? 0.0f : NUM2FLOAT( argv[5] );
         rt->PictureList[rt->PictureCount].z = z;
@@ -3125,27 +3125,27 @@ void RenderTarget_drawBoxFill_func( struct DXRubyPicture_drawLine *picture )
         VertexDataTbl[5].y = (float)picture->y2 + 0.5f;
     }
 
-    /* ’¸“_F */
+    /* é ‚ç‚¹è‰² */
     VertexDataTbl[0].color = VertexDataTbl[1].color =
     VertexDataTbl[2].color = VertexDataTbl[3].color =
     VertexDataTbl[4].color = VertexDataTbl[5].color = picture->col;
-    /* ‚yÀ•W */
+    /* ï¼ºåº§æ¨™ */
     VertexDataTbl[0].z  = VertexDataTbl[1].z =
     VertexDataTbl[2].z  = VertexDataTbl[3].z =
     VertexDataTbl[4].z  = VertexDataTbl[5].z = 0.0f;
 
-    /* ƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetTexture(g_pD3DDevice, 0, (IDirect3DBaseTexture9*)NULL);
 
-    /* ƒfƒoƒCƒX‚Ég—p‚·‚é’¸“_ƒtƒH[ƒ}ƒbƒg‚ğƒZƒbƒg */
+    /* ãƒ‡ãƒã‚¤ã‚¹ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetFVF( g_pD3DDevice, D3DFVF_XYZ | D3DFVF_DIFFUSE );
 
-    /* •`‰æ */
+    /* æç”» */
     g_pD3DDevice->lpVtbl->DrawPrimitiveUP(g_pD3DDevice, D3DPT_TRIANGLELIST , 2, VertexDataTbl, sizeof(TLVERTX2));
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiBoxFill•`‰æj
+   æç”»è¨­å®šï¼ˆBoxFillæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawBoxFill( int argc, VALUE *argv, VALUE obj )
 {
@@ -3162,7 +3162,7 @@ static VALUE RenderTarget_drawBoxFill( int argc, VALUE *argv, VALUE obj )
 
     picture = (struct DXRubyPicture_drawLine *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawLine ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawBoxFill_func;
     picture->x1 = NUM2INT( argv[0] ) - rt->ox;
     picture->y1 = NUM2INT( argv[1] ) - rt->oy;
@@ -3173,7 +3173,7 @@ static VALUE RenderTarget_drawBoxFill( int argc, VALUE *argv, VALUE obj )
     picture->blendflag = 0;
     picture->col = col;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 6 || argv[5] == Qnil ? 0.0f : NUM2FLOAT( argv[5] );
     rt->PictureList[rt->PictureCount].z = z;
@@ -3193,39 +3193,39 @@ void RenderTarget_drawCircle_func( struct DXRubyPicture_drawCircle *picture )
     int i;
     UINT pass;
 
-    /* ’¸“_‚P */
+    /* é ‚ç‚¹ï¼‘ */
     VertexDataTbl[0].x = basex-0.5f;
     VertexDataTbl[0].y = basey-0.5f;
-    /* ’¸“_‚Q */
+    /* é ‚ç‚¹ï¼’ */
     VertexDataTbl[1].x = VertexDataTbl[3].x = basex + r2-0.5f;
     VertexDataTbl[1].y = VertexDataTbl[3].y = basey-0.5f;
-    /* ’¸“_‚R */
+    /* é ‚ç‚¹ï¼“ */
     VertexDataTbl[4].x = basex + r2-0.5f;
     VertexDataTbl[4].y = basey + r2-0.5f;
-    /* ’¸“_‚S */
+    /* é ‚ç‚¹ï¼” */
     VertexDataTbl[2].x = VertexDataTbl[5].x = basex-0.5f;
     VertexDataTbl[2].y = VertexDataTbl[5].y = basey + r2-0.5f;
-    /* ’¸“_F */
+    /* é ‚ç‚¹è‰² */
     VertexDataTbl[0].color = VertexDataTbl[1].color =
     VertexDataTbl[2].color = VertexDataTbl[3].color =
     VertexDataTbl[4].color = VertexDataTbl[5].color = D3DCOLOR_ARGB(picture->alpha,255,255,255);
-    /* ‚yÀ•W */
+    /* ï¼ºåº§æ¨™ */
     VertexDataTbl[0].z  = VertexDataTbl[1].z =
     VertexDataTbl[2].z  = VertexDataTbl[3].z =
     VertexDataTbl[4].z  = VertexDataTbl[5].z = 0.0f;
-    /* ƒeƒNƒXƒ`ƒƒÀ•W */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ */
     VertexDataTbl[0].tu = VertexDataTbl[5].tu = VertexDataTbl[2].tu = 0.0f;
     VertexDataTbl[0].tv = VertexDataTbl[1].tv = VertexDataTbl[3].tv = 0.0f;
     VertexDataTbl[1].tu = VertexDataTbl[3].tu = VertexDataTbl[4].tu = 1.0f;
     VertexDataTbl[4].tv = VertexDataTbl[5].tv = VertexDataTbl[2].tv = 1.0f;
 
-    /* ƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetTexture(g_pD3DDevice, 0, (IDirect3DBaseTexture9*)NULL);
 
-    /* ƒfƒoƒCƒX‚Ég—p‚·‚é’¸“_ƒtƒH[ƒ}ƒbƒg‚ğƒZƒbƒg */
+    /* ãƒ‡ãƒã‚¤ã‚¹ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetFVF(g_pD3DDevice, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
-    /* F‚ğƒZƒbƒg */
+    /* è‰²ã‚’ã‚»ãƒƒãƒˆ */
     {
         D3DXHANDLE h;
         float *temp;
@@ -3239,7 +3239,7 @@ void RenderTarget_drawCircle_func( struct DXRubyPicture_drawCircle *picture )
         g_WindowInfo.pD3DXEffectCircleShader->lpVtbl->SetFloatArray( g_WindowInfo.pD3DXEffectCircleShader, h, temp, 4 );
     }
 
-    /* ‰~ü‚ğ”F¯‚·‚é•‚ğƒZƒbƒg */
+    /* å††å‘¨ã‚’èªè­˜ã™ã‚‹å¹…ã‚’ã‚»ãƒƒãƒˆ */
     {
         D3DXHANDLE h;
         h = g_WindowInfo.pD3DXEffectCircleShader->lpVtbl->GetParameterByName( g_WindowInfo.pD3DXEffectCircleShader, NULL, "p" );
@@ -3250,7 +3250,7 @@ void RenderTarget_drawCircle_func( struct DXRubyPicture_drawCircle *picture )
     g_WindowInfo.pD3DXEffectCircleShader->lpVtbl->Begin( g_WindowInfo.pD3DXEffectCircleShader, &pass, 0 );
     for( i = 0; i < pass; i++ )
     {
-        /* •`‰æ */
+        /* æç”» */
         g_WindowInfo.pD3DXEffectCircleShader->lpVtbl->BeginPass( g_WindowInfo.pD3DXEffectCircleShader, i );
         g_pD3DDevice->lpVtbl->DrawPrimitiveUP( g_pD3DDevice, D3DPT_TRIANGLELIST, 2, VertexDataTbl, sizeof(TLVERTX) );
         g_WindowInfo.pD3DXEffectCircleShader->lpVtbl->EndPass( g_WindowInfo.pD3DXEffectCircleShader );
@@ -3259,7 +3259,7 @@ void RenderTarget_drawCircle_func( struct DXRubyPicture_drawCircle *picture )
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiCircle•`‰æj
+   æç”»è¨­å®šï¼ˆCircleæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawCircle( int argc, VALUE *argv, VALUE obj )
 {
@@ -3276,7 +3276,7 @@ static VALUE RenderTarget_drawCircle( int argc, VALUE *argv, VALUE obj )
 
     picture = (struct DXRubyPicture_drawCircle *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawCircle ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawCircle_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
@@ -3286,7 +3286,7 @@ static VALUE RenderTarget_drawCircle( int argc, VALUE *argv, VALUE obj )
     picture->blendflag = 0;
     picture->col = col;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 5 || argv[4] == Qnil ? 0.0f : NUM2FLOAT( argv[4] );
     rt->PictureList[rt->PictureCount].z = z;
@@ -3306,39 +3306,39 @@ void RenderTarget_drawCircleFill_func( struct DXRubyPicture_drawCircle *picture 
     int i;
     UINT pass;
 
-    /* ’¸“_‚P */
+    /* é ‚ç‚¹ï¼‘ */
     VertexDataTbl[0].x = basex-0.5f;
     VertexDataTbl[0].y = basey-0.5f;
-    /* ’¸“_‚Q */
+    /* é ‚ç‚¹ï¼’ */
     VertexDataTbl[1].x = VertexDataTbl[3].x = basex + r2-0.5f;
     VertexDataTbl[1].y = VertexDataTbl[3].y = basey-0.5f;
-    /* ’¸“_‚R */
+    /* é ‚ç‚¹ï¼“ */
     VertexDataTbl[4].x = basex + r2-0.5f;
     VertexDataTbl[4].y = basey + r2-0.5f;
-    /* ’¸“_‚S */
+    /* é ‚ç‚¹ï¼” */
     VertexDataTbl[2].x = VertexDataTbl[5].x = basex-0.5f;
     VertexDataTbl[2].y = VertexDataTbl[5].y = basey + r2-0.5f;
-    /* ’¸“_F */
+    /* é ‚ç‚¹è‰² */
     VertexDataTbl[0].color = VertexDataTbl[1].color =
     VertexDataTbl[2].color = VertexDataTbl[3].color =
     VertexDataTbl[4].color = VertexDataTbl[5].color = D3DCOLOR_ARGB(picture->alpha,255,255,255);
-    /* ‚yÀ•W */
+    /* ï¼ºåº§æ¨™ */
     VertexDataTbl[0].z  = VertexDataTbl[1].z =
     VertexDataTbl[2].z  = VertexDataTbl[3].z =
     VertexDataTbl[4].z  = VertexDataTbl[5].z = 0.0f;
-    /* ƒeƒNƒXƒ`ƒƒÀ•W */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ */
     VertexDataTbl[0].tu = VertexDataTbl[5].tu = VertexDataTbl[2].tu = 0.0f;
     VertexDataTbl[0].tv = VertexDataTbl[1].tv = VertexDataTbl[3].tv = 0.0f;
     VertexDataTbl[1].tu = VertexDataTbl[3].tu = VertexDataTbl[4].tu = 1.0f;
     VertexDataTbl[4].tv = VertexDataTbl[5].tv = VertexDataTbl[2].tv = 1.0f;
 
-    /* ƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetTexture(g_pD3DDevice, 0, (IDirect3DBaseTexture9*)NULL);
 
-    /* ƒfƒoƒCƒX‚Ég—p‚·‚é’¸“_ƒtƒH[ƒ}ƒbƒg‚ğƒZƒbƒg */
+    /* ãƒ‡ãƒã‚¤ã‚¹ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetFVF(g_pD3DDevice, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
-    /* F‚ğƒZƒbƒg */
+    /* è‰²ã‚’ã‚»ãƒƒãƒˆ */
     {
         D3DXHANDLE h;
         float *temp;
@@ -3355,7 +3355,7 @@ void RenderTarget_drawCircleFill_func( struct DXRubyPicture_drawCircle *picture 
     g_WindowInfo.pD3DXEffectCircleFillShader->lpVtbl->Begin( g_WindowInfo.pD3DXEffectCircleFillShader, &pass, 0 );
     for( i = 0; i < pass; i++ )
     {
-        /* •`‰æ */
+        /* æç”» */
         g_WindowInfo.pD3DXEffectCircleFillShader->lpVtbl->BeginPass( g_WindowInfo.pD3DXEffectCircleFillShader, i );
         g_pD3DDevice->lpVtbl->DrawPrimitiveUP( g_pD3DDevice, D3DPT_TRIANGLELIST, 2, VertexDataTbl, sizeof(TLVERTX) );
         g_WindowInfo.pD3DXEffectCircleFillShader->lpVtbl->EndPass( g_WindowInfo.pD3DXEffectCircleFillShader );
@@ -3364,7 +3364,7 @@ void RenderTarget_drawCircleFill_func( struct DXRubyPicture_drawCircle *picture 
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiCircleFill•`‰æj
+   æç”»è¨­å®šï¼ˆCircleFillæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawCircleFill( int argc, VALUE *argv, VALUE obj )
 {
@@ -3381,7 +3381,7 @@ static VALUE RenderTarget_drawCircleFill( int argc, VALUE *argv, VALUE obj )
 
     picture = (struct DXRubyPicture_drawCircle *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawCircle ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawCircleFill_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
@@ -3391,7 +3391,7 @@ static VALUE RenderTarget_drawCircleFill( int argc, VALUE *argv, VALUE obj )
     picture->blendflag = 0;
     picture->col = col;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 5 || argv[4] == Qnil ? 0.0f : NUM2FLOAT( argv[4] );
     rt->PictureList[rt->PictureCount].z = z;
@@ -3421,47 +3421,47 @@ void RenderTarget_draw_func( struct DXRubyPicture_draw *picture )
     tv1 = image->y / image->texture->height;
     tv2 = (image->y + height) / image->texture->height;
 
-    /* ’¸“_‚P */
+    /* é ‚ç‚¹ï¼‘ */
     VertexDataTbl[0].x = basex;
     VertexDataTbl[0].y = basey;
-    /* ’¸“_‚Q */
+    /* é ‚ç‚¹ï¼’ */
     VertexDataTbl[1].x = VertexDataTbl[3].x = basex + width;
     VertexDataTbl[1].y = VertexDataTbl[3].y = basey;
-    /* ’¸“_‚R */
+    /* é ‚ç‚¹ï¼“ */
     VertexDataTbl[4].x = basex + width;
     VertexDataTbl[4].y = basey + height;
-    /* ’¸“_‚S */
+    /* é ‚ç‚¹ï¼” */
     VertexDataTbl[2].x = VertexDataTbl[5].x = basex;
     VertexDataTbl[2].y = VertexDataTbl[5].y = basey + height;
-    /* ’¸“_F */
+    /* é ‚ç‚¹è‰² */
     VertexDataTbl[0].color = VertexDataTbl[1].color =
     VertexDataTbl[2].color = VertexDataTbl[3].color =
     VertexDataTbl[4].color = VertexDataTbl[5].color = D3DCOLOR_ARGB(picture->alpha,255,255,255);
-    /* ‚yÀ•W */
+    /* ï¼ºåº§æ¨™ */
     VertexDataTbl[0].z  = VertexDataTbl[1].z =
     VertexDataTbl[2].z  = VertexDataTbl[3].z =
     VertexDataTbl[4].z  = VertexDataTbl[5].z = 0.0f;
-    /* ƒeƒNƒXƒ`ƒƒÀ•W */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ */
     VertexDataTbl[0].tu = VertexDataTbl[5].tu = VertexDataTbl[2].tu = tu1;
     VertexDataTbl[0].tv = VertexDataTbl[1].tv = VertexDataTbl[3].tv = tv1;
     VertexDataTbl[1].tu = VertexDataTbl[3].tu = VertexDataTbl[4].tu = tu2;
     VertexDataTbl[4].tv = VertexDataTbl[5].tv = VertexDataTbl[2].tv = tv2;
 
-    /* ƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetTexture(g_pD3DDevice, 0, (IDirect3DBaseTexture9*)image->texture->pD3DTexture);
 
-    /* ƒfƒoƒCƒX‚Ég—p‚·‚é’¸“_ƒtƒH[ƒ}ƒbƒg‚ğƒZƒbƒg */
+    /* ãƒ‡ãƒã‚¤ã‚¹ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetFVF(g_pD3DDevice, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
-    /* •`‰æ */
+    /* æç”» */
     g_pD3DDevice->lpVtbl->DrawPrimitiveUP(g_pD3DDevice, D3DPT_TRIANGLELIST, 2, VertexDataTbl, sizeof(TLVERTX));
 
-    /* ƒƒbƒNƒJƒEƒ“ƒg‚ğŒ¸‚ç‚· */
+    /* ãƒ­ãƒƒã‚¯ã‚«ã‚¦ãƒ³ãƒˆã‚’æ¸›ã‚‰ã™ */
 //    image->lockcount--;
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi’Êí•`‰æj
+   æç”»è¨­å®šï¼ˆé€šå¸¸æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_draw( int argc, VALUE *argv, VALUE obj )
 {
@@ -3474,14 +3474,14 @@ static VALUE RenderTarget_draw( int argc, VALUE *argv, VALUE obj )
 
     if( argc < 3 || argc > 4 ) rb_raise( rb_eArgError, "wrong number of arguments (%d for %d..%d)", argc, 3, 4 );
 
-    /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+    /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
     DXRUBY_CHECK_IMAGE( argv[2] );
     image = DXRUBY_GET_STRUCT( Image, argv[2] );
     DXRUBY_CHECK_DISPOSE( image, texture );
 
     picture = (struct DXRubyPicture_draw *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_draw ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_draw_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
@@ -3489,24 +3489,24 @@ static VALUE RenderTarget_draw( int argc, VALUE *argv, VALUE obj )
     picture->alpha = 0xff;
     picture->blendflag = 0;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 4 || argv[3] == Qnil ? 0.0f : NUM2FLOAT( argv[3] );
     rt->PictureList[rt->PictureCount].z = z;
     picture->z = z;
     rt->PictureCount++;
 
-    /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     RenderTerget_auto_update( argv[2] );
 
-    /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+    /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //    image->lockcount++;
 
     return obj;
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi”¼“§–¾•`‰æj
+   æç”»è¨­å®šï¼ˆåŠé€æ˜æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawAlpha( int argc, VALUE *argv, VALUE obj )
 {
@@ -3519,14 +3519,14 @@ static VALUE RenderTarget_drawAlpha( int argc, VALUE *argv, VALUE obj )
 
     if( argc < 4 || argc > 5 ) rb_raise( rb_eArgError, "wrong number of arguments (%d for %d..%d)", argc, 4, 5 );
 
-    /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+    /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
     DXRUBY_CHECK_IMAGE( argv[2] );
     image = DXRUBY_GET_STRUCT( Image, argv[2] );
     DXRUBY_CHECK_DISPOSE( image, texture );
 
     picture = (struct DXRubyPicture_draw *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_draw ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_draw_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
@@ -3534,17 +3534,17 @@ static VALUE RenderTarget_drawAlpha( int argc, VALUE *argv, VALUE obj )
     picture->alpha = NUM2INT( argv[3] );
     picture->blendflag = 0;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 5 || argv[4] == Qnil ? 0.0f : NUM2FLOAT( argv[4] );
     rt->PictureList[rt->PictureCount].z = z;
     picture->z = z;
     rt->PictureCount++;
 
-    /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     RenderTerget_auto_update( argv[2] );
 
-    /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+    /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //    image->lockcount++;
 
     return obj;
@@ -3552,7 +3552,7 @@ static VALUE RenderTarget_drawAlpha( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi‰ÁZ‡¬•`‰æj
+   æç”»è¨­å®šï¼ˆåŠ ç®—åˆæˆæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawAdd( int argc, VALUE *argv, VALUE obj )
 {
@@ -3565,14 +3565,14 @@ static VALUE RenderTarget_drawAdd( int argc, VALUE *argv, VALUE obj )
 
     if( argc < 3 || argc > 4 ) rb_raise( rb_eArgError, "wrong number of arguments (%d for %d..%d)", argc, 3, 4 );
 
-    /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+    /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
     DXRUBY_CHECK_IMAGE( argv[2] );
     image = DXRUBY_GET_STRUCT( Image, argv[2] );
     DXRUBY_CHECK_DISPOSE( image, texture );
 
     picture = (struct DXRubyPicture_draw *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_draw ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_draw_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
@@ -3580,17 +3580,17 @@ static VALUE RenderTarget_drawAdd( int argc, VALUE *argv, VALUE obj )
     picture->alpha = 0xff;
     picture->blendflag = 4;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 4 || argv[3] == Qnil ? 0.0f : NUM2FLOAT( argv[3] );
     rt->PictureList[rt->PictureCount].z = z;
     picture->z = z;
     rt->PictureCount++;
 
-    /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     RenderTerget_auto_update( argv[2] );
 
-    /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+    /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //    image->lockcount++;
 
     return obj;
@@ -3598,7 +3598,7 @@ static VALUE RenderTarget_drawAdd( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiŒ¸Z‡¬•`‰æj
+   æç”»è¨­å®šï¼ˆæ¸›ç®—åˆæˆæç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawSub( int argc, VALUE *argv, VALUE obj )
 {
@@ -3611,14 +3611,14 @@ static VALUE RenderTarget_drawSub( int argc, VALUE *argv, VALUE obj )
 
     if( argc < 3 || argc > 4 ) rb_raise( rb_eArgError, "wrong number of arguments (%d for %d..%d)", argc, 3, 4);
 
-    /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+    /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
     DXRUBY_CHECK_IMAGE( argv[2] );
     image = DXRUBY_GET_STRUCT( Image, argv[2] );
     DXRUBY_CHECK_DISPOSE( image, texture );
 
     picture = (struct DXRubyPicture_draw *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_draw ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_draw_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
@@ -3626,24 +3626,24 @@ static VALUE RenderTarget_drawSub( int argc, VALUE *argv, VALUE obj )
     picture->alpha = 0xff;
     picture->blendflag = 6;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 4 || argv[3] == Qnil ? 0.0f : NUM2FLOAT( argv[3] );
     rt->PictureList[rt->PictureCount].z = z;
     picture->z = z;
     rt->PictureCount++;
 
-    /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     RenderTerget_auto_update( argv[2] );
 
-    /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+    /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //    image->lockcount++;
 
     return obj;
 }
 
 
-static int Window_drawShader_func_foreach( VALUE key, VALUE value, VALUE obj ) /* keyAvalue‚ÍvparamAobj‚ÍShaderCore */
+static int Window_drawShader_func_foreach( VALUE key, VALUE value, VALUE obj ) /* keyã€valueã¯vparamã€objã¯ShaderCore */
 {
     struct DXRubyShaderCore *core = DXRUBY_GET_STRUCT( ShaderCore, obj );
     const char *str;
@@ -3695,7 +3695,7 @@ static int Window_drawShader_func_foreach( VALUE key, VALUE value, VALUE obj ) /
             DXRUBY_CHECK_DISPOSE( DXRUBY_GET_STRUCT( Image, value ), texture );
             core->pD3DXEffect->lpVtbl->SetTexture( core->pD3DXEffect, str ,
                                                      (IDirect3DBaseTexture9*)(DXRUBY_GET_STRUCT( Image, value )->texture->pD3DTexture) );
-            /* ƒƒbƒNƒJƒEƒ“ƒg‚ğŒ¸‚ç‚· */
+            /* ãƒ­ãƒƒã‚¯ã‚«ã‚¦ãƒ³ãƒˆã‚’æ¸›ã‚‰ã™ */
 //            DXRUBY_GET_STRUCT( Image, value )->lockcount--;
 
         }
@@ -3771,33 +3771,33 @@ void RenderTarget_drawShader_func( struct DXRubyPicture_draw *picture )
     tv1 = image->y / image->texture->height;
     tv2 = (image->y + height) / image->texture->height;
 
-    /* ’¸“_‚P */
+    /* é ‚ç‚¹ï¼‘ */
     VertexDataTbl[0].x = basex-0.5f;
     VertexDataTbl[0].y = basey-0.5f;
-    /* ’¸“_‚Q */
+    /* é ‚ç‚¹ï¼’ */
     VertexDataTbl[1].x = VertexDataTbl[3].x = basex + width-0.5f;
     VertexDataTbl[1].y = VertexDataTbl[3].y = basey-0.5f;
-    /* ’¸“_‚R */
+    /* é ‚ç‚¹ï¼“ */
     VertexDataTbl[4].x = basex + width-0.5f;
     VertexDataTbl[4].y = basey + height-0.5f;
-    /* ’¸“_‚S */
+    /* é ‚ç‚¹ï¼” */
     VertexDataTbl[2].x = VertexDataTbl[5].x = basex-0.5f;
     VertexDataTbl[2].y = VertexDataTbl[5].y = basey + height-0.5f;
-    /* ’¸“_F */
+    /* é ‚ç‚¹è‰² */
     VertexDataTbl[0].color = VertexDataTbl[1].color =
     VertexDataTbl[2].color = VertexDataTbl[3].color =
     VertexDataTbl[4].color = VertexDataTbl[5].color = D3DCOLOR_ARGB(picture->alpha,255,255,255);
-    /* ‚yÀ•W */
+    /* ï¼ºåº§æ¨™ */
     VertexDataTbl[0].z  = VertexDataTbl[1].z =
     VertexDataTbl[2].z  = VertexDataTbl[3].z =
     VertexDataTbl[4].z  = VertexDataTbl[5].z = 0.0f;
-    /* ƒeƒNƒXƒ`ƒƒÀ•W */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ */
     VertexDataTbl[0].tu = VertexDataTbl[5].tu = VertexDataTbl[2].tu = tu1;
     VertexDataTbl[0].tv = VertexDataTbl[1].tv = VertexDataTbl[3].tv = tv1;
     VertexDataTbl[1].tu = VertexDataTbl[3].tu = VertexDataTbl[4].tu = tu2;
     VertexDataTbl[4].tv = VertexDataTbl[5].tv = VertexDataTbl[2].tv = tv2;
 
-    /* ƒfƒoƒCƒX‚Ég—p‚·‚é’¸“_ƒtƒH[ƒ}ƒbƒg‚ğƒZƒbƒg */
+    /* ãƒ‡ãƒã‚¤ã‚¹ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetFVF(g_pD3DDevice, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
     rb_hash_foreach( RARRAY_PTR( picture->value )[2], Window_drawShader_func_foreach, RARRAY_PTR( picture->value )[1]);
@@ -3809,19 +3809,19 @@ void RenderTarget_drawShader_func( struct DXRubyPicture_draw *picture )
     core->pD3DXEffect->lpVtbl->Begin( core->pD3DXEffect, &pass, 0 );
     for( i = 0; i < pass; i++ )
     {
-        /* •`‰æ */
+        /* æç”» */
         core->pD3DXEffect->lpVtbl->BeginPass( core->pD3DXEffect, i );
         g_pD3DDevice->lpVtbl->DrawPrimitiveUP( g_pD3DDevice, D3DPT_TRIANGLELIST, 2, VertexDataTbl, sizeof(TLVERTX) );
         core->pD3DXEffect->lpVtbl->EndPass( core->pD3DXEffect );
     }
     core->pD3DXEffect->lpVtbl->End( core->pD3DXEffect );
 
-    /* ƒƒbƒNƒJƒEƒ“ƒg‚ğŒ¸‚ç‚· */
+    /* ãƒ­ãƒƒã‚¯ã‚«ã‚¦ãƒ³ãƒˆã‚’æ¸›ã‚‰ã™ */
 //    image->lockcount--;
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiƒVƒF[ƒ_•`‰æj
+   æç”»è¨­å®šï¼ˆã‚·ã‚§ãƒ¼ãƒ€æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawShader( int argc, VALUE *argv, VALUE obj )
 {
@@ -3845,34 +3845,34 @@ static VALUE RenderTarget_drawShader( int argc, VALUE *argv, VALUE obj )
     core = DXRUBY_GET_STRUCT( ShaderCore, shader->vcore );
     DXRUBY_CHECK_DISPOSE( core, pD3DXEffect );
 
-    /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+    /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
     DXRUBY_CHECK_IMAGE( argv[2] );
     DXRUBY_CHECK_DISPOSE( DXRUBY_GET_STRUCT( Image, argv[2] ), texture );
 
     temp = rb_ary_new3( 3, argv[2], shader->vcore, rb_obj_dup( shader->vparam ) );
     picture->value = temp;
 
-    /* Shader“à‚ÌImageƒIƒuƒWƒFƒNƒg‚ğƒƒbƒN‚·‚é */
+    /* Shaderå†…ã®Imageã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ */
 //    rb_hash_foreach( RARRAY_PTR( picture->value )[2], Window_drawShader_func_foreach_lock, RARRAY_PTR( picture->value )[1]);
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawShader_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
     picture->alpha = 0xff;
     picture->blendflag = 0;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 5 || argv[4] == Qnil ? 0.0f : NUM2FLOAT( argv[4] );
     rt->PictureList[rt->PictureCount].z = z;
     picture->z = z;
     rt->PictureCount++;
 
-    /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     RenderTerget_auto_update( argv[2] );
 
-    /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+    /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //    DXRUBY_GET_STRUCT( Image, argv[2] )->lockcount++;
 
     return obj;
@@ -3921,36 +3921,36 @@ void RenderTarget_drawEx_func( struct DXRubyPicture_drawEx *picture )
     tv1 = (image->y) / image->texture->height;
     tv2 = (image->y + image->height) / image->texture->height;
 
-    /* ’¸“_‚P */
+    /* é ‚ç‚¹ï¼‘ */
     VertexDataTbl[0].x =  centerx * data1x - centery * data1y + basex - 0.5f;
     VertexDataTbl[0].y =  centerx * data2x + centery * data2y + basey - 0.5f;
-    /* ’¸“_‚Q */
+    /* é ‚ç‚¹ï¼’ */
     VertexDataTbl[1].x = VertexDataTbl[3].x =  (centerx+width) * data1x - centery * data1y + basex - 0.5f;
     VertexDataTbl[1].y = VertexDataTbl[3].y =  (centerx+width) * data2x + centery * data2y + basey - 0.5f;
-    /* ’¸“_‚R */
+    /* é ‚ç‚¹ï¼“ */
     VertexDataTbl[4].x =  (centerx+width) * data1x - (centery+height) * data1y + basex - 0.5f;
     VertexDataTbl[4].y =  (centerx+width) * data2x + (centery+height) * data2y + basey - 0.5f;
-    /* ’¸“_‚S */
+    /* é ‚ç‚¹ï¼” */
     VertexDataTbl[2].x = VertexDataTbl[5].x =  centerx * data1x - (centery+height) * data1y + basex - 0.5f;
     VertexDataTbl[2].y = VertexDataTbl[5].y =  centerx * data2x + (centery+height) * data2y + basey - 0.5f;
-    /* ’¸“_F */
+    /* é ‚ç‚¹è‰² */
     VertexDataTbl[0].color = VertexDataTbl[1].color =
     VertexDataTbl[2].color = VertexDataTbl[3].color =
     VertexDataTbl[4].color = VertexDataTbl[5].color = D3DCOLOR_ARGB(picture->alpha,255,255,255);
-    /* ‚yÀ•W */
+    /* ï¼ºåº§æ¨™ */
     VertexDataTbl[0].z  = VertexDataTbl[1].z =
     VertexDataTbl[2].z  = VertexDataTbl[3].z =
     VertexDataTbl[4].z  = VertexDataTbl[5].z = 0.0f;
-    /* ƒeƒNƒXƒ`ƒƒÀ•W */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ */
     VertexDataTbl[0].tu = VertexDataTbl[5].tu = VertexDataTbl[2].tu = tu1;
     VertexDataTbl[0].tv = VertexDataTbl[1].tv = VertexDataTbl[3].tv = tv1;
     VertexDataTbl[1].tu = VertexDataTbl[3].tu = VertexDataTbl[4].tu = tu2;
     VertexDataTbl[4].tv = VertexDataTbl[5].tv = VertexDataTbl[2].tv = tv2;
 
-    /* ƒfƒoƒCƒX‚Ég—p‚·‚é’¸“_ƒtƒH[ƒ}ƒbƒg‚ğƒZƒbƒg */
+    /* ãƒ‡ãƒã‚¤ã‚¹ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetFVF(g_pD3DDevice, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
-    if( TYPE(picture->value) == T_ARRAY ) /* Shader‚ ‚è */
+    if( TYPE(picture->value) == T_ARRAY ) /* Shaderã‚ã‚Š */
     {
         struct DXRubyShaderCore *core = DXRUBY_GET_STRUCT( ShaderCore, RARRAY_PTR( picture->value )[1] );
         DXRUBY_CHECK_DISPOSE( core, pD3DXEffect );
@@ -3963,7 +3963,7 @@ void RenderTarget_drawEx_func( struct DXRubyPicture_drawEx *picture )
         core->pD3DXEffect->lpVtbl->Begin( core->pD3DXEffect, &pass, 0 );
         for( i = 0; i < pass; i++ )
         {
-            /* •`‰æ */
+            /* æç”» */
             core->pD3DXEffect->lpVtbl->BeginPass( core->pD3DXEffect, i );
             g_pD3DDevice->lpVtbl->DrawPrimitiveUP( g_pD3DDevice, D3DPT_TRIANGLELIST, 2, VertexDataTbl, sizeof(TLVERTX) );
             core->pD3DXEffect->lpVtbl->EndPass( core->pD3DXEffect );
@@ -3972,19 +3972,19 @@ void RenderTarget_drawEx_func( struct DXRubyPicture_drawEx *picture )
     }
     else
     {
-        /* ƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg */
+        /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ */
         g_pD3DDevice->lpVtbl->SetTexture( g_pD3DDevice, 0, (IDirect3DBaseTexture9*)image->texture->pD3DTexture );
 
-        /* •`‰æ */
+        /* æç”» */
         g_pD3DDevice->lpVtbl->DrawPrimitiveUP( g_pD3DDevice, D3DPT_TRIANGLELIST, 2, VertexDataTbl, sizeof(TLVERTX) );
     }
 
-    /* ƒƒbƒNƒJƒEƒ“ƒg‚ğŒ¸‚ç‚· */
+    /* ãƒ­ãƒƒã‚¯ã‚«ã‚¦ãƒ³ãƒˆã‚’æ¸›ã‚‰ã™ */
 //    image->lockcount--;
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiŠg‘åk¬•`‰æj
+   æç”»è¨­å®šï¼ˆæ‹¡å¤§ç¸®å°æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawScale( int argc, VALUE *argv, VALUE obj )
 {
@@ -3998,14 +3998,14 @@ static VALUE RenderTarget_drawScale( int argc, VALUE *argv, VALUE obj )
 
     if( argc < 5 || argc > 8 ) rb_raise( rb_eArgError, "wrong number of arguments (%d for %d..%d)", argc, 5, 8 );
 
-    /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+    /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
     DXRUBY_CHECK_IMAGE( argv[2] );
     image = DXRUBY_GET_STRUCT( Image, argv[2] );
     DXRUBY_CHECK_DISPOSE( image, texture );
 
     picture = (struct DXRubyPicture_drawEx *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawEx ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawEx_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
@@ -4018,24 +4018,24 @@ static VALUE RenderTarget_drawScale( int argc, VALUE *argv, VALUE obj )
     picture->centerx = argc < 6 || argv[5] == Qnil  ? image->width / 2 : NUM2FLOAT( argv[5] );
     picture->centery = argc < 7 || argv[6] == Qnil  ? image->height / 2 : NUM2FLOAT( argv[6] );
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 8 || argv[7] == Qnil ? 0.0f : NUM2FLOAT( argv[7] );
     rt->PictureList[rt->PictureCount].z = z;
     picture->z = z;
     rt->PictureCount++;
 
-    /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     RenderTerget_auto_update( argv[2] );
 
-    /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+    /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //    image->lockcount++;
 
     return obj;
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi‰ñ“]•`‰æj
+   æç”»è¨­å®šï¼ˆå›è»¢æç”»ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawRot( int argc, VALUE *argv, VALUE obj )
 {
@@ -4049,14 +4049,14 @@ static VALUE RenderTarget_drawRot( int argc, VALUE *argv, VALUE obj )
 
     if( argc < 4 || argc > 7 ) rb_raise( rb_eArgError, "wrong number of arguments (%d for %d..%d)", argc, 4, 7 );
 
-    /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+    /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
     DXRUBY_CHECK_IMAGE( argv[2] );
     image = DXRUBY_GET_STRUCT( Image, argv[2] );
     DXRUBY_CHECK_DISPOSE( image, texture );
 
     picture = (struct DXRubyPicture_drawEx *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawEx ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawEx_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
@@ -4069,24 +4069,24 @@ static VALUE RenderTarget_drawRot( int argc, VALUE *argv, VALUE obj )
     picture->centerx = argc < 5 || argv[4] == Qnil  ? image->width / 2 : NUM2FLOAT( argv[4] );
     picture->centery = argc < 5 || argv[5] == Qnil  ? image->height / 2 : NUM2FLOAT( argv[5] );
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     z = argc < 7 || argv[6] == Qnil ? 0.0f : NUM2FLOAT( argv[6] );
     rt->PictureList[rt->PictureCount].z = z;
     picture->z = z;
     rt->PictureCount++;
 
-    /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     RenderTerget_auto_update( argv[2] );
 
-    /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+    /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //    image->lockcount++;
 
     return obj;
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èiƒtƒ‹ƒIƒvƒVƒ‡ƒ“j
+   æç”»è¨­å®šï¼ˆãƒ•ãƒ«ã‚ªãƒ—ã‚·ãƒ§ãƒ³ï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawEx( int argc, VALUE *argv, VALUE obj )
 {
@@ -4133,14 +4133,14 @@ static VALUE RenderTarget_drawEx( int argc, VALUE *argv, VALUE obj )
     {
         struct DXRubyPicture_drawEx *picture;
 
-        /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+        /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
         DXRUBY_CHECK_IMAGE( argv[2] );
         image = DXRUBY_GET_STRUCT( Image, argv[2] );
         DXRUBY_CHECK_DISPOSE( image, texture );
 
         picture = (struct DXRubyPicture_drawEx *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawEx ) );
 
-        /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+        /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
         picture->func = RenderTarget_drawEx_func;
         picture->angle   = (vangle   == Qnil ? 0.0f             : NUM2FLOAT( vangle   ));
         picture->scalex  = (vscalex  == Qnil ? 1.0f             : NUM2FLOAT( vscalex  ));
@@ -4161,7 +4161,7 @@ static VALUE RenderTarget_drawEx( int argc, VALUE *argv, VALUE obj )
             struct DXRubyShader *shader = DXRUBY_GET_STRUCT( Shader, vshader );
             picture->value = temp = rb_ary_new3( 3, argv[2], shader->vcore, rb_obj_dup( shader->vparam ) );
 
-            /* Shader“à‚ÌImageƒIƒuƒWƒFƒNƒg‚ğƒƒbƒN‚·‚é */
+            /* Shaderå†…ã®Imageã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹ */
 //            rb_hash_foreach( RARRAY_PTR( picture->value )[2], Window_drawShader_func_foreach_lock, RARRAY_PTR( picture->value )[1]);
         }
         else
@@ -4169,7 +4169,7 @@ static VALUE RenderTarget_drawEx( int argc, VALUE *argv, VALUE obj )
             picture->value = argv[2];
         }
 
-        /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+        /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
         rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
         z = vz == Qnil ? 0.0f : NUM2FLOAT( vz );
         rt->PictureList[rt->PictureCount].z = z;
@@ -4178,10 +4178,10 @@ static VALUE RenderTarget_drawEx( int argc, VALUE *argv, VALUE obj )
 
     rt->PictureCount++;
 
-    /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     RenderTerget_auto_update( argv[2] );
 
-    /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+    /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //    image->lockcount++;
 
     return obj;
@@ -4198,15 +4198,15 @@ static void RenderTarget_drawFont_func( struct DXRubyPicture_drawFont *picture )
     float angle = 3.141592653589793115997963468544185161590576171875f / 180.0f * picture->angle;
     DXRUBY_CHECK_DISPOSE( font, pD3DXFont );
 
-    /* D3DXSprite‚Ì•`‰æŠJn */
+    /* D3DXSpriteã®æç”»é–‹å§‹ */
     g_pD3DXSprite->lpVtbl->Begin( g_pD3DXSprite, D3DXSPRITE_ALPHABLEND );
 
-    /* ‰ñ“]‹y‚ÑŠg‘åk¬ */
+    /* å›è»¢åŠã³æ‹¡å¤§ç¸®å° */
     D3DXMatrixScaling    ( &matrix_t, picture->scalex, picture->scaley, 1 );
     D3DXMatrixRotationZ  ( &matrix  , angle );
     D3DXMatrixMultiply   ( &matrix  , &matrix_t, &matrix );
 
-    /* •½sˆÚ“® */
+    /* å¹³è¡Œç§»å‹• */
     D3DXMatrixTranslation( &matrix_t, (float)picture->x + picture->centerx, (float)picture->y + picture->centery, 0 );
     D3DXMatrixMultiply   ( &matrix  , &matrix, &matrix_t );
 
@@ -4235,12 +4235,12 @@ static void RenderTarget_drawFont_func( struct DXRubyPicture_drawFont *picture )
 
     g_pD3DXSprite->lpVtbl->Flush( g_pD3DXSprite );
 
-    /* ƒsƒNƒ`ƒƒ‚Ì•`‰æI—¹ */
+    /* ãƒ”ã‚¯ãƒãƒ£ã®æç”»çµ‚äº† */
     g_pD3DXSprite->lpVtbl->End( g_pD3DXSprite );
 }
 
 /*--------------------------------------------------------------------
-   ƒtƒHƒ“ƒg•`‰æ
+   ãƒ•ã‚©ãƒ³ãƒˆæç”»
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawFont( int argc, VALUE *argv, VALUE obj )
 {
@@ -4294,7 +4294,7 @@ static VALUE RenderTarget_drawFont( int argc, VALUE *argv, VALUE obj )
         rb_raise( eDXRubyError, "Out of memory" );
     }
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawFont_func;
     picture->x = NUM2INT( argv[0] ) - rt->ox;
     picture->y = NUM2INT( argv[1] ) - rt->oy;
@@ -4348,7 +4348,7 @@ static VALUE RenderTarget_drawFont( int argc, VALUE *argv, VALUE obj )
     picture->color = D3DCOLOR_XRGB(cr, cg, cb);
     picture->z = 0;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     rt->PictureList[rt->PictureCount].z = vz == Qnil ? 0.0f : NUM2FLOAT( vz );
     rt->PictureCount++;
@@ -4358,7 +4358,7 @@ static VALUE RenderTarget_drawFont( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ‚•i¿ƒtƒHƒ“ƒg•`‰æ
+   é«˜å“è³ªãƒ•ã‚©ãƒ³ãƒˆæç”»
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawFontEx( int argc, VALUE *argv, VALUE obj )
 {
@@ -4383,9 +4383,9 @@ static VALUE RenderTarget_drawFontEx( int argc, VALUE *argv, VALUE obj )
         voption = argv[4];
     }
 
-    /* “à•”ImageƒIƒuƒWƒFƒNƒg¶¬*/
+    /* å†…éƒ¨Imageã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ*/
 
-    /* ƒGƒbƒWƒIƒvƒVƒ‡ƒ“•â³ */
+    /* ã‚¨ãƒƒã‚¸ã‚ªãƒ—ã‚·ãƒ§ãƒ³è£œæ­£ */
     vedge = hash_lookup( voption, symbol_edge );
     if( vedge == Qnil || vedge == Qfalse )
     {
@@ -4397,7 +4397,7 @@ static VALUE RenderTarget_drawFontEx( int argc, VALUE *argv, VALUE obj )
         edge_width = vedge_width == Qnil ? 2 : NUM2INT( vedge_width );
     }
 
-    /* ‰eƒIƒvƒVƒ‡ƒ“•â³ */
+    /* å½±ã‚ªãƒ—ã‚·ãƒ§ãƒ³è£œæ­£ */
     vshadow = hash_lookup( voption, symbol_shadow );
     if( vshadow == Qnil || vshadow == Qfalse )
     {
@@ -4437,13 +4437,13 @@ static VALUE RenderTarget_drawFontEx( int argc, VALUE *argv, VALUE obj )
         }
     }
 
-    /* Image‚É•`‰æ */
+    /* Imageã«æç”» */
     {
         VALUE arr[5] = {INT2FIX(edge_width), INT2FIX(edge_width), argv[2], argv[3], voption};
         Image_drawFontEx( 5, arr, vimage );
     }
 
-    /* RenderTarget_drawExŒÄ‚Ño‚µ */
+    /* RenderTarget_drawExå‘¼ã³å‡ºã— */
     {
         VALUE arr[4] = {INT2NUM(NUM2INT(argv[0]) - edge_width), INT2NUM(NUM2INT(argv[1]) - edge_width), vimage, voption};
         RenderTarget_drawEx( 4, arr, obj );
@@ -4511,27 +4511,27 @@ static void RenderTarget_drawMorph_func( struct DXRubyPicture_drawMorph *picture
             float rx2 = (x3 - x2) * wx2 + x2;
             float ry2 = (y3 - y2) * wy2 + y2;
 
-            /* ’¸“_‚P */
+            /* é ‚ç‚¹ï¼‘ */
             VertexDataTbl[cur+0].x = (bx1 - tx1) * wy1 + tx1 - 0.5f;
             VertexDataTbl[cur+0].y = (ry1 - ly1) * wx1 + ly1 - 0.5f;
-            /* ’¸“_‚Q */
+            /* é ‚ç‚¹ï¼’ */
             VertexDataTbl[cur+1].x = VertexDataTbl[cur+3].x = (bx2 - tx2) * wy1 + tx2 - 0.5f;
             VertexDataTbl[cur+1].y = VertexDataTbl[cur+3].y = (ry1 - ly1) * wx2 + ly1 - 0.5f;
-            /* ’¸“_‚R */
+            /* é ‚ç‚¹ï¼“ */
             VertexDataTbl[cur+4].x = (bx2 - tx2) * wy2 + tx2 - 0.5f;
             VertexDataTbl[cur+4].y = (ry2 - ly2) * wx2 + ly2 - 0.5f;
-            /* ’¸“_‚S */
+            /* é ‚ç‚¹ï¼” */
             VertexDataTbl[cur+2].x = VertexDataTbl[cur+5].x = (bx1 - tx1) * wy2 + tx1 - 0.5f;
             VertexDataTbl[cur+2].y = VertexDataTbl[cur+5].y = (ry2 - ly2) * wx1 + ly2 - 0.5f;
-            /* ’¸“_F */
+            /* é ‚ç‚¹è‰² */
             VertexDataTbl[cur+0].color = VertexDataTbl[cur+1].color =
             VertexDataTbl[cur+2].color = VertexDataTbl[cur+3].color =
             VertexDataTbl[cur+4].color = VertexDataTbl[cur+5].color = D3DCOLOR_ARGB(picture->alpha,picture->r,picture->g,picture->b);
-            /* ‚yÀ•W */
+            /* ï¼ºåº§æ¨™ */
             VertexDataTbl[cur+0].z  = VertexDataTbl[cur+1].z =
             VertexDataTbl[cur+2].z  = VertexDataTbl[cur+3].z =
             VertexDataTbl[cur+4].z  = VertexDataTbl[cur+5].z = 0.0f;
-            /* ƒeƒNƒXƒ`ƒƒÀ•W */
+            /* ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ */
             VertexDataTbl[cur+0].tu = VertexDataTbl[cur+5].tu = VertexDataTbl[cur+2].tu = tu1 + ((tu2 - tu1) / picture->dividex) * count_x;
             VertexDataTbl[cur+0].tv = VertexDataTbl[cur+1].tv = VertexDataTbl[cur+3].tv = tv1 + ((tv2 - tv1) / picture->dividey) * count_y;
             VertexDataTbl[cur+1].tu = VertexDataTbl[cur+3].tu = VertexDataTbl[cur+4].tu = tu1 + ((tu2 - tu1) / picture->dividex) * (count_x+1);
@@ -4544,13 +4544,13 @@ static void RenderTarget_drawMorph_func( struct DXRubyPicture_drawMorph *picture
         g_pD3DDevice->lpVtbl->SetTextureStageState( g_pD3DDevice, 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2 );
     }
 
-    /* ƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg */
+    /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetTexture(g_pD3DDevice, 0, (IDirect3DBaseTexture9*)image->texture->pD3DTexture);
 
-    /* ƒfƒoƒCƒX‚Ég—p‚·‚é’¸“_ƒtƒH[ƒ}ƒbƒg‚ğƒZƒbƒg */
+    /* ãƒ‡ãƒã‚¤ã‚¹ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚»ãƒƒãƒˆ */
     g_pD3DDevice->lpVtbl->SetFVF(g_pD3DDevice, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
-    /* •`‰æ */
+    /* æç”» */
     g_pD3DDevice->lpVtbl->DrawPrimitiveUP(g_pD3DDevice, D3DPT_TRIANGLELIST, picture->dividex * picture->dividey * 2, VertexDataTbl, sizeof(TLVERTX));
 
     if( picture->colorflag == 1 )
@@ -4558,12 +4558,12 @@ static void RenderTarget_drawMorph_func( struct DXRubyPicture_drawMorph *picture
         g_pD3DDevice->lpVtbl->SetTextureStageState( g_pD3DDevice, 0, D3DTSS_COLOROP, D3DTOP_MODULATE );
     }
 
-    /* ƒƒbƒNƒJƒEƒ“ƒg‚ğŒ¸‚ç‚· */
+    /* ãƒ­ãƒƒã‚¯ã‚«ã‚¦ãƒ³ãƒˆã‚’æ¸›ã‚‰ã™ */
 //    image->lockcount--;
 }
 
 /*--------------------------------------------------------------------
-   •`‰æİ’èi4“_w’èj
+   æç”»è¨­å®šï¼ˆ4ç‚¹æŒ‡å®šï¼‰
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawMorph( int argc, VALUE *argv, VALUE obj )
 {
@@ -4595,14 +4595,14 @@ static VALUE RenderTarget_drawMorph( int argc, VALUE *argv, VALUE obj )
     vz = hash_lookup( voption, symbol_z );
     vcolor = hash_lookup( voption, symbol_color );
 
-    /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+    /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
     DXRUBY_CHECK_IMAGE( argv[8] );
     image = DXRUBY_GET_STRUCT( Image, argv[8] );
     DXRUBY_CHECK_DISPOSE( image, texture );
 
     picture = (struct DXRubyPicture_drawMorph *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawMorph ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawMorph_func;
     picture->x1 = NUM2FLOAT( argv[0] ) - rt->ox;
     picture->y1 = NUM2FLOAT( argv[1] ) - rt->oy;
@@ -4625,7 +4625,7 @@ static VALUE RenderTarget_drawMorph( int argc, VALUE *argv, VALUE obj )
 
     if( picture->dividex <= 0 || picture->dividey <= 0 )
     {
-        rb_raise( eDXRubyError, "•ªŠ„”‚É0ˆÈ‰º‚Íw’è‚Å‚«‚Ü‚¹‚ñ");
+        rb_raise( eDXRubyError, "åˆ†å‰²æ•°ã«0ä»¥ä¸‹ã¯æŒ‡å®šã§ãã¾ã›ã‚“");
     }
 
     if( vcolor != Qnil )
@@ -4653,16 +4653,16 @@ static VALUE RenderTarget_drawMorph( int argc, VALUE *argv, VALUE obj )
     }
 
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     rt->PictureList[rt->PictureCount].z = vz == Qnil ? 0.0f : NUM2FLOAT( vz );
     picture->z = vz == Qnil ? 0.0f : NUM2FLOAT( vz );
     rt->PictureCount++;
 
-    /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+    /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
     RenderTerget_auto_update( argv[8] );
 
-    /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+    /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //    image->lockcount++;
 
     return obj;
@@ -4693,7 +4693,7 @@ void RenderTarget_drawTile_func( struct DXRubyPicture_drawTile *picture )
 
     mapdata = RARRAY_PTR( vmapdata );
 
-    /* •‚Æ‚‚³æ“¾ */
+    /* å¹…ã¨é«˜ã•å–å¾— */
     width  = NUM2INT( rb_funcall(*mapdata, rb_intern("width"), 0) );
     height = NUM2INT( rb_funcall(*mapdata, rb_intern("height"), 0) );
 
@@ -4703,7 +4703,7 @@ void RenderTarget_drawTile_func( struct DXRubyPicture_drawTile *picture )
     startt_mod_height = picture->starty % height;
 
     y = picture->basey - (startt_mod_height < 0 ? height + startt_mod_height : startt_mod_height) - 0.5f;
-    /* •`‰æ */
+    /* æç”» */
     for( i = startt_mod_height < 0 ? -1 : 0; i < picture->sizey + (startt_mod_height <= 0 ? 0 : 1); i++ )
     {
         int my;
@@ -4748,34 +4748,34 @@ void RenderTarget_drawTile_func( struct DXRubyPicture_drawTile *picture )
 
                 if( index >= RARRAY_LEN( vmapdata ) ) rb_raise(eDXRubyError, "Invalid MapChipNumber - Window_drawTile");
 
-                /* ƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+                /* ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
                 image = (struct DXRubyImage *)DATA_PTR( mapdata[index] );
 
                 VertexDataTbl[0].x = VertexDataTbl[2].x = VertexDataTbl[5].x = x;
                 VertexDataTbl[0].y = VertexDataTbl[1].y = VertexDataTbl[3].y = y;
                 VertexDataTbl[1].x = VertexDataTbl[3].x = VertexDataTbl[4].x = x + width;
                 VertexDataTbl[4].y = VertexDataTbl[2].y = VertexDataTbl[5].y = y + height;
-                /* ’¸“_F */
+                /* é ‚ç‚¹è‰² */
                 VertexDataTbl[0].color = VertexDataTbl[1].color =
                 VertexDataTbl[2].color = VertexDataTbl[3].color =
                 VertexDataTbl[4].color = VertexDataTbl[5].color = D3DCOLOR_ARGB(255,255,255,255);
-                /* ‚yÀ•W */
+                /* ï¼ºåº§æ¨™ */
                 VertexDataTbl[0].z  = VertexDataTbl[1].z =
                 VertexDataTbl[2].z  = VertexDataTbl[3].z =
                 VertexDataTbl[4].z  = VertexDataTbl[5].z = 0.0f;
-                /* ƒeƒNƒXƒ`ƒƒÀ•W */
+                /* ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ */
                 VertexDataTbl[0].tu = VertexDataTbl[5].tu = VertexDataTbl[2].tu = image->x / image->texture->width;
                 VertexDataTbl[0].tv = VertexDataTbl[1].tv = VertexDataTbl[3].tv = image->y / image->texture->height;
                 VertexDataTbl[1].tu = VertexDataTbl[3].tu = VertexDataTbl[4].tu = (image->x + width) / image->texture->width;
                 VertexDataTbl[4].tv = VertexDataTbl[5].tv = VertexDataTbl[2].tv = (image->y + height) / image->texture->height;
 
-                /* ƒeƒNƒXƒ`ƒƒ‚ğƒZƒbƒg */
+                /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ã‚»ãƒƒãƒˆ */
                 g_pD3DDevice->lpVtbl->SetTexture(g_pD3DDevice, 0, (IDirect3DBaseTexture9*)image->texture->pD3DTexture);
 
-                /* ƒfƒoƒCƒX‚Ég—p‚·‚é’¸“_ƒtƒH[ƒ}ƒbƒg‚ğƒZƒbƒg */
+                /* ãƒ‡ãƒã‚¤ã‚¹ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚»ãƒƒãƒˆ */
                 g_pD3DDevice->lpVtbl->SetFVF(g_pD3DDevice, D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
-                /* •`‰æ */
+                /* æç”» */
                 g_pD3DDevice->lpVtbl->DrawPrimitiveUP(g_pD3DDevice, D3DPT_TRIANGLELIST, 2, VertexDataTbl, sizeof(TLVERTX));
             }
 
@@ -4784,7 +4784,7 @@ void RenderTarget_drawTile_func( struct DXRubyPicture_drawTile *picture )
         y = y + height;
     }
 
-    /* ƒƒbƒNƒJƒEƒ“ƒg‚ğŒ¸‚ç‚· */
+    /* ãƒ­ãƒƒã‚¯ã‚«ã‚¦ãƒ³ãƒˆã‚’æ¸›ã‚‰ã™ */
 //    for( i = 0; i < RARRAY_LEN( vmapdata ); i++ )
 //    {
 //        DXRUBY_GET_STRUCT( Image, mapdata[i] )->lockcount--;
@@ -4792,7 +4792,7 @@ void RenderTarget_drawTile_func( struct DXRubyPicture_drawTile *picture )
 }
 
 /*--------------------------------------------------------------------
-   ƒ}ƒbƒv•`‰æ
+   ãƒãƒƒãƒ—æç”»
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_drawTile( int argc, VALUE *argv, VALUE obj )
 {
@@ -4814,22 +4814,22 @@ static VALUE RenderTarget_drawTile( int argc, VALUE *argv, VALUE obj )
 
     vmapdata_f = rb_funcall( vmapdata, rb_intern("flatten"), 0 );
 
-    /* ƒCƒ[ƒW”z—ñ‚ª‘S•”ƒCƒ[ƒW‚©‚Ç‚¤‚©‚ğƒ`ƒFƒbƒN‚µ‚Æ‚­ */
+    /* ã‚¤ãƒ¡ãƒ¼ã‚¸é…åˆ—ãŒå…¨éƒ¨ã‚¤ãƒ¡ãƒ¼ã‚¸ã‹ã©ã†ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã—ã¨ã */
     for( i = 0; i < RARRAY_LEN( vmapdata_f ); i++ )
     {
         DXRUBY_CHECK_IMAGE( RARRAY_AREF(vmapdata_f, i) );
         DXRUBY_CHECK_DISPOSE( DXRUBY_GET_STRUCT( Image, RARRAY_AREF(vmapdata_f, i) ), texture );
 
-        /* RenderTarget‚¾‚Á‚½ê‡‚É•`‰æ—\–ñ‚ª‚ ‚ê‚Îupdate‚·‚é */
+        /* RenderTargetã ã£ãŸå ´åˆã«æç”»äºˆç´„ãŒã‚ã‚Œã°updateã™ã‚‹ */
         RenderTerget_auto_update( RARRAY_AREF(vmapdata_f, i) );
 
-        /* g‚í‚ê‚½image‚ÌƒƒbƒN */
+        /* ä½¿ã‚ã‚ŒãŸimageã®ãƒ­ãƒƒã‚¯ */
 //        image->lockcount++;
    }
 
     picture = (struct DXRubyPicture_drawTile *)RenderTarget_AllocPictureList( rt, sizeof( struct DXRubyPicture_drawTile ) );
 
-    /* DXRubyPictureƒIƒuƒWƒFƒNƒgİ’è */
+    /* DXRubyPictureã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š */
     picture->func = RenderTarget_drawTile_func;
     picture->basex = vbasex == Qnil ? 0 : (NUM2INT( vbasex ) - rt->ox);
     picture->basey = vbasey == Qnil ? 0 : (NUM2INT( vbasey ) - rt->oy);
@@ -4842,7 +4842,7 @@ static VALUE RenderTarget_drawTile( int argc, VALUE *argv, VALUE obj )
     picture->alpha = 0xff;
     picture->blendflag = 0;
 
-    /* ƒŠƒXƒgƒf[ƒ^‚É’Ç‰Á */
+    /* ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã«è¿½åŠ  */
     rt->PictureList[rt->PictureCount].picture = (struct DXRubyPicture *)picture;
     picture->z = rt->PictureList[rt->PictureCount].z = vz == Qnil ? 0.0f : NUM2FLOAT( vz );
     rt->PictureCount++;
@@ -4852,7 +4852,7 @@ static VALUE RenderTarget_drawTile( int argc, VALUE *argv, VALUE obj )
 
 
 ///*--------------------------------------------------------------------
-//   Sprite•`‰æ
+//   Spriteæç”»
 // ---------------------------------------------------------------------*/
 //static VALUE RenderTarget_drawSprite( VALUE self, VALUE varg )
 //{
@@ -4884,7 +4884,7 @@ static VALUE RenderTarget_drawTile( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   RenderTargetƒNƒŠƒA
+   RenderTargetã‚¯ãƒªã‚¢
  ---------------------------------------------------------------------*/
 VALUE RenderTarget_clear( VALUE self )
 {
@@ -4898,19 +4898,19 @@ VALUE RenderTarget_clear( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   RenderTargetXV
+   RenderTargetæ›´æ–°
  ---------------------------------------------------------------------*/
 VALUE RenderTarget_update( VALUE self )
 {
     HRESULT hr;
     int x_2d, width_2d;
     int y_2d, height_2d;
-    struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, self ); /* o—Íæ */
+    struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, self ); /* å‡ºåŠ›å…ˆ */
     int i;
 
     DXRUBY_CHECK_DISPOSE( rt, surface );
 
-    /* ƒV[ƒ“‚ÌƒNƒŠƒA */
+    /* ã‚·ãƒ¼ãƒ³ã®ã‚¯ãƒªã‚¢ */
     {
         D3DVIEWPORT9 vp;
         vp.X       = x_2d = 0;
@@ -4942,7 +4942,7 @@ VALUE RenderTarget_update( VALUE self )
 #endif
     }
 
-    /* ƒV[ƒ“‚Ì•`‰æŠJn */
+    /* ã‚·ãƒ¼ãƒ³ã®æç”»é–‹å§‹ */
     if( SUCCEEDED( g_pD3DDevice->lpVtbl->BeginScene( g_pD3DDevice ) ) )
     {
         i = 0;
@@ -4977,7 +4977,7 @@ VALUE RenderTarget_update( VALUE self )
         g_pD3DDevice->lpVtbl->SetSamplerState( g_pD3DDevice, 0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP );
         g_pD3DDevice->lpVtbl->SetSamplerState( g_pD3DDevice, 0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP );
 
-        /* Šg‘åk¬ƒtƒBƒ‹ƒ^İ’è */
+        /* æ‹¡å¤§ç¸®å°ãƒ•ã‚£ãƒ«ã‚¿è¨­å®š */
         g_pD3DDevice->lpVtbl->SetSamplerState(g_pD3DDevice, 0, D3DSAMP_MINFILTER,
                                          rt->minfilter);
         g_pD3DDevice->lpVtbl->SetSamplerState(g_pD3DDevice, 0, D3DSAMP_MAGFILTER,
@@ -4990,7 +4990,7 @@ VALUE RenderTarget_update( VALUE self )
 
             RenderTarget_SortPictureList( rt );
 
-            /* 2D•`‰æ */
+            /* 2Dæç”» */
             D3DXMatrixScaling    ( &matrix, 1, -1, 1 );
             D3DXMatrixTranslation( &matrix_t, (float)-(width_2d)/2.0f, (float)(height_2d)/2.0f, 0 );
             D3DXMatrixMultiply( &matrix, &matrix, &matrix_t );
@@ -5011,37 +5011,37 @@ VALUE RenderTarget_update( VALUE self )
                 {
                     switch( temp->blendflag )
                     {
-                    case 0:          /* ”¼“§–¾‡¬ */
+                    case 0:          /* åŠé€æ˜åˆæˆ */
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLENDALPHA, D3DBLEND_ONE );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLENDALPHA, D3DBLEND_INVSRCALPHA );
                         break;
-                    case 1:          /* ’Pƒã‘‚« */
+                    case 1:          /* å˜ç´”ä¸Šæ›¸ã */
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLEND, D3DBLEND_ONE );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLEND, D3DBLEND_ZERO );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLENDALPHA, D3DBLEND_ONE );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLENDALPHA, D3DBLEND_ZERO );
                         break;
-                    case 4:          /* ‰ÁZ‡¬1‚Ìİ’è */
+                    case 4:          /* åŠ ç®—åˆæˆ1ã®è¨­å®š */
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLEND, D3DBLEND_SRCALPHA );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLEND, D3DBLEND_ONE );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLENDALPHA, D3DBLEND_ONE );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLENDALPHA, D3DBLEND_INVSRCALPHA );
                         break;
-                    case 5:          /* ‰ÁZ‡¬2‚Ìİ’è */
+                    case 5:          /* åŠ ç®—åˆæˆ2ã®è¨­å®š */
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLEND, D3DBLEND_ONE );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLENDALPHA, D3DBLEND_ONE );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLENDALPHA, D3DBLEND_INVSRCALPHA );
                         break;
-                    case 6:          /* Œ¸Z‡¬1‚Ìİ’è */
+                    case 6:          /* æ¸›ç®—åˆæˆ1ã®è¨­å®š */
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLEND, D3DBLEND_ZERO );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLENDALPHA, D3DBLEND_ONE );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLENDALPHA, D3DBLEND_INVSRCALPHA );
                         break;
-                    case 7:          /* Œ¸Z‡¬2‚Ìİ’è */
+                    case 7:          /* æ¸›ç®—åˆæˆ2ã®è¨­å®š */
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLEND, D3DBLEND_ZERO );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR );
                         g_pD3DDevice->lpVtbl->SetRenderState( g_pD3DDevice, D3DRS_SRCBLENDALPHA, D3DBLEND_ONE );
@@ -5055,7 +5055,7 @@ VALUE RenderTarget_update( VALUE self )
             }
         }
 
-        /* ƒV[ƒ“‚Ì•`‰æI—¹ */
+        /* ã‚·ãƒ¼ãƒ³ã®æç”»çµ‚äº† */
         g_pD3DDevice->lpVtbl->EndScene( g_pD3DDevice );
     }
 
@@ -5069,7 +5069,7 @@ VALUE RenderTarget_update( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   k¬ƒtƒBƒ‹ƒ^æ“¾
+   ç¸®å°ãƒ•ã‚£ãƒ«ã‚¿å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_getMinFilter( VALUE self )
 {
@@ -5080,7 +5080,7 @@ static VALUE RenderTarget_getMinFilter( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   k¬ƒtƒBƒ‹ƒ^İ’è
+   ç¸®å°ãƒ•ã‚£ãƒ«ã‚¿è¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_setMinFilter( VALUE self, VALUE minfilter )
 {
@@ -5092,7 +5092,7 @@ static VALUE RenderTarget_setMinFilter( VALUE self, VALUE minfilter )
 
 
 /*--------------------------------------------------------------------
-   Šg‘åƒtƒBƒ‹ƒ^æ“¾
+   æ‹¡å¤§ãƒ•ã‚£ãƒ«ã‚¿å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_getMagFilter( VALUE self )
 {
@@ -5103,7 +5103,7 @@ static VALUE RenderTarget_getMagFilter( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   Šg‘åƒtƒBƒ‹ƒ^İ’è
+   æ‹¡å¤§ãƒ•ã‚£ãƒ«ã‚¿è¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_setMagFilter( VALUE self, VALUE magfilter )
 {
@@ -5115,7 +5115,7 @@ static VALUE RenderTarget_setMagFilter( VALUE self, VALUE magfilter )
 
 
 /*--------------------------------------------------------------------
-   •`‰æ—\–ñŠm’è
+   æç”»äºˆç´„ç¢ºå®š
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_decide( VALUE self )
 {
@@ -5128,7 +5128,7 @@ static VALUE RenderTarget_decide( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   •`‰æ—\–ñ”jŠü
+   æç”»äºˆç´„ç ´æ£„
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_discard( VALUE self )
 {
@@ -5142,7 +5142,7 @@ static VALUE RenderTarget_discard( VALUE self )
 
 #ifdef DXRUBY15
 /*--------------------------------------------------------------------
-   Ä¶¬Procæ“¾
+   å†ç”ŸæˆProcå–å¾—
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_getRegenerateProc( VALUE self )
 {
@@ -5153,7 +5153,7 @@ static VALUE RenderTarget_getRegenerateProc( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   Ä¶¬Procİ’è
+   å†ç”ŸæˆProcè¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE RenderTarget_setRegenerateProc( VALUE self, VALUE vregenerate_proc )
 {
@@ -5166,23 +5166,23 @@ static VALUE RenderTarget_setRegenerateProc( VALUE self, VALUE vregenerate_proc 
 
 
 /*--------------------------------------------------------------------
-  i“à•”ŠÖ”jƒtƒŒ[ƒ€’²®‰Šú‰»
+  ï¼ˆå†…éƒ¨é–¢æ•°ï¼‰ãƒ•ãƒ¬ãƒ¼ãƒ èª¿æ•´åˆæœŸåŒ–
  ---------------------------------------------------------------------*/
 static void InitSync( void )
 {
     timeBeginPeriod( 1 );
 
-    /* ƒpƒtƒH[ƒ}ƒ“ƒXƒJƒEƒ“ƒ^‚Ì•bŠÔƒJƒEƒ“ƒg’læ“¾ */
+    /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã‚«ã‚¦ãƒ³ã‚¿ã®ç§’é–“ã‚«ã‚¦ãƒ³ãƒˆå€¤å–å¾— */
     if( QueryPerformanceFrequency( (LARGE_INTEGER *)&g_OneSecondCount ) )
     {
-        /* ƒpƒtƒH[ƒ}ƒ“ƒXƒJƒEƒ“ƒ^‚ª‚ ‚éê‡ */
+        /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã‚«ã‚¦ãƒ³ã‚¿ãŒã‚ã‚‹å ´åˆ */
         g_isPerformanceCounter = 1;
         QueryPerformanceCounter( (LARGE_INTEGER *)&g_OldTime );
         g_DrawEndTime = g_OldTime;
     }
     else
     {
-        /* ƒpƒtƒH[ƒ}ƒ“ƒXƒJƒEƒ“ƒ^‚ª–³‚¢ê‡ */
+        /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã‚«ã‚¦ãƒ³ã‚¿ãŒç„¡ã„å ´åˆ */
         g_isPerformanceCounter = 0;
         g_OneSecondCount = 1000;
         g_OldTime = timeGetTime();
@@ -5204,13 +5204,13 @@ void Init_dxruby()
     HRESULT hr;
     int i, j;
 
-    /* ƒCƒ“ƒXƒ^ƒ“ƒXƒnƒ“ƒhƒ‹æ“¾ */
+    /* ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãƒãƒ³ãƒ‰ãƒ«å–å¾— */
     g_hInstance = (HINSTANCE)GetModuleHandle( NULL );
 
-    /* DXRubyƒ‚ƒWƒ…[ƒ‹“o˜^ */
+    /* DXRubyãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ç™»éŒ² */
     mDXRuby = rb_define_module( "DXRuby" );
 
-    /* —áŠO’è‹` */
+    /* ä¾‹å¤–å®šç¾© */
     eDXRubyError = rb_define_class_under( mDXRuby, "DXRubyError", rb_eRuntimeError );
 
 //    hr = CoInitializeEx( NULL, COINIT_MULTITHREADED );
@@ -5221,14 +5221,14 @@ void Init_dxruby()
         rb_raise( eDXRubyError, "initialize error - CoInitialize" );
     }
 
-    /* ƒVƒXƒeƒ€‚ÌƒGƒ“ƒR[ƒhæ“¾ */
+    /* ã‚·ã‚¹ãƒ†ãƒ ã®ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰å–å¾— */
     strcpy( sys_encode, "CP" );
     itoa( GetACP(), sys_encode+2, 10 );
 
-    /* Windowƒ‚ƒWƒ…[ƒ‹“o˜^ */
+    /* Windowãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ç™»éŒ² */
     mWindow = rb_define_module_under( mDXRuby, "Window" );
 
-    /* Windowƒ‚ƒWƒ…[ƒ‹‚Éƒƒ\ƒbƒh“o˜^ */
+    /* Windowãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã«ãƒ¡ã‚½ãƒƒãƒ‰ç™»éŒ² */
     rb_define_singleton_method( mWindow, "loop"     , Window_loop       , -1  );
     rb_define_singleton_method( mWindow, "draw"     , Window_draw       , -1 );
     rb_define_singleton_method( mWindow, "draw_scale", Window_drawScale  , -1 );
@@ -5352,35 +5352,35 @@ void Init_dxruby()
     rb_define_singleton_method( mWindow, "folderDialog" , Window_folderDialog, -1 );
     rb_define_singleton_method( mWindow, "folder_dialog" , Window_folderDialog, -1 );
 
-    /* ShaderƒNƒ‰ƒX’è‹` */
+    /* Shaderã‚¯ãƒ©ã‚¹å®šç¾© */
     cShader = rb_define_class_under( mDXRuby, "Shader", rb_cObject );
 
-    /* ShaderƒNƒ‰ƒX‚Éƒƒ\ƒbƒh“o˜^*/
+    /* Shaderã‚¯ãƒ©ã‚¹ã«ãƒ¡ã‚½ãƒƒãƒ‰ç™»éŒ²*/
     rb_define_private_method( cShader, "initialize", Shader_initialize, -1 );
     rb_define_method( cShader, "technique"   , Shader_getTechnique   , 0 );
     rb_define_method( cShader, "technique="  , Shader_setTechnique   , 1 );
 
-    /* ShaderƒIƒuƒWƒFƒNƒg‚ğ¶¬‚µ‚½‚Éinitialize‚Ì‘O‚ÉŒÄ‚Î‚ê‚éƒƒ‚ƒŠŠ„‚è“–‚ÄŠÖ”“o˜^ */
+    /* Shaderã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã—ãŸæ™‚ã«initializeã®å‰ã«å‘¼ã°ã‚Œã‚‹ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦é–¢æ•°ç™»éŒ² */
     rb_define_alloc_func( cShader, Shader_allocate );
 
 
-    /* ShaderCoreƒNƒ‰ƒX’è‹` */
+    /* ShaderCoreã‚¯ãƒ©ã‚¹å®šç¾© */
     cShaderCore = rb_define_class_under( cShader, "Core", rb_cObject );
 
-    /* ShaderCoreƒNƒ‰ƒX‚Éƒƒ\ƒbƒh“o˜^*/
+    /* ShaderCoreã‚¯ãƒ©ã‚¹ã«ãƒ¡ã‚½ãƒƒãƒ‰ç™»éŒ²*/
     rb_define_private_method( cShaderCore, "initialize", ShaderCore_initialize, -1 );
     rb_define_method( cShaderCore, "dispose"   , ShaderCore_dispose, 0 );
     rb_define_method( cShaderCore, "disposed?" , ShaderCore_check_disposed, 0 );
     rb_define_method( cShaderCore, "param"     , ShaderCore_getParam  , 0 );
 
-    /* ShaderCoreƒIƒuƒWƒFƒNƒg‚ğ¶¬‚µ‚½‚Éinitialize‚Ì‘O‚ÉŒÄ‚Î‚ê‚éƒƒ‚ƒŠŠ„‚è“–‚ÄŠÖ”“o˜^ */
+    /* ShaderCoreã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã—ãŸæ™‚ã«initializeã®å‰ã«å‘¼ã°ã‚Œã‚‹ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦é–¢æ•°ç™»éŒ² */
     rb_define_alloc_func( cShaderCore, ShaderCore_allocate );
 
 
-    /* RenderTargetƒNƒ‰ƒX’è‹` */
+    /* RenderTargetã‚¯ãƒ©ã‚¹å®šç¾© */
     cRenderTarget = rb_define_class_under( mDXRuby, "RenderTarget", rb_cObject );
 
-    /* RenderTargetƒNƒ‰ƒX‚Éƒƒ\ƒbƒh“o˜^*/
+    /* RenderTargetã‚¯ãƒ©ã‚¹ã«ãƒ¡ã‚½ãƒƒãƒ‰ç™»éŒ²*/
     rb_define_private_method( cRenderTarget, "initialize", RenderTarget_initialize, -1 );
     rb_define_method( cRenderTarget, "dispose"   , RenderTarget_dispose   , 0 );
     rb_define_method( cRenderTarget, "disposed?" , RenderTarget_check_disposed, 0 );
@@ -5458,7 +5458,7 @@ void Init_dxruby()
     rb_define_method( cRenderTarget, "drawShader" , RenderTarget_drawShader, -1 );
 
 
-    /* RenderTargetƒIƒuƒWƒFƒNƒg‚ğ¶¬‚µ‚½‚Éinitialize‚Ì‘O‚ÉŒÄ‚Î‚ê‚éƒƒ‚ƒŠŠ„‚è“–‚ÄŠÖ”“o˜^ */
+    /* RenderTargetã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã—ãŸæ™‚ã«initializeã®å‰ã«å‘¼ã°ã‚Œã‚‹ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦é–¢æ•°ç™»éŒ² */
     rb_define_alloc_func( cRenderTarget, RenderTarget_allocate );
 
 
@@ -5482,7 +5482,7 @@ void Init_dxruby()
     rb_define_const( mDXRuby, "C_WHITE"      , rb_ary_new3(4, INT2FIX(255), INT2FIX(255), INT2FIX(255), INT2FIX(255)) );
     rb_define_const( mDXRuby, "C_DEFAULT"    , rb_ary_new3(4, INT2FIX(0), INT2FIX(0), INT2FIX(0), INT2FIX(0))  );
 
-    /* ’è”“o˜^ */
+    /* å®šæ•°ç™»éŒ² */
     rb_define_const( mDXRuby, "VERSION", rb_str_new2( DXRUBY_VERSION ) );
 
     {
@@ -5494,7 +5494,7 @@ void Init_dxruby()
         }
     }
 
-    /* ƒVƒ“ƒ{ƒ‹’è‹` */
+    /* ã‚·ãƒ³ãƒœãƒ«å®šç¾© */
     symbol_blend          = ID2SYM(rb_intern("blend"));
     symbol_angle          = ID2SYM(rb_intern("angle"));
     symbol_alpha          = ID2SYM(rb_intern("alpha"));
@@ -5536,10 +5536,10 @@ void Init_dxruby()
     symbol_aa             = ID2SYM(rb_intern("aa"));
     symbol_call           = ID2SYM(rb_intern("call"));
 
-    /* I—¹‚ÉÀs‚·‚éŠÖ” */
+    /* çµ‚äº†æ™‚ã«å®Ÿè¡Œã™ã‚‹é–¢æ•° */
     rb_set_end_proc( Window_shutdown, Qnil );
 
-    /* ƒƒXƒgƒŠƒXƒg */
+    /* ãƒ­ã‚¹ãƒˆãƒªã‚¹ãƒˆ */
     g_RenderTargetList.pointer = malloc( sizeof(void*) * 16 );
     g_RenderTargetList.count = 0;
     g_RenderTargetList.allocate_size = 16;
@@ -5575,10 +5575,10 @@ void Init_dxruby()
     g_enc_utf16 = rb_enc_find( "UTF-16LE" );
     g_enc_utf8 = rb_enc_find( "UTF-8" );
 
-    /* BGF‚Ì‰Šú‰» */
+    /* BGè‰²ã®åˆæœŸåŒ– */
     Window_set_bgcolor( mWindow, rb_ary_new3( 3, INT2FIX( 0 ), INT2FIX( 0 ), INT2FIX( 0 ) ) );
 
-    /* Œ³‚Ìƒ}ƒEƒXƒJ[ƒ\ƒ‹æ“¾ */
+    /* å…ƒã®ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«å–å¾— */
     mouse_cursor = GetCursor();
 
     InitMessageThread();
@@ -5595,14 +5595,14 @@ void Init_dxruby()
 
     InitSync();
 
-    /* ‰~•`‰æ—pShader¶¬ */
+    /* å††æç”»ç”¨Shaderç”Ÿæˆ */
     Window_createCircleShader();
 
-    /* “h‚è‚Â‚Ô‚µ‰~•`‰æ—pShader¶¬ */
+    /* å¡—ã‚Šã¤ã¶ã—å††æç”»ç”¨Shaderç”Ÿæˆ */
     Window_createCircleFillShader();
 }
 
-/* Ruby1.8‚ÌŒÃ‚¢‚Ù‚¤‘Î‰ */
+/* Ruby1.8ã®å¤ã„ã»ã†å¯¾å¿œ */
 VALUE hash_lookup(VALUE hash, VALUE key)
 {
     VALUE val;
@@ -5614,7 +5614,7 @@ VALUE hash_lookup(VALUE hash, VALUE key)
 }
 
 /*--------------------------------------------------------------------
-    ƒCƒ[ƒW‚ÌƒƒbƒN
+    ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒ­ãƒƒã‚¯
  ---------------------------------------------------------------------*/
 void *DXRuby_lock( VALUE vimage, char **address, int *pitch, int *width, int *height )
 {
@@ -5622,7 +5622,7 @@ void *DXRuby_lock( VALUE vimage, char **address, int *pitch, int *width, int *he
     D3DLOCKED_RECT texrect;
     RECT rect;
 
-    /* ˆø”‚ÌƒCƒ[ƒWƒIƒuƒWƒFƒNƒg‚©‚ç’†g‚ğæ‚èo‚· */
+    /* å¼•æ•°ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ä¸­èº«ã‚’å–ã‚Šå‡ºã™ */
     if( TYPE( vimage ) != T_DATA ) rb_raise(rb_eTypeError, "wrong argument type %s (expected DXRuby::Image)", rb_obj_classname( vimage ));
     image = (struct DXRubyImage *)DATA_PTR( vimage );
     if( DXRUBY_CHECK( Image, vimage ) )
@@ -5648,7 +5648,7 @@ void *DXRuby_lock( VALUE vimage, char **address, int *pitch, int *width, int *he
 
 
 /*--------------------------------------------------------------------
-    ƒCƒ[ƒW‚ÌƒAƒ“ƒƒbƒN
+    ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ã‚¢ãƒ³ãƒ­ãƒƒã‚¯
  ---------------------------------------------------------------------*/
 void DXRuby_unlock( void *texture )
 {
@@ -5729,7 +5729,7 @@ unsigned char icon_bitmap_mask_data[] = {
 };
 
 /*--------------------------------------------------------------------
-  ƒfƒtƒHƒ‹ƒgƒEƒBƒ“ƒhƒEƒAƒCƒRƒ“‚ğİ’è‚·‚é
+  ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¢ã‚¤ã‚³ãƒ³ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static void Window_setDefaultIcon( void )
 {
@@ -5789,7 +5789,7 @@ static void Window_setDefaultIcon( void )
 
 
 /*--------------------------------------------------------------------
-  “à•”—pCircleShader‚ğ¶¬‚·‚éB
+  å†…éƒ¨ç”¨CircleShaderã‚’ç”Ÿæˆã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static void Window_createCircleShader(void)
 {
@@ -5814,7 +5814,7 @@ static void Window_createCircleShader(void)
         g_pD3DDevice, hlsl, strlen( hlsl ), NULL, NULL,
         0 , NULL, &g_WindowInfo.pD3DXEffectCircleShader, &pErr )))
     {
-        // ƒVƒF[ƒ_‚Ì“Ç‚İ‚İ‚Ì¸”s
+        // ã‚·ã‚§ãƒ¼ãƒ€ã®èª­ã¿è¾¼ã¿ã®å¤±æ•—
         rb_raise( eDXRubyError, pErr ? pErr->lpVtbl->GetBufferPointer( pErr ) : "D3DXCreateEffect failed");
     }
 
@@ -5825,7 +5825,7 @@ static void Window_createCircleShader(void)
 
 
 /*--------------------------------------------------------------------
-  “à•”—pCircleFillShader‚ğ¶¬‚·‚éB
+  å†…éƒ¨ç”¨CircleFillShaderã‚’ç”Ÿæˆã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static void Window_createCircleFillShader(void)
 {
@@ -5848,7 +5848,7 @@ static void Window_createCircleFillShader(void)
         g_pD3DDevice, hlsl, strlen( hlsl ), NULL, NULL,
         0 , NULL, &g_WindowInfo.pD3DXEffectCircleFillShader, &pErr )))
     {
-        // ƒVƒF[ƒ_‚Ì“Ç‚İ‚İ‚Ì¸”s
+        // ã‚·ã‚§ãƒ¼ãƒ€ã®èª­ã¿è¾¼ã¿ã®å¤±æ•—
         rb_raise( eDXRubyError, pErr ? pErr->lpVtbl->GetBufferPointer( pErr ) : "D3DXCreateEffect failed");
     }
 

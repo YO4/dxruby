@@ -1,4 +1,4 @@
-#define WINVER 0x0500                                  /* ƒo[ƒWƒ‡ƒ“’è‹` Windows2000ˆÈã */
+#define WINVER 0x0500                                  /* ãƒãƒ¼ã‚¸ãƒ§ãƒ³å®šç¾© Windows2000ä»¥ä¸Š */
 #define _WIN32_WINNT WINVER
 
 #include "ruby.h"
@@ -72,12 +72,12 @@ void DXRuby_raise( int errorcode, char *msg )
     strcat( buf, " - " );
     strcat( buf, msg );
 
-    /* buf‚Ì’†g‚ğƒƒbƒZ[ƒW‚Æ‚µ‚ÄeDXRubyError—áŠO‚ğ“Š‚°‚é */
+    /* bufã®ä¸­èº«ã‚’ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¨ã—ã¦eDXRubyErrorä¾‹å¤–ã‚’æŠ•ã’ã‚‹ */
     rb_funcall( rb_cObject, rb_intern( "raise" ), 2, eDXRubyError, rb_funcall( rb_str_new2( buf ), rb_intern( "force_encoding" ), 1, rb_str_new2( sys_encode ) ) );
 }
 
 /*--------------------------------------------------------------------
-  i“à•”ŠÖ”jƒXƒNƒŠ[ƒ“ƒTƒCƒY•ÏX
+  ï¼ˆå†…éƒ¨é–¢æ•°ï¼‰ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚µã‚¤ã‚ºå¤‰æ›´
  ---------------------------------------------------------------------*/
 static int DDChangeSize( void )
 {
@@ -91,7 +91,7 @@ static int DDChangeSize( void )
 
     if( !g_WindowInfo.windowed )
     {
-        /* ƒtƒ‹ƒXƒNƒŠ[ƒ“i32bitColorŒÅ’è/ƒŠƒtƒŒƒbƒVƒ…ƒŒ[ƒg‚Í‚ ‚ê‚Î‚»‚êA–³‚¯‚ê‚Îˆê”Ô‚‚¢‚à‚Ì) */
+        /* ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³æ™‚ï¼ˆ32bitColorå›ºå®š/ãƒªãƒ•ãƒ¬ãƒƒã‚·ãƒ¥ãƒ¬ãƒ¼ãƒˆã¯ã‚ã‚Œã°ãã‚Œã€ç„¡ã‘ã‚Œã°ä¸€ç•ªé«˜ã„ã‚‚ã®) */
         int count , max, set_refreshrate;
 
         max = g_pD3D->lpVtbl->GetAdapterModeCount( g_pD3D, D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8 );
@@ -102,22 +102,22 @@ static int DDChangeSize( void )
         for( count = 0 ; count < max ; count++ )
         {
             g_pD3D->lpVtbl->EnumAdapterModes( g_pD3D, D3DADAPTER_DEFAULT, D3DFMT_X8R8G8B8 , count , &d3ddm);
-            /* ‰ğ‘œ“x‚ªˆá‚Á‚½‚ç–³‹ */
+            /* è§£åƒåº¦ãŒé•ã£ãŸã‚‰ç„¡è¦– */
             if( g_WindowInfo.width != d3ddm.Width || g_WindowInfo.height != d3ddm.Height )
             {
                 continue;
             }
 
-            /* fpsw’è‚ª‚ ‚èA“¯‚¶‚à‚Ì‚ª‚ ‚Á‚½‚ç‚»‚ê‚ÉŒˆ’è */
+            /* fpsæŒ‡å®šãŒã‚ã‚Šã€åŒã˜ã‚‚ã®ãŒã‚ã£ãŸã‚‰ãã‚Œã«æ±ºå®š */
             if( g_WindowInfo.fps != 0 && d3ddm.RefreshRate == g_WindowInfo.fps )
             {
                 set_refreshrate = d3ddm.RefreshRate;
-                g_sync = 1; // ‚’¼“¯Šúƒ‚[ƒh
+                g_sync = 1; // å‚ç›´åŒæœŸãƒ¢ãƒ¼ãƒ‰
                 g_D3DPP.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
                 break;
             }
 
-            /* –³‚¢ê‡‚É‚Íˆê”Ô‘å‚«‚¢“z‚É‚·‚é */
+            /* ç„¡ã„å ´åˆã«ã¯ä¸€ç•ªå¤§ãã„å¥´ã«ã™ã‚‹ */
             if( d3ddm.RefreshRate > set_refreshrate )
             {
                 set_refreshrate = d3ddm.RefreshRate;
@@ -130,31 +130,31 @@ static int DDChangeSize( void )
     }
     else
     {
-        /* ƒEƒBƒ“ƒhƒEƒ‚[ƒh */
+        /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰æ™‚ */
 
-        /* Œ»İ‚Ìƒ‚[ƒh‚ğæ“¾ */
+        /* ç¾åœ¨ã®ãƒ¢ãƒ¼ãƒ‰ã‚’å–å¾— */
         g_pD3D->lpVtbl->GetAdapterDisplayMode( g_pD3D, D3DADAPTER_DEFAULT , &d3ddm );
 
-        g_sync = 0; // ‚’¼”ñ“¯Šúƒ‚[ƒh
+        g_sync = 0; // å‚ç›´éåŒæœŸãƒ¢ãƒ¼ãƒ‰
         g_D3DPP.PresentationInterval       = D3DPRESENT_INTERVAL_IMMEDIATE;
         g_D3DPP.BackBufferFormat           = D3DFMT_UNKNOWN;
         g_D3DPP.Windowed                   = TRUE;
         g_D3DPP.FullScreen_RefreshRateInHz = 0;
     }
 
-    /* D3DXSprite‚ğƒƒXƒg‚³‚¹‚é */
+    /* D3DXSpriteã‚’ãƒ­ã‚¹ãƒˆã•ã›ã‚‹ */
     if( g_pD3DXSprite )
     {
         g_pD3DXSprite->lpVtbl->OnLostDevice( g_pD3DXSprite );
     }
 
-    /* ƒƒCƒ“ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì‰ğ•ú */
+    /* ãƒ¡ã‚¤ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®è§£æ”¾ */
     {
         struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, g_WindowInfo.render_target );
         RELEASE( rt->surface );
     }
 
-    /* ƒ†[ƒU[ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì‰ğ•ú */
+    /* ãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®è§£æ”¾ */
 //    ppD3DTexture = (LPDIRECT3DTEXTURE9 *)alloca( g_RenderTargetList.count * sizeof(LPDIRECT3DTEXTURE9 *) );
     for( i = 0; i < g_RenderTargetList.count; i++ )
     {
@@ -167,30 +167,30 @@ static int DDChangeSize( void )
         }
     }
 
-    /* ƒVƒF[ƒ_‚ÌƒƒXƒg */
+    /* ã‚·ã‚§ãƒ¼ãƒ€ã®ãƒ­ã‚¹ãƒˆ */
     for( i = 0; i < g_ShaderCoreList.count; i++ )
     {
         struct DXRubyShaderCore *core = (struct DXRubyShaderCore *)g_ShaderCoreList.pointer[i];
         core->pD3DXEffect->lpVtbl->OnLostDevice( core->pD3DXEffect );
     }
 
-    /* İ’è•ÏX */
+    /* è¨­å®šå¤‰æ›´ */
     hr = g_pD3DDevice->lpVtbl->Reset( g_pD3DDevice, &g_D3DPP );
     if( FAILED( hr ) ) return 1;
 
-    /* ƒƒCƒ“ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•œŒ³ */
+    /* ãƒ¡ã‚¤ãƒ³ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¾©å…ƒ */
     {
         struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, g_WindowInfo.render_target );
         g_pD3DDevice->lpVtbl->GetRenderTarget( g_pD3DDevice, 0, &rt->surface );
     }
 
-    /* ƒ†[ƒU[ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•œŒ³ */
+    /* ãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¾©å…ƒ */
     for( i = 0; i < g_RenderTargetList.count; i++ )
     {
         struct DXRubyRenderTarget *rt = (struct DXRubyRenderTarget *)g_RenderTargetList.pointer[i];
         if( g_RenderTargetList.pointer[i] )
         {
-            /* ƒeƒNƒXƒ`ƒƒƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é */
+            /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹ */
             hr = D3DXCreateTexture( g_pD3DDevice, (UINT)rt->texture->width, (UINT)rt->texture->height,
                                     1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
                                     &rt->texture->pD3DTexture);
@@ -201,14 +201,14 @@ static int DDChangeSize( void )
         }
     }
 
-    /* ƒVƒF[ƒ_‚Ì•œ‹A */
+    /* ã‚·ã‚§ãƒ¼ãƒ€ã®å¾©å¸° */
     for( i = 0; i < g_ShaderCoreList.count; i++ )
     {
         struct DXRubyShaderCore *core = (struct DXRubyShaderCore *)g_ShaderCoreList.pointer[i];
         core->pD3DXEffect->lpVtbl->OnResetDevice( core->pD3DXEffect );
     }
 
-    /* D3DXSprite•œ‹A */
+    /* D3DXSpriteå¾©å¸° */
     if( g_pD3DXSprite )
     {
         g_pD3DXSprite->lpVtbl->OnResetDevice( g_pD3DXSprite );
@@ -218,7 +218,7 @@ static int DDChangeSize( void )
 }
 
 /*--------------------------------------------------------------------
-   ƒEƒBƒ“ƒhƒE‚Ì¶¬‚Æ‰Šú‰»
+   ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç”Ÿæˆã¨åˆæœŸåŒ–
  ---------------------------------------------------------------------*/
 static int ChangeSize()
 {
@@ -228,46 +228,46 @@ static int ChangeSize()
     struct DXRubyRenderTarget *rt;
     int ret;
 
-    /* ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒYİ’è */
+    /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºè¨­å®š */
     rect.top     = 0;
     rect.left    = 0;
     rect.right   = (LONG)(g_WindowInfo.width * g_WindowInfo.scale);
     rect.bottom  = (LONG)(g_WindowInfo.height * g_WindowInfo.scale);
 
-    /* ƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒYC³ */
+    /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºä¿®æ­£ */
     if( !g_WindowInfo.windowed )
-    {   /* ƒtƒ‹ƒXƒNƒŠ[ƒ“ */
+    {   /* ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ */
         SetWindowLong( g_hWnd, GWL_STYLE, WS_POPUP );
         SetWindowPos( g_hWnd, HWND_TOP, 0, 0, g_WindowInfo.width, g_WindowInfo.height, 0);
     }
     else
-    {   /* ƒEƒBƒ“ƒhƒEƒ‚[ƒh */
+    {   /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰ */
         SetWindowLong( g_hWnd, GWL_STYLE, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX);
         AdjustWindowRect( &rect, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, FALSE );
 
-        /* •‚Æ‚‚³ŒvZ */
+        /* å¹…ã¨é«˜ã•è¨ˆç®— */
         rect.right   = rect.right - rect.left;
         rect.bottom  = rect.bottom - rect.top;
 
-        /* ƒEƒBƒ“ƒhƒEˆÚ“®/ƒTƒCƒYİ’è */
+        /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç§»å‹•/ã‚µã‚¤ã‚ºè¨­å®š */
         if( g_WindowInfo.x == CW_USEDEFAULT )
-        {   /* ˆÊ’u‚ªƒfƒtƒHƒ‹ƒg‚Ìê‡ */
+        {   /* ä½ç½®ãŒãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®å ´åˆ */
             SetWindowPos( g_hWnd, HWND_NOTOPMOST , 0, 0, rect.right, rect.bottom, SWP_NOMOVE);
         }
         else
-        {   /* ˆÊ’uw’è‚Ìê‡ */
+        {   /* ä½ç½®æŒ‡å®šã®å ´åˆ */
             SetWindowPos( g_hWnd, HWND_NOTOPMOST, g_WindowInfo.x, g_WindowInfo.y, rect.right, rect.bottom, 0 );
         }
     }
 
-    /* DirectX‚ÌƒXƒNƒŠ[ƒ“ƒTƒCƒY•ÏX */
+    /* DirectXã®ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚µã‚¤ã‚ºå¤‰æ›´ */
     ret = DDChangeSize();
     if( ret != 0 )
     {
         return ret;
     }
 
-    /* ƒEƒBƒ“ƒhƒE•\¦ */
+    /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦è¡¨ç¤º */
     ShowWindow( g_hWnd, SW_SHOWNORMAL );
     InvalidateRect( NULL, NULL, TRUE );
     UpdateWindow( g_hWnd );
@@ -275,7 +275,7 @@ static int ChangeSize()
     {
         struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, g_WindowInfo.render_target );
 
-        /* ƒV[ƒ“‚ÌƒNƒŠƒA */
+        /* ã‚·ãƒ¼ãƒ³ã®ã‚¯ãƒªã‚¢ */
         g_pD3DDevice->lpVtbl->SetRenderTarget( g_pD3DDevice, 0, rt->surface );
         g_pD3DDevice->lpVtbl->Clear( g_pD3DDevice, 0, NULL, D3DCLEAR_TARGET,
                                      D3DCOLOR_XRGB( rt->r, rt->g, rt->b ), 0, 0 );
@@ -297,17 +297,17 @@ static int reset( void )
 {
     HRESULT hr;
     hr = g_pD3DDevice->lpVtbl->TestCooperativeLevel( g_pD3DDevice );
-    if( hr == D3DERR_DEVICENOTRESET ) /* ƒfƒoƒCƒX‚ÍƒƒXƒgó‘Ô‚Å‚ ‚é‚ªƒŠƒZƒbƒg‰Â”\‚Å‚ ‚é */
+    if( hr == D3DERR_DEVICENOTRESET ) /* ãƒ‡ãƒã‚¤ã‚¹ã¯ãƒ­ã‚¹ãƒˆçŠ¶æ…‹ã§ã‚ã‚‹ãŒãƒªã‚»ãƒƒãƒˆå¯èƒ½ã§ã‚ã‚‹ */
     {
         int i;
-        /* ‚±‚±‚Ö—ˆ‚½‚ÍƒfƒoƒCƒX‚ªƒŠƒZƒbƒg‰Â”\ó‘Ô‚Å‚ ‚é */
-        /* D3DXSprite‚ğƒƒXƒg‚³‚¹‚é */
+        /* ã“ã“ã¸æ¥ãŸæ™‚ã¯ãƒ‡ãƒã‚¤ã‚¹ãŒãƒªã‚»ãƒƒãƒˆå¯èƒ½çŠ¶æ…‹ã§ã‚ã‚‹ */
+        /* D3DXSpriteã‚’ãƒ­ã‚¹ãƒˆã•ã›ã‚‹ */
         if( g_pD3DXSprite )
         {
             g_pD3DXSprite->lpVtbl->OnLostDevice( g_pD3DXSprite );
         }
 
-        /* ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì‰ğ•ú */
+        /* ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®è§£æ”¾ */
         {
             struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, g_WindowInfo.render_target );
             RELEASE( rt->surface );
@@ -322,19 +322,19 @@ static int reset( void )
             }
         }
 
-        /* ƒVƒF[ƒ_‚ÌƒƒXƒg */
+        /* ã‚·ã‚§ãƒ¼ãƒ€ã®ãƒ­ã‚¹ãƒˆ */
         for( i = 0; i < g_ShaderCoreList.count; i++ )
         {
             struct DXRubyShaderCore *core = (struct DXRubyShaderCore *)g_ShaderCoreList.pointer[i];
             core->pD3DXEffect->lpVtbl->OnLostDevice( core->pD3DXEffect );
         }
 
-        hr = g_pD3DDevice->lpVtbl->Reset( g_pD3DDevice, &g_D3DPP ); /* •œŒ³‚ğ‚İ‚é */
+        hr = g_pD3DDevice->lpVtbl->Reset( g_pD3DDevice, &g_D3DPP ); /* å¾©å…ƒã‚’è©¦ã¿ã‚‹ */
         if( FAILED( hr ) )
         {
             if( hr == D3DERR_DEVICELOST )
             {
-                return 5; /* ‚Ü‚½ƒƒXƒg‚µ‚½ */
+                return 5; /* ã¾ãŸãƒ­ã‚¹ãƒˆã—ãŸ */
             }
             if( hr == D3DERR_INVALIDCALL )
             {
@@ -343,7 +343,7 @@ static int reset( void )
             return 1;
         }
 
-        /* ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì•œŒ³ */
+        /* ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®å¾©å…ƒ */
         {
             struct DXRubyRenderTarget *rt = DXRUBY_GET_STRUCT( RenderTarget, g_WindowInfo.render_target );
             g_pD3DDevice->lpVtbl->GetRenderTarget( g_pD3DDevice, 0, &rt->surface );
@@ -353,7 +353,7 @@ static int reset( void )
             struct DXRubyRenderTarget *rt = (struct DXRubyRenderTarget *)g_RenderTargetList.pointer[i];
             if( g_RenderTargetList.pointer[i] )
             {
-                /* ƒeƒNƒXƒ`ƒƒƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚é */
+                /* ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹ */
                 hr = D3DXCreateTexture( g_pD3DDevice, (UINT)rt->texture->width, (UINT)rt->texture->height,
                                         1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
                                         &rt->texture->pD3DTexture);
@@ -364,23 +364,23 @@ static int reset( void )
             }
         }
 
-        /* ƒVƒF[ƒ_‚Ì•œ‹A */
+        /* ã‚·ã‚§ãƒ¼ãƒ€ã®å¾©å¸° */
         for( i = 0; i < g_ShaderCoreList.count; i++ )
         {
             struct DXRubyShaderCore *core = (struct DXRubyShaderCore *)g_ShaderCoreList.pointer[i];
             core->pD3DXEffect->lpVtbl->OnResetDevice( core->pD3DXEffect );
         }
 
-        if( g_pD3DXSprite ) /* D3DXSprite•œ‹A */
+        if( g_pD3DXSprite ) /* D3DXSpriteå¾©å¸° */
         {
             g_pD3DXSprite->lpVtbl->OnResetDevice( g_pD3DXSprite );
         }
     }
-    else if( hr == D3DERR_DEVICELOST )  /* ƒfƒoƒCƒX‚ÍƒƒXƒgó‘Ô‚Å‚ ‚é */
+    else if( hr == D3DERR_DEVICELOST )  /* ãƒ‡ãƒã‚¤ã‚¹ã¯ãƒ­ã‚¹ãƒˆçŠ¶æ…‹ã§ã‚ã‚‹ */
     {
-        return 5; /* Ÿ‚Ì‹@‰ï‚É */
+        return 5; /* æ¬¡ã®æ©Ÿä¼šã« */
     }
-    else /* DirectX‚Ì“à•”ƒGƒ‰[ */
+    else /* DirectXã®å†…éƒ¨ã‚¨ãƒ©ãƒ¼ */
     {
         return 4;
     }
@@ -390,7 +390,7 @@ static int reset( void )
 
 
 /*--------------------------------------------------------------------
-   ƒXƒŒƒbƒhƒƒCƒ“
+   ã‚¹ãƒ¬ãƒƒãƒ‰ãƒ¡ã‚¤ãƒ³
  ---------------------------------------------------------------------*/
 static DWORD WINAPI MessageThreadProc( LPVOID lpParameter )
 {
@@ -399,7 +399,7 @@ static DWORD WINAPI MessageThreadProc( LPVOID lpParameter )
 
     CoInitializeEx( NULL, COINIT_MULTITHREADED );
 
-    /* ƒEƒBƒ“ƒhƒEì¬(‚±‚Ì“_‚Å‚Í”ñ•\¦) */
+    /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½œæˆ(ã“ã®æ™‚ç‚¹ã§ã¯éè¡¨ç¤º) */
     InitWindow();
     if( MainThreadError != 0 )
     {
@@ -407,7 +407,7 @@ static DWORD WINAPI MessageThreadProc( LPVOID lpParameter )
         ExitThread( 0 );
     }
 
-    /* DirectX Graphics‚Ì‰Šú‰» */
+    /* DirectX Graphicsã®åˆæœŸåŒ– */
     InitDXGraphics();
     if( MainThreadError != 0 )
     {
@@ -415,7 +415,7 @@ static DWORD WINAPI MessageThreadProc( LPVOID lpParameter )
         ExitThread( 0 );
     }
 
-    /* DirectInput‰Šú‰» */
+    /* DirectInputåˆæœŸåŒ– */
     InitDirectInput();
     if( MainThreadError != 0 )
     {
@@ -423,17 +423,17 @@ static DWORD WINAPI MessageThreadProc( LPVOID lpParameter )
         ExitThread( 0 );
     }
 
-    /* ‰Šú‰»‚ªI‚í‚Á‚½‚±‚Æ‚Ì’Ê’m */
+    /* åˆæœŸåŒ–ãŒçµ‚ã‚ã£ãŸã“ã¨ã®é€šçŸ¥ */
     SetEvent( hEventMainThreadStart );
 
-    /* ƒƒbƒZ[ƒWƒ‹[ƒv */
-    /* WM_QUIT‚ª“Í‚­‚Ü‚ÅƒƒbƒZ[ƒWˆ—‚ğ‚µ‘±‚¯‚é */
+    /* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒ«ãƒ¼ãƒ— */
+    /* WM_QUITãŒå±Šãã¾ã§ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã‚’ã—ç¶šã‘ã‚‹ */
     while( msg.message != WM_QUIT )
     {
         if( GetMessage( &msg, 0, 0, 0 ) != 0)
 //        if( PeekMessage( &msg, g_hWnd, 0, 0, PM_REMOVE ) != 0)
         {
-            /* ƒƒbƒZ[ƒW‚ª‚ ‚é */
+            /* ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒã‚ã‚‹æ™‚ */
             TranslateMessage( &msg );
             DispatchMessage( &msg );
         }
@@ -446,12 +446,12 @@ static DWORD WINAPI MessageThreadProc( LPVOID lpParameter )
 
     CoUninitialize();
 
-    // ƒXƒŒƒbƒhI—¹
+    // ã‚¹ãƒ¬ãƒƒãƒ‰çµ‚äº†
     ExitThread( 0 );
 }
 
 /*--------------------------------------------------------------------
-   i“à•”ŠÖ”jƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
+   ï¼ˆå†…éƒ¨é–¢æ•°ï¼‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
  ---------------------------------------------------------------------*/
 LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
@@ -464,7 +464,7 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
         break;
 
     case WM_ACTIVATE:
-        /* ƒEƒBƒ“ƒhƒEƒAƒNƒeƒBƒu^”ñƒAƒNƒeƒBƒu‰» */
+        /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ï¼éã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ– */
         g_WindowInfo.active = (LOWORD(wParam) != 0);
         break;
 
@@ -473,7 +473,7 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
         return 0;
 
     case WM_DESTROY:
-        /* ƒEƒBƒ“ƒhƒE”jŠü */
+        /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç ´æ£„ */
         PostQuitMessage( 0 );
         g_hWnd = NULL;
         return 0;
@@ -510,7 +510,7 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
 #ifdef DXRUBY15
     case WM_KEYDOWN:
         EnterCriticalSection( &ime_cs );
-        if( ime_vk_push_str_length+1 >= IME_VK_BUF_SIZE-1 ) /* ƒoƒbƒtƒ@ƒI[ƒo[‚µ‚½‚çƒNƒŠƒA‚µ‚¿‚á‚¤ */
+        if( ime_vk_push_str_length+1 >= IME_VK_BUF_SIZE-1 ) /* ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ¼ãƒãƒ¼ã—ãŸã‚‰ã‚¯ãƒªã‚¢ã—ã¡ã‚ƒã† */
         {
             ime_vk_push_str_length = 0;
         }
@@ -520,7 +520,7 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
     case WM_KEYUP:
         EnterCriticalSection( &ime_cs );
-        if( ime_vk_release_str_length+1 >= IME_VK_BUF_SIZE-1 ) /* ƒoƒbƒtƒ@ƒI[ƒo[‚µ‚½‚çƒNƒŠƒA‚µ‚¿‚á‚¤ */
+        if( ime_vk_release_str_length+1 >= IME_VK_BUF_SIZE-1 ) /* ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ¼ãƒãƒ¼ã—ãŸã‚‰ã‚¯ãƒªã‚¢ã—ã¡ã‚ƒã† */
         {
             ime_vk_release_str_length = 0;
         }
@@ -535,7 +535,7 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
         }
 
         EnterCriticalSection( &ime_cs );
-        if( ime_str_length+1 >= IME_BUF_SIZE-1 ) /* ƒoƒbƒtƒ@ƒI[ƒo[‚µ‚½‚çƒNƒŠƒA‚µ‚¿‚á‚¤ */
+        if( ime_str_length+1 >= IME_BUF_SIZE-1 ) /* ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ¼ãƒãƒ¼ã—ãŸã‚‰ã‚¯ãƒªã‚¢ã—ã¡ã‚ƒã† */
         {
             ime_str_length = 0;
         }
@@ -549,7 +549,7 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
         if( ((char)(wParam >> 8) & 0xff) != 0 )
         {
             EnterCriticalSection( &ime_cs );
-            if( ime_str_length+1 >= IME_BUF_SIZE-1 ) /* ƒoƒbƒtƒ@ƒI[ƒo[‚µ‚½‚çƒNƒŠƒA‚µ‚¿‚á‚¤ */
+            if( ime_str_length+1 >= IME_BUF_SIZE-1 ) /* ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ¼ãƒãƒ¼ã—ãŸã‚‰ã‚¯ãƒªã‚¢ã—ã¡ã‚ƒã† */
             {
                 ime_str_length = 0;
             }
@@ -564,33 +564,33 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
 #endif
 
     case WM_APP + 0:
-        /* ƒfƒoƒCƒX‚ÌƒŠƒZƒbƒg */
+        /* ãƒ‡ãƒã‚¤ã‚¹ã®ãƒªã‚»ãƒƒãƒˆ */
         return reset();
 
     case WM_APP + 1:
-        /* ƒEƒBƒ“ƒhƒE‚Ìİ’è•ÏX */
+        /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®è¨­å®šå¤‰æ›´ */
         return ChangeSize();
 
     case WM_APP + 2:
-        /* ƒJ[ƒ\ƒ‹‚Ì•\¦ */
+        /* ã‚«ãƒ¼ã‚½ãƒ«ã®è¡¨ç¤º */
         while( ShowCursor( TRUE ) < 0 );
         g_WindowInfo.enablemouse = 1;
         return 0;
 
     case WM_APP + 3:
-        /* ƒJ[ƒ\ƒ‹‚Ì”ñ•\¦ */
+        /* ã‚«ãƒ¼ã‚½ãƒ«ã®éè¡¨ç¤º */
         while( ShowCursor( FALSE ) >= 0 );
         g_WindowInfo.enablemouse = 0;
         return 0;
 
     case WM_APP + 4:
-        /* ƒJ[ƒ\ƒ‹‚Ì•ÏX */
+        /* ã‚«ãƒ¼ã‚½ãƒ«ã®å¤‰æ›´ */
         SetCursor( LoadCursor( NULL, (LPSTR)lParam ));
         return 0;
 
 #ifdef DXRUBY15
     case WM_APP + 6:
-        /* IME‚Ì—LŒø‰»/–³Œø‰» */
+        /* IMEã®æœ‰åŠ¹åŒ–/ç„¡åŠ¹åŒ– */
         if( (int)lParam )
         {
             if( default_imc )
@@ -610,7 +610,7 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
         return 0;
 
     case WM_APP + 7:
-        /* IME‚Ìó‘Ô‚ğ•Ô‚· */
+        /* IMEã®çŠ¶æ…‹ã‚’è¿”ã™ */
 //        return WINNLSGetEnableStatus( g_hWnd );
         return !!default_imc;
 
@@ -705,7 +705,7 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
                     return 0;
                 }
 
-                if( ime_str_length + len + 1 >= IME_BUF_SIZE-1 ) /* ƒoƒbƒtƒ@ƒI[ƒo[‚µ‚½‚çƒNƒŠƒA‚µ‚¿‚á‚¤ */
+                if( ime_str_length + len + 1 >= IME_BUF_SIZE-1 ) /* ãƒãƒƒãƒ•ã‚¡ã‚ªãƒ¼ãƒãƒ¼ã—ãŸã‚‰ã‚¯ãƒªã‚¢ã—ã¡ã‚ƒã† */
                 {
                     ime_str_length = 0;
                 }
@@ -777,19 +777,19 @@ LRESULT CALLBACK MessageThreadWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARA
 #endif
     }
 
-    /* ƒfƒtƒHƒ‹ƒgˆ— */
+    /* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå‡¦ç† */
     return DefWindowProc( hWnd, msg, wParam, lParam );
 }
 
 /*--------------------------------------------------------------------
-  i“à•”ŠÖ”jƒEƒBƒ“ƒhƒE‚Ì¶¬
+  ï¼ˆå†…éƒ¨é–¢æ•°ï¼‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç”Ÿæˆ
  ---------------------------------------------------------------------*/
 static int InitWindow( void )
 {
     WNDCLASSEX wcex;
     RECT rect;
 
-    /* ƒEƒCƒ“ƒhƒEEƒNƒ‰ƒX‚Ì“o˜^ */
+    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ»ã‚¯ãƒ©ã‚¹ã®ç™»éŒ² */
     wcex.cbSize        = sizeof( WNDCLASSEX );
     wcex.style         = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc   = (WNDPROC)MessageThreadWndProc;
@@ -809,7 +809,7 @@ static int InitWindow( void )
         return MainThreadError;
     }
 
-    /* ƒƒCƒ“EƒEƒCƒ“ƒhƒEì¬(ƒEƒCƒ“ƒhƒEEƒ‚[ƒh—p) */
+    /* ãƒ¡ã‚¤ãƒ³ãƒ»ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ä½œæˆ(ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ»ãƒ¢ãƒ¼ãƒ‰ç”¨) */
     rect.top     = 0;
     rect.left    = 0;
     rect.right   = g_WindowInfo.width;
@@ -842,14 +842,14 @@ static int InitWindow( void )
 
 
 /*--------------------------------------------------------------------
-  i“à•”ŠÖ”jDirectX Graphics‰Šú‰»
+  ï¼ˆå†…éƒ¨é–¢æ•°ï¼‰DirectX GraphicsåˆæœŸåŒ–
  ---------------------------------------------------------------------*/
 static int InitDXGraphics( void )
 {
     D3DVIEWPORT9 vp;
     HRESULT hr;
 
-    /* Direct3DƒIƒuƒWƒFƒNƒg‚Ìì¬ */
+    /* Direct3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆ */
     g_pD3D = Direct3DCreate9( D3D_SDK_VERSION );
 
     if( g_pD3D == NULL )
@@ -858,7 +858,7 @@ static int InitDXGraphics( void )
         return MainThreadError;
     }
 
-    /* D3DDeviceƒIƒuƒWƒFƒNƒg‚Ìì¬(ƒEƒCƒ“ƒhƒEEƒ‚[ƒh) */
+    /* D3DDeviceã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆ(ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ»ãƒ¢ãƒ¼ãƒ‰) */
     ZeroMemory( &g_D3DPP, sizeof( g_D3DPP ) );
 
     g_D3DPP.BackBufferWidth            = 0;
@@ -891,7 +891,7 @@ static int InitDXGraphics( void )
         }
     }
 
-    /* ƒrƒ…[ƒ|[ƒg‚Ìİ’è */
+    /* ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®è¨­å®š */
     vp.X       = 0;
     vp.Y       = 0;
     vp.Width   = g_D3DPP.BackBufferWidth;
@@ -910,7 +910,7 @@ static int InitDXGraphics( void )
     g_pD3DDevice->lpVtbl->Clear( g_pD3DDevice, 0, NULL, D3DCLEAR_TARGET,
                                  D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
 
-    /* D3DXSpriteƒIƒuƒWƒFƒNƒgì¬ */
+    /* D3DXSpriteã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä½œæˆ */
     hr = D3DXCreateSprite( g_pD3DDevice, &g_pD3DXSprite );
 
     if( FAILED( hr ) )
@@ -923,33 +923,33 @@ static int InitDXGraphics( void )
 }
 
 /*--------------------------------------------------------------------
-   DirectXƒIƒuƒWƒFƒNƒg‚ğ‰ğ•ú‚·‚é
+   DirectXã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’è§£æ”¾ã™ã‚‹
  ---------------------------------------------------------------------*/
 static void DXRelease()
 {
     int i;
     HRESULT hr;
 
-    /* ‰~•`‰æ—pShader‰ğ•ú */
+    /* å††æç”»ç”¨Shaderè§£æ”¾ */
     RELEASE( g_WindowInfo.pD3DXEffectCircleShader );
     RELEASE( g_WindowInfo.pD3DXEffectCircleFillShader );
 
-    /* D3DXSpriteƒIƒuƒWƒFƒNƒg‚Ìg—pI—¹ */
+    /* D3DXSpriteã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ç”¨çµ‚äº† */
     if( g_pD3DXSprite )
     {
         g_pD3DXSprite->lpVtbl->OnLostDevice( g_pD3DXSprite );
     }
 
-    /* DirectInput‰ğ•ú */
+    /* DirectInputè§£æ”¾ */
     Input_release();
 
-    /* D3DXSpriteƒIƒuƒWƒFƒNƒg”jŠü */
+    /* D3DXSpriteã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç ´æ£„ */
     RELEASE( g_pD3DXSprite );
 
-    /* Direct3D DeviceƒIƒuƒWƒFƒNƒg‚Ì”jŠü */
+    /* Direct3D Deviceã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç ´æ£„ */
     RELEASE( g_pD3DDevice );
 
-	/* Direct3DƒIƒuƒWƒFƒNƒg‚Ì”jŠü */
+	/* Direct3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç ´æ£„ */
     RELEASE( g_pD3D );
 }
 
@@ -1093,7 +1093,7 @@ void ExitMessageThread( void )
     DeleteCriticalSection( &ime_cs );
 #endif
 
-    /* ƒEƒCƒ“ƒhƒEEƒNƒ‰ƒX‚Ì“o˜^‰ğœ */
+    /* ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ãƒ»ã‚¯ãƒ©ã‚¹ã®ç™»éŒ²è§£é™¤ */
     UnregisterClass( "DXRuby", g_hInstance );
 
     CloseHandle( hMessageThread );
@@ -1128,7 +1128,7 @@ void WindowCreateMessage( void )
 int ResetMessage( void )
 {
     int ret;
-    /* ƒfƒoƒCƒXƒƒXƒg‚Ìê‡‚Ìˆ— */
+    /* ãƒ‡ãƒã‚¤ã‚¹ãƒ­ã‚¹ãƒˆã®å ´åˆã®å‡¦ç† */
     ret = SendMessage( g_hWnd, WM_APP + 0, 0, 0 );
     switch( ret )
     {
@@ -1151,7 +1151,7 @@ int ResetMessage( void )
         DXRuby_raise( ERR_INTERNAL, "Reset_InvaridCall" );
         break;
     }
-    Sleep(100); /* ‚Æ‚è‚ ‚¦‚¸wait */
+    Sleep(100); /* ã¨ã‚Šã‚ãˆãšwait */
     return ret;
 }
 

@@ -1,4 +1,4 @@
-/* 行列 */
+/* 陦悟�� */
 struct DXRubyMatrix {
     int x;
     int y;
@@ -13,7 +13,7 @@ struct DXRubyMatrix {
     };
 };
 
-/* ベクトル */
+/* 繝吶け繝医Ν */
 struct DXRubyVector {
     int x;
     union {

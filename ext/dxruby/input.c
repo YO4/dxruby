@@ -1,8 +1,8 @@
-/* ƒAƒiƒƒOƒpƒbƒh“ü—Í‚ÌƒR[ƒh‚Í @iMAKOPi‚³‚ñ‚æ‚è’¸‚«‚Ü‚µ‚½B2012/07/06 */
-#define WINVER 0x0500                                  /* ƒo[ƒWƒ‡ƒ“’è‹` Windows2000ˆÈã */
+/* ã‚¢ãƒŠãƒ­ã‚°ãƒ‘ãƒƒãƒ‰å…¥åŠ›ã®ã‚³ãƒ¼ãƒ‰ã¯ @iMAKOPiã•ã‚“ã‚ˆã‚Šé ‚ãã¾ã—ãŸã€‚2012/07/06 */
+#define WINVER 0x0500                                  /* ãƒãƒ¼ã‚¸ãƒ§ãƒ³å®šç¾© Windows2000ä»¥ä¸Š */
 #define _WIN32_WINNT WINVER
 #undef DIRECTINPUT_VERSION
-#define DIRECTINPUT_VERSION        (0x0800)            /* DirectInputƒo[ƒWƒ‡ƒ“’è‹` */
+#define DIRECTINPUT_VERSION        (0x0800)            /* DirectInputãƒãƒ¼ã‚¸ãƒ§ãƒ³å®šç¾© */
 
 #include "ruby.h"
 #ifndef RUBY_ST_H
@@ -30,7 +30,7 @@ extern rb_data_type_t Font_data_type;
 
 #define PADMAX 2
 
-/* ŠÇ—‚·‚éƒ{ƒ^ƒ“‚ÌŒÂ” */
+/* ç®¡ç†ã™ã‚‹ãƒœã‚¿ãƒ³ã®å€‹æ•° */
 #define PADBUTTON_MAX 28
 
 #define P_LEFT     0
@@ -54,19 +54,19 @@ extern rb_data_type_t Font_data_type;
 #define P_BUTTON14 18
 #define P_BUTTON15 19
 
-/* ¶ƒAƒiƒƒOƒXƒeƒBƒbƒN */
+/* å·¦ã‚¢ãƒŠãƒ­ã‚°ã‚¹ãƒ†ã‚£ãƒƒã‚¯ */
 #define P_L_LEFT     0
 #define P_L_RIGHT    1
 #define P_L_UP       2
 #define P_L_DOWN     3
 
-/* ƒfƒWƒ^ƒ‹\šƒ{ƒ^ƒ“ */
+/* ãƒ‡ã‚¸ã‚¿ãƒ«åå­—ãƒœã‚¿ãƒ³ */
 #define P_D_LEFT     20
 #define P_D_RIGHT    21
 #define P_D_UP       22
 #define P_D_DOWN     23
 
-/* ‰EƒAƒiƒƒOƒXƒeƒBƒbƒN */
+/* å³ã‚¢ãƒŠãƒ­ã‚°ã‚¹ãƒ†ã‚£ãƒƒã‚¯ */
 #define P_R_LEFT     24
 #define P_R_RIGHT    25
 #define P_R_UP       26
@@ -76,7 +76,7 @@ extern rb_data_type_t Font_data_type;
 #define M_RBUTTON   1
 #define M_MBUTTON   2
 
-/* POV‚Ì•ûŒü”»’è—p */
+/* POVã®æ–¹å‘åˆ¤å®šç”¨ */
 #define POV_UP          0
 #define POV_UP_RIGHT    4500
 #define POV_RIGHT       9000
@@ -87,17 +87,17 @@ extern rb_data_type_t Font_data_type;
 #define POV_UP_LEFT     31500
 
 
-static VALUE mInput;        /* ƒCƒ“ƒvƒbƒgƒ‚ƒWƒ…[ƒ‹ */
-static VALUE mIME;          /* IMEƒ‚ƒWƒ…[ƒ‹ */
+static VALUE mInput;        /* ã‚¤ãƒ³ãƒ—ãƒƒãƒˆãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ« */
+static VALUE mIME;          /* IMEãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ« */
 static LPDIRECTINPUT8        g_pDInput            = NULL; /* DirectInput */
-static LPDIRECTINPUTDEVICE8  g_pDIDKeyBoard       = NULL; /* DirectInput‚ÌƒL[ƒ{[ƒhƒfƒoƒCƒX */
-static LPDIRECTINPUTDEVICE8  g_pDIDJoyPad[PADMAX];        /* DirectInput‚ÌƒpƒbƒhƒfƒoƒCƒX     */
-static BYTE g_diKeyState[256];                            /* DirectInput‚Å‚ÌƒL[ƒ{[ƒh“ü—Í—pƒoƒbƒtƒ@ */
-static BYTE g_diKeyStateOld[256];                         /* DirectInput‚Å‚ÌƒL[ƒ{[ƒh“ü—Í—pƒoƒbƒtƒ@‚PƒtƒŒ[ƒ€‘O */
-static BYTE g_diKeyCount[256];                            /* DirectInput‚Å‚ÌƒL[ƒ{[ƒh“ü—Í—pƒJƒEƒ“ƒ^ */
-static BYTE g_diKeyConfig[256];                           /* DirectInput‚Å‚ÌƒL[ƒ{[ƒhEƒpƒbƒhŠ„‚è“–‚Ä */
-static BYTE g_diKeyWait[256];                             /* ƒI[ƒgƒŠƒs[ƒgƒEƒFƒCƒgŠÔ */
-static BYTE g_diKeyInterval[256];                         /* ƒI[ƒgƒŠƒs[ƒgŠÔŠu */
+static LPDIRECTINPUTDEVICE8  g_pDIDKeyBoard       = NULL; /* DirectInputã®ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒ‡ãƒã‚¤ã‚¹ */
+static LPDIRECTINPUTDEVICE8  g_pDIDJoyPad[PADMAX];        /* DirectInputã®ãƒ‘ãƒƒãƒ‰ãƒ‡ãƒã‚¤ã‚¹     */
+static BYTE g_diKeyState[256];                            /* DirectInputã§ã®ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰å…¥åŠ›ç”¨ãƒãƒƒãƒ•ã‚¡ */
+static BYTE g_diKeyStateOld[256];                         /* DirectInputã§ã®ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰å…¥åŠ›ç”¨ãƒãƒƒãƒ•ã‚¡ï¼‘ãƒ•ãƒ¬ãƒ¼ãƒ å‰ */
+static BYTE g_diKeyCount[256];                            /* DirectInputã§ã®ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰å…¥åŠ›ç”¨ã‚«ã‚¦ãƒ³ã‚¿ */
+static BYTE g_diKeyConfig[256];                           /* DirectInputã§ã®ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒ»ãƒ‘ãƒƒãƒ‰å‰²ã‚Šå½“ã¦ */
+static BYTE g_diKeyWait[256];                             /* ã‚ªãƒ¼ãƒˆãƒªãƒ”ãƒ¼ãƒˆã‚¦ã‚§ã‚¤ãƒˆæ™‚é–“ */
+static BYTE g_diKeyInterval[256];                         /* ã‚ªãƒ¼ãƒˆãƒªãƒ”ãƒ¼ãƒˆé–“éš” */
 static int g_JoystickCount = 0;
 static BYTE g_byMouseState_L, g_byMouseStateOld_L;
 static BYTE g_byMouseState_M, g_byMouseStateOld_M;
@@ -129,14 +129,14 @@ extern int ime_cursor_pos;
 
 static VALUE g_vCompInfoArray = Qnil;;
 
-static VALUE cCompInfo;     /* •ÏŠ·î•ñƒNƒ‰ƒX   */
+static VALUE cCompInfo;     /* å¤‰æ›æƒ…å ±ã‚¯ãƒ©ã‚¹   */
 #endif
 
 //LPDIRECTINPUTEFFECT  g_lpDIEffect = NULL;
 
-/* Padî•ñ */
+/* Padæƒ…å ± */
 static struct DXRubyPadInfo {
-    /* Še²‚Ì”ÍˆÍ */
+    /* å„è»¸ã®ç¯„å›² */
     int x_flg;
     int x_min;
     int x_center;
@@ -165,10 +165,10 @@ static struct DXRubyPadInfo {
     int x_ff_flg;
     int y_ff_flg;
 
-    LPDIRECTINPUTDEVICE8  pDIDJoyPad; /* DirectInput‚ÌƒpƒbƒhƒfƒoƒCƒX */
+    LPDIRECTINPUTDEVICE8  pDIDJoyPad; /* DirectInputã®ãƒ‘ãƒƒãƒ‰ãƒ‡ãƒã‚¤ã‚¹ */
 } g_PadInfo[PADMAX];
 
-/* Padó‘Ô */
+/* PadçŠ¶æ…‹ */
 static struct DXRubyPadState {
     char button[PADBUTTON_MAX];
     int PadConfig[PADBUTTON_MAX];
@@ -187,19 +187,19 @@ static struct DXRubyPadState {
 int Window_autocall_foreach( VALUE key, VALUE value, VALUE obj );
 
 /*********************************************************************
- * Inputƒ‚ƒWƒ…[ƒ‹
+ * Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«
  *
- * DirectInput‚ğg—p‚µ‚ÄƒL[ƒ{[ƒhEƒpƒbƒh‚Ì“ü—Í‚ğs‚¤B
+ * DirectInputã‚’ä½¿ç”¨ã—ã¦ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒ»ãƒ‘ãƒƒãƒ‰ã®å…¥åŠ›ã‚’è¡Œã†ã€‚
  *********************************************************************/
 
 /*--------------------------------------------------------------------
-   WindowsƒƒbƒZ[ƒWˆ—‚İ‚Ì“ü—ÍXV
+   Windowsãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†è¾¼ã¿ã®å…¥åŠ›æ›´æ–°
  ---------------------------------------------------------------------*/
 VALUE Input_update( VALUE obj )
 {
 //    if( g_WindowInfo.input_updated == 0 )
 //    {
-        /* “ü—Íó‘ÔXV */
+        /* å…¥åŠ›çŠ¶æ…‹æ›´æ–° */
         inputupdate_internal();
         rb_hash_foreach( g_WindowInfo.before_call, Window_autocall_foreach, obj );
 //    }
@@ -215,7 +215,7 @@ VALUE Input_update( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   •Â‚¶‚ç‚ê‚æ‚¤‚Æ‚µ‚½‚©‚Ç‚¤‚©‚ğ•Ô‚·
+   é–‰ã˜ã‚‰ã‚Œã‚ˆã†ã¨ã—ãŸã‹ã©ã†ã‹ã‚’è¿”ã™
  ---------------------------------------------------------------------*/
 VALUE Input_requested_close( VALUE obj )
 {
@@ -230,7 +230,7 @@ VALUE Input_requested_close( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ì“ü—Íˆ—
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®å…¥åŠ›å‡¦ç†
  ---------------------------------------------------------------------*/
 void inputupdate_internal( void )
 {
@@ -239,14 +239,14 @@ void inputupdate_internal( void )
     WCHAR *ime_buf_tmp_wchar;
     char *ime_buf_tmp_char;
 
-    /* ƒtƒH[ƒJƒX‚ª‚Í‚¸‚ê‚½ê‡AƒL[‚ÆƒpƒbƒhAƒ}ƒEƒXƒ{ƒ^ƒ“‚Ì“ü—Í‚ğó‚¯•t‚¯‚È‚­‚·‚é */
+    /* ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ãŒã¯ãšã‚ŒãŸå ´åˆã€ã‚­ãƒ¼ã¨ãƒ‘ãƒƒãƒ‰ã€ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ã®å…¥åŠ›ã‚’å—ã‘ä»˜ã‘ãªãã™ã‚‹ */
     if( g_WindowInfo.active == 0 )
     {
-        /* ƒL[ƒ{[ƒh‚Ìƒf[ƒ^‚ğƒNƒŠƒA‚·‚é */
+        /* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ */
         ZeroMemory( &g_diKeyState, sizeof(g_diKeyState) );
         ZeroMemory( &g_diKeyStateOld, sizeof(g_diKeyStateOld) );
 
-        /* ƒpƒbƒhƒf[ƒ^‚ğƒNƒŠƒA‚·‚é */
+        /* ãƒ‘ãƒƒãƒ‰ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ */
         for( i = 0; i < g_JoystickCount; i++ )
         {
             for( j = 0; j < PADBUTTON_MAX; j++ )
@@ -256,7 +256,7 @@ void inputupdate_internal( void )
             }
         }
 
-        /* ƒ}ƒEƒXƒ{ƒ^ƒ“‚Ìƒf[ƒ^‚ğƒNƒŠƒA‚·‚é */
+        /* ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ã®ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹ */
         g_byMouseStateOld_L = g_byMouseState_L;
         g_byMouseStateOld_M = g_byMouseState_M;
         g_byMouseStateOld_R = g_byMouseState_R;
@@ -268,7 +268,7 @@ void inputupdate_internal( void )
         return;
     }
 
-    /* ƒfƒoƒCƒXƒAƒNƒZƒXŒ ‚ğÄæ“¾‚·‚é */
+    /* ãƒ‡ãƒã‚¤ã‚¹ã‚¢ã‚¯ã‚»ã‚¹æ¨©ã‚’å†å–å¾—ã™ã‚‹ */
     g_pDIDKeyBoard->lpVtbl->Acquire( g_pDIDKeyBoard );
 
     for( i = 0; i < g_JoystickCount; i++ )
@@ -277,7 +277,7 @@ void inputupdate_internal( void )
         g_pDIDJoyPad[i]->lpVtbl->Acquire( g_pDIDJoyPad[i] );
     }
 
-    /* ƒL[ƒ{[ƒh‚Ì’¼Úƒf[ƒ^‚ğæ“¾‚·‚é */
+    /* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ç›´æ¥ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ */
     memcpy( g_diKeyStateOld, g_diKeyState, sizeof(g_diKeyState) );
     g_pDIDKeyBoard->lpVtbl->GetDeviceState( g_pDIDKeyBoard, 256, g_diKeyState );
 
@@ -287,11 +287,11 @@ void inputupdate_internal( void )
         {
             g_PadStateOld[i].button[j] = g_PadState[i].button[j];
             g_PadState[i].button[j] = 0;
-            g_PadState[i].count[j]++; /* ƒJƒEƒ“ƒg */
+            g_PadState[i].count[j]++; /* ã‚«ã‚¦ãƒ³ãƒˆ */
         }
     }
 
-    /* ƒQ[ƒ€ƒpƒbƒh‚Ìƒf[ƒ^‚ğæ“¾‚·‚é */
+    /* ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã®ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ */
     for( i = 0; i < g_JoystickCount; i++ )
     {
         int j;
@@ -370,7 +370,7 @@ void inputupdate_internal( void )
 //          printf("g_PadInfo[%d].r_backward = 0x%08X\n", i, g_PadInfo[i].r_backward);
 //        }
 
-        /* Še²‚ğ0.0`1.0‚Ì’l‚ÉŒvZ */
+        /* å„è»¸ã‚’0.0ï½1.0ã®å€¤ã«è¨ˆç®— */
         g_PadState[i].x = g_PadInfo[i].x_flg ? (float)(paddata.lX - g_PadInfo[i].x_min) / (g_PadInfo[i].x_max - g_PadInfo[i].x_min) : 0;
         g_PadState[i].y = g_PadInfo[i].y_flg ? (float)(paddata.lY - g_PadInfo[i].y_min) / (g_PadInfo[i].y_max - g_PadInfo[i].y_min) : 0;
         g_PadState[i].z = g_PadInfo[i].z_flg ? (float)(paddata.lZ - g_PadInfo[i].z_min) / (g_PadInfo[i].z_max - g_PadInfo[i].z_min) : 0;
@@ -378,99 +378,99 @@ void inputupdate_internal( void )
         g_PadState[i].ry = g_PadInfo[i].ry_flg ? (float)(paddata.lRy - g_PadInfo[i].ry_min) / (g_PadInfo[i].ry_max - g_PadInfo[i].ry_min) : 0;
         g_PadState[i].rz = g_PadInfo[i].rz_flg ? (float)(paddata.lRz - g_PadInfo[i].rz_min) / (g_PadInfo[i].rz_max - g_PadInfo[i].rz_min) : 0;
 
-        /* POV‚Ì’l•Û‘¶ */
+        /* POVã®å€¤ä¿å­˜ */
         g_PadState[i].pov = paddata.rgdwPOV[0];
 
-        /* ƒpƒbƒh‚Ì\šƒ{ƒ^ƒ“(ƒfƒWƒ^ƒ‹‚Ìê‡)or¶ƒXƒeƒBƒbƒN(ƒAƒiƒƒO‚Ìê‡) */
-        /* ¶ */
+        /* ãƒ‘ãƒƒãƒ‰ã®åå­—ãƒœã‚¿ãƒ³(ãƒ‡ã‚¸ã‚¿ãƒ«ã®å ´åˆ)orå·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯(ã‚¢ãƒŠãƒ­ã‚°ã®å ´åˆ) */
+        /* å·¦ */
         if( paddata.lX < (g_PadInfo[i].x_center + g_PadInfo[i].x_min) / 2 )
         {
             g_PadState[i].button[P_LEFT] = 1;
         }
-        /* ‰E */
+        /* å³ */
         else if( paddata.lX > (g_PadInfo[i].x_center + g_PadInfo[i].x_max ) / 2 )
         {
             g_PadState[i].button[P_RIGHT] = 1;
         }
 
-        /* ã */
+        /* ä¸Š */
         if( paddata.lY < (g_PadInfo[i].y_center + g_PadInfo[i].y_min) / 2 )
         {
             g_PadState[i].button[P_UP] = 1;
         }
-        /* ‰º */
+        /* ä¸‹ */
         else if( paddata.lY > (g_PadInfo[i].y_center + g_PadInfo[i].y_max) / 2 )
         {
             g_PadState[i].button[P_DOWN] = 1;
         }
 
-        /* ƒ{ƒ^ƒ“ó‘Ô */
+        /* ãƒœã‚¿ãƒ³çŠ¶æ…‹ */
         for( j = 0; j < 16; j++)
         {
             g_PadState[i].button[j + 4] = paddata.rgbButtons[j] >> 7;
         }
 
-        /* ‰EƒAƒiƒƒO:¶ */
+        /* å³ã‚¢ãƒŠãƒ­ã‚°:å·¦ */
         if( paddata.lZ < (g_PadInfo[i].z_center + g_PadInfo[i].z_min) / 2 )
         {
             g_PadState[i].button[P_R_LEFT] = 1;
         }
-        /* ‰EƒAƒiƒƒO:‰E */
+        /* å³ã‚¢ãƒŠãƒ­ã‚°:å³ */
         else if( paddata.lZ > (g_PadInfo[i].z_center + g_PadInfo[i].z_max ) / 2 )
         {
             g_PadState[i].button[P_R_RIGHT] = 1;
         }
 
-        /* ‰EƒAƒiƒƒO:ã */
+        /* å³ã‚¢ãƒŠãƒ­ã‚°:ä¸Š */
         if( paddata.lRz < (g_PadInfo[i].rz_center + g_PadInfo[i].rz_min) / 2 )
         {
             g_PadState[i].button[P_R_UP] = 1;
         }
-        /* ‰EƒAƒiƒƒO:‰º */
+        /* å³ã‚¢ãƒŠãƒ­ã‚°:ä¸‹ */
         else if( paddata.lRz > (g_PadInfo[i].rz_center + g_PadInfo[i].rz_max ) / 2 )
         {
             g_PadState[i].button[P_R_DOWN] = 1;
         }
 
-        /* \šƒ{ƒ^ƒ“(POV)Fã */
+        /* åå­—ãƒœã‚¿ãƒ³(POV)ï¼šä¸Š */
         if( paddata.rgdwPOV[0] == POV_UP )
         {
             g_PadState[i].button[P_D_UP] = 1;
         }
-        /* \šƒ{ƒ^ƒ“(POV)F‰Eã */
+        /* åå­—ãƒœã‚¿ãƒ³(POV)ï¼šå³ä¸Š */
         else if( paddata.rgdwPOV[0] == POV_UP_RIGHT )
         {
             g_PadState[i].button[P_D_UP] = 1;
             g_PadState[i].button[P_D_RIGHT] = 1;
         }
-        /* \šƒ{ƒ^ƒ“(POV)F‰E */
+        /* åå­—ãƒœã‚¿ãƒ³(POV)ï¼šå³ */
         else if( paddata.rgdwPOV[0] == POV_RIGHT )
         {
             g_PadState[i].button[P_D_RIGHT] = 1;
         }
-        /* \šƒ{ƒ^ƒ“(POV)F‰E‰º */
+        /* åå­—ãƒœã‚¿ãƒ³(POV)ï¼šå³ä¸‹ */
         else if( paddata.rgdwPOV[0] == POV_DOWN_RIGHT )
         {
             g_PadState[i].button[P_D_DOWN] = 1;
             g_PadState[i].button[P_D_RIGHT] = 1;
         }
-        /* \šƒ{ƒ^ƒ“(POV)F‰º */
+        /* åå­—ãƒœã‚¿ãƒ³(POV)ï¼šä¸‹ */
         else if( paddata.rgdwPOV[0] == POV_DOWN )
         {
             g_PadState[i].button[P_D_DOWN] = 1;
         }
-        /* \šƒ{ƒ^ƒ“(POV)F¶‰º */
+        /* åå­—ãƒœã‚¿ãƒ³(POV)ï¼šå·¦ä¸‹ */
         else if( paddata.rgdwPOV[0] == POV_DOWN_LEFT )
         {
             g_PadState[i].button[P_D_DOWN] = 1;
             g_PadState[i].button[P_D_LEFT] = 1;
         }
-        /* \šƒ{ƒ^ƒ“(POV)F¶ */
+        /* åå­—ãƒœã‚¿ãƒ³(POV)ï¼šå·¦ */
         else if( paddata.rgdwPOV[0] == POV_LEFT )
         {
             g_PadState[i].button[P_D_LEFT] = 1;
         }
-        /* \šƒ{ƒ^ƒ“(POV)F¶ã */
+        /* åå­—ãƒœã‚¿ãƒ³(POV)ï¼šå·¦ä¸Š */
         else if( paddata.rgdwPOV[0] == POV_UP_LEFT )
         {
             g_PadState[i].button[P_D_UP] = 1;
@@ -478,7 +478,7 @@ void inputupdate_internal( void )
         }
     }
 
-    /* ƒ}ƒEƒXƒ{ƒ^ƒ“‚Ìó‘Ô */
+    /* ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ã®çŠ¶æ…‹ */
     g_byMouseStateOld_L = g_byMouseState_L;
     g_byMouseStateOld_M = g_byMouseState_M;
     g_byMouseStateOld_R = g_byMouseState_R;
@@ -488,11 +488,11 @@ void inputupdate_internal( void )
 
     for( i = 0; i < 256; i++ )
     {
-        g_diKeyCount[i]++; /* ƒJƒEƒ“ƒg */
+        g_diKeyCount[i]++; /* ã‚«ã‚¦ãƒ³ãƒˆ */
     }
 
 #ifdef DXRUBY15
-    /* ƒL[ƒoƒbƒtƒ@•Û‘¶ */
+    /* ã‚­ãƒ¼ãƒãƒƒãƒ•ã‚¡ä¿å­˜ */
     EnterCriticalSection( &ime_cs );
     ime_buf_tmp_wchar = ime_buf_old;
     ime_buf_old = ime_buf;
@@ -619,9 +619,9 @@ void inputupdate_internal( void )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   ‰¡•ûŒü‚Ì“ü—Í‚ğx‚Ì‘•ª‚Å•Ô‚·
+   æ¨ªæ–¹å‘ã®å…¥åŠ›ã‚’xã®å¢—åˆ†ã§è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_x( int argc, VALUE *argv, VALUE obj )
 {
@@ -646,14 +646,14 @@ static VALUE Input_x( int argc, VALUE *argv, VALUE obj )
 //           );
 
 
-	/* ‚Ğ‚¾‚è */
+	/* ã²ã ã‚Š */
     if( (g_PadState[number].PadConfig[P_LEFT] != -1   && g_diKeyState[g_PadState[number].PadConfig[P_LEFT]] & 0x80)   || g_PadState[number].button[P_LEFT] == 1 ||
         (g_PadState[number].PadConfig[P_D_LEFT] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_D_LEFT]] & 0x80) || g_PadState[number].button[P_D_LEFT] == 1 )
     {
         x = x - 1;
     }
 
-    /* ‚İ‚¬ */
+    /* ã¿ã */
     if( (g_PadState[number].PadConfig[P_RIGHT] != -1   && g_diKeyState[g_PadState[number].PadConfig[P_RIGHT]] & 0x80)   || g_PadState[number].button[P_RIGHT] == 1 ||
         (g_PadState[number].PadConfig[P_D_RIGHT] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_D_RIGHT]] & 0x80) || g_PadState[number].button[P_D_RIGHT] == 1 )
     {
@@ -665,9 +665,9 @@ static VALUE Input_x( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   c•ûŒü‚Ì“ü—Í‚ğy‚Ì‘•ª‚Å•Ô‚·
+   ç¸¦æ–¹å‘ã®å…¥åŠ›ã‚’yã®å¢—åˆ†ã§è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_y( int argc, VALUE *argv, VALUE obj )
 {
@@ -685,14 +685,14 @@ static VALUE Input_y( int argc, VALUE *argv, VALUE obj )
     }
 
 
-    /* ‚¤‚¦ */
+    /* ã†ãˆ */
     if( (g_PadState[number].PadConfig[P_UP] != -1   && g_diKeyState[g_PadState[number].PadConfig[P_UP]] & 0x80)   || g_PadState[number].button[P_UP] == 1 ||
         (g_PadState[number].PadConfig[P_D_UP] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_D_UP]] & 0x80) || g_PadState[number].button[P_D_UP] == 1 )
     {
         y = y - 1;
     }
 
-    /* ‚µ‚½ */
+    /* ã—ãŸ */
     if( (g_PadState[number].PadConfig[P_DOWN] != -1   && g_diKeyState[g_PadState[number].PadConfig[P_DOWN]] & 0x80)   || g_PadState[number].button[P_DOWN] == 1 ||
         (g_PadState[number].PadConfig[P_D_DOWN] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_D_DOWN]] & 0x80) || g_PadState[number].button[P_D_DOWN] == 1 )
     {
@@ -705,9 +705,9 @@ static VALUE Input_y( int argc, VALUE *argv, VALUE obj )
 
 /*--------------------------------------------------------------------*/
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾(¶ƒXƒeƒBƒbƒN)
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—(å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯)
 
-   ¶ƒXƒeƒBƒbƒN‚Ì‰¡•ûŒü‚Ì“ü—Í‚ğx‚Ì‘•ª‚Å•Ô‚·
+   å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®æ¨ªæ–¹å‘ã®å…¥åŠ›ã‚’xã®å¢—åˆ†ã§è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_lx( int argc, VALUE *argv, VALUE obj )
 {
@@ -724,13 +724,13 @@ static VALUE Input_lx( int argc, VALUE *argv, VALUE obj )
         rb_raise( eDXRubyError, "invalid value - Input_rx" );
     }
 
-	/* ‚Ğ‚¾‚è */
+	/* ã²ã ã‚Š */
     if( (g_PadState[number].PadConfig[P_LEFT] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_LEFT]] & 0x80) || g_PadState[number].button[P_LEFT] == 1 )
     {
         x = x - 1;
     }
 
-    /* ‚İ‚¬ */
+    /* ã¿ã */
     if( (g_PadState[number].PadConfig[P_RIGHT] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_RIGHT]] & 0x80) || g_PadState[number].button[P_RIGHT] == 1 )
     {
         x = x + 1;
@@ -741,9 +741,9 @@ static VALUE Input_lx( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾(¶ƒXƒeƒBƒbƒN)
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—(å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯)
 
-   ¶ƒXƒeƒBƒbƒN‚Ìc•ûŒü‚Ì“ü—Í‚ğy‚Ì‘•ª‚Å•Ô‚·
+   å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®ç¸¦æ–¹å‘ã®å…¥åŠ›ã‚’yã®å¢—åˆ†ã§è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_ly( int argc, VALUE *argv, VALUE obj )
 {
@@ -761,13 +761,13 @@ static VALUE Input_ly( int argc, VALUE *argv, VALUE obj )
     }
 
 
-    /* ‚¤‚¦ */
+    /* ã†ãˆ */
     if( (g_PadState[number].PadConfig[P_UP] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_UP]] & 0x80) || g_PadState[number].button[P_UP] == 1 )
     {
         y = y - 1;
     }
 
-    /* ‚µ‚½ */
+    /* ã—ãŸ */
     if( (g_PadState[number].PadConfig[P_DOWN] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_DOWN]] & 0x80) || g_PadState[number].button[P_DOWN] == 1 )
     {
         y = y + 1;
@@ -778,9 +778,9 @@ static VALUE Input_ly( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾(‰EƒXƒeƒBƒbƒN)
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—(å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯)
 
-   ‰EƒXƒeƒBƒbƒN‚Ì‰¡•ûŒü‚Ì“ü—Í‚ğx‚Ì‘•ª‚Å•Ô‚·
+   å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®æ¨ªæ–¹å‘ã®å…¥åŠ›ã‚’xã®å¢—åˆ†ã§è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_rx( int argc, VALUE *argv, VALUE obj )
 {
@@ -797,13 +797,13 @@ static VALUE Input_rx( int argc, VALUE *argv, VALUE obj )
         rb_raise( eDXRubyError, "invalid value - Input_rx" );
     }
 
-	/* ‚Ğ‚¾‚è */
+	/* ã²ã ã‚Š */
     if( (g_PadState[number].PadConfig[P_R_LEFT] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_R_LEFT]] & 0x80) || g_PadState[number].button[P_R_LEFT] == 1 )
     {
         x = x - 1;
     }
 
-    /* ‚İ‚¬ */
+    /* ã¿ã */
     if( (g_PadState[number].PadConfig[P_R_RIGHT] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_R_RIGHT]] & 0x80) || g_PadState[number].button[P_R_RIGHT] == 1 )
     {
         x = x + 1;
@@ -814,9 +814,9 @@ static VALUE Input_rx( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾(‰EƒXƒeƒBƒbƒN)
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—(å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯)
 
-   ‰EƒXƒeƒBƒbƒN‚Ìc•ûŒü‚Ì“ü—Í‚ğy‚Ì‘•ª‚Å•Ô‚·
+   å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®ç¸¦æ–¹å‘ã®å…¥åŠ›ã‚’yã®å¢—åˆ†ã§è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_ry( int argc, VALUE *argv, VALUE obj )
 {
@@ -834,13 +834,13 @@ static VALUE Input_ry( int argc, VALUE *argv, VALUE obj )
     }
 
 
-    /* ‚¤‚¦ */
+    /* ã†ãˆ */
     if( (g_PadState[number].PadConfig[P_R_UP] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_R_UP]] & 0x80) || g_PadState[number].button[P_R_UP] == 1 )
     {
         y = y - 1;
     }
 
-    /* ‚µ‚½ */
+    /* ã—ãŸ */
     if( (g_PadState[number].PadConfig[P_R_DOWN] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_R_DOWN]] & 0x80) || g_PadState[number].button[P_R_DOWN] == 1 )
     {
         y = y + 1;
@@ -851,9 +851,9 @@ static VALUE Input_ry( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾(\šƒ{ƒ^ƒ“)
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—(åå­—ãƒœã‚¿ãƒ³)
 
-   \šƒ{ƒ^ƒ“‚Ì‰¡•ûŒü‚Ì“ü—Í‚ğx‚Ì‘•ª‚Å•Ô‚·
+   åå­—ãƒœã‚¿ãƒ³ã®æ¨ªæ–¹å‘ã®å…¥åŠ›ã‚’xã®å¢—åˆ†ã§è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_dx( int argc, VALUE *argv, VALUE obj )
 {
@@ -871,13 +871,13 @@ static VALUE Input_dx( int argc, VALUE *argv, VALUE obj )
     }
 
 
-	/* ‚Ğ‚¾‚è */
+	/* ã²ã ã‚Š */
     if( (g_PadState[number].PadConfig[P_D_LEFT] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_D_LEFT]] & 0x80) || g_PadState[number].button[P_D_LEFT] == 1 )
     {
         x = x - 1;
     }
 
-    /* ‚İ‚¬ */
+    /* ã¿ã */
     if( (g_PadState[number].PadConfig[P_D_RIGHT] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_D_RIGHT]] & 0x80) || g_PadState[number].button[P_D_RIGHT] == 1 )
     {
         x = x + 1;
@@ -888,9 +888,9 @@ static VALUE Input_dx( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾(\šƒ{ƒ^ƒ“)
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—(åå­—ãƒœã‚¿ãƒ³)
 
-   \šƒ{ƒ^ƒ“‚Ìc•ûŒü‚Ì“ü—Í‚ğy‚Ì‘•ª‚Å•Ô‚·
+   åå­—ãƒœã‚¿ãƒ³ã®ç¸¦æ–¹å‘ã®å…¥åŠ›ã‚’yã®å¢—åˆ†ã§è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_dy( int argc, VALUE *argv, VALUE obj )
 {
@@ -908,13 +908,13 @@ static VALUE Input_dy( int argc, VALUE *argv, VALUE obj )
     }
 
 
-    /* ‚¤‚¦ */
+    /* ã†ãˆ */
     if( (g_PadState[number].PadConfig[P_D_UP] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_D_UP]] & 0x80) || g_PadState[number].button[P_D_UP] == 1 )
     {
         y = y - 1;
     }
 
-    /* ‚µ‚½ */
+    /* ã—ãŸ */
     if( (g_PadState[number].PadConfig[P_D_DOWN] != -1 && g_diKeyState[g_PadState[number].PadConfig[P_D_DOWN]] & 0x80) || g_PadState[number].button[P_D_DOWN] == 1 )
     {
         y = y + 1;
@@ -925,9 +925,9 @@ static VALUE Input_dy( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   ‰Ÿ‚³‚ê‚Ä‚¢‚½‚çtrue‚É‚È‚éBˆø”‚ÍƒL[ƒR[ƒhB
+   æŠ¼ã•ã‚Œã¦ã„ãŸã‚‰trueã«ãªã‚‹ã€‚å¼•æ•°ã¯ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Input_keyDown( VALUE obj , VALUE vkey )
 {
@@ -955,9 +955,9 @@ static VALUE Input_keyDown( VALUE obj , VALUE vkey )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   ‰Ÿ‚µ‚½uŠÔ‚¾‚¯true‚É‚È‚éBˆø”‚ÍƒL[ƒR[ƒhB
+   æŠ¼ã—ãŸç¬é–“ã ã‘trueã«ãªã‚‹ã€‚å¼•æ•°ã¯ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Input_keyPush( VALUE obj , VALUE vkey )
 {
@@ -983,19 +983,19 @@ static VALUE Input_keyPush( VALUE obj , VALUE vkey )
         }
     }
 
-    if( (g_diKeyState[key] & 0x80) ||  padbutton == 1 ) /* “ü—Í‚³‚ê‚Ä‚¢‚é */
+    if( (g_diKeyState[key] & 0x80) ||  padbutton == 1 ) /* å…¥åŠ›ã•ã‚Œã¦ã„ã‚‹ */
     {
-        if( !(g_diKeyStateOld[key] & 0x80) && padbuttonold == 0 )    /* ‘O‰ñOFF‚Å‚ ‚é */
+        if( !(g_diKeyStateOld[key] & 0x80) && padbuttonold == 0 )    /* å‰å›OFFã§ã‚ã‚‹ */
         {
-            g_diKeyCount[key] = 0;                  /* ƒJƒEƒ“ƒg‰Šú‰» */
-            return Qtrue;                           /* ‚È‚É‚Í‚Æ‚à‚ ‚êTrue */
+            g_diKeyCount[key] = 0;                  /* ã‚«ã‚¦ãƒ³ãƒˆåˆæœŸåŒ– */
+            return Qtrue;                           /* ãªã«ã¯ã¨ã‚‚ã‚ã‚ŒTrue */
         }
-        else                                    /* ‘O‰ñON‚¾‚Á‚½ */
+        else                                    /* å‰å›ONã ã£ãŸ */
         {
-            if( g_diKeyWait[key] <= g_diKeyCount[key] ) /* ƒEƒFƒCƒgƒ^ƒCƒ€‚ğ’´‚¦‚½‚© */
+            if( g_diKeyWait[key] <= g_diKeyCount[key] ) /* ã‚¦ã‚§ã‚¤ãƒˆã‚¿ã‚¤ãƒ ã‚’è¶…ãˆãŸã‹ */
             {
                 if( g_diKeyInterval[key] != 0 &&
-                    (g_diKeyCount[key] - g_diKeyWait[key]) % g_diKeyInterval[key] == 0 ) /* ƒCƒ“ƒ^[ƒoƒ‹ƒ^ƒCƒ€‚²‚Æ‚É */
+                    (g_diKeyCount[key] - g_diKeyWait[key]) % g_diKeyInterval[key] == 0 ) /* ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«ã‚¿ã‚¤ãƒ ã”ã¨ã« */
                 {
                     return Qtrue;                           /* True */
                 }
@@ -1008,9 +1008,9 @@ static VALUE Input_keyPush( VALUE obj , VALUE vkey )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   —£‚µ‚½uŠÔ‚¾‚¯true‚É‚È‚éBˆø”‚ÍƒL[ƒR[ƒhB
+   é›¢ã—ãŸç¬é–“ã ã‘trueã«ãªã‚‹ã€‚å¼•æ•°ã¯ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Input_keyRelease( VALUE obj , VALUE vkey )
 {
@@ -1036,11 +1036,11 @@ static VALUE Input_keyRelease( VALUE obj , VALUE vkey )
         }
     }
 
-    if( !(g_diKeyState[key] & 0x80) &&  padbutton == 0 ) /* “ü—Í‚³‚ê‚Ä‚¢‚È‚¢ */
+    if( !(g_diKeyState[key] & 0x80) &&  padbutton == 0 ) /* å…¥åŠ›ã•ã‚Œã¦ã„ãªã„ */
     {
-        if( g_diKeyStateOld[key] & 0x80 || padbuttonold == 1 )    /* ‘O‰ñON‚Å‚ ‚é */
+        if( g_diKeyStateOld[key] & 0x80 || padbuttonold == 1 )    /* å‰å›ONã§ã‚ã‚‹ */
         {
-            return Qtrue;                           /* ‚È‚É‚Í‚Æ‚à‚ ‚êTrue */
+            return Qtrue;                           /* ãªã«ã¯ã¨ã‚‚ã‚ã‚ŒTrue */
         }
     }
 
@@ -1049,9 +1049,9 @@ static VALUE Input_keyRelease( VALUE obj , VALUE vkey )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   ‰Ÿ‚³‚ê‚Ä‚¢‚½‚çtrue‚É‚È‚éBˆø”‚Íƒ{ƒ^ƒ“”Ô†B
+   æŠ¼ã•ã‚Œã¦ã„ãŸã‚‰trueã«ãªã‚‹ã€‚å¼•æ•°ã¯ãƒœã‚¿ãƒ³ç•ªå·ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Input_padDown( int argc, VALUE *argv, VALUE obj )
 {
@@ -1083,9 +1083,9 @@ static VALUE Input_padDown( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   ‰Ÿ‚µ‚½uŠÔ‚¾‚¯true‚É‚È‚éBˆø”‚Íƒ{ƒ^ƒ“”Ô†B
+   æŠ¼ã—ãŸç¬é–“ã ã‘trueã«ãªã‚‹ã€‚å¼•æ•°ã¯ãƒœã‚¿ãƒ³ç•ªå·ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Input_padPush( int argc, VALUE *argv, VALUE obj )
 {
@@ -1114,20 +1114,20 @@ static VALUE Input_padPush( int argc, VALUE *argv, VALUE obj )
         }
     }
 
-    if( key == 1 || g_PadState[number].button[button] == 1 ) /* “ü—Í‚³‚ê‚Ä‚¢‚é */
+    if( key == 1 || g_PadState[number].button[button] == 1 ) /* å…¥åŠ›ã•ã‚Œã¦ã„ã‚‹ */
     {
-        if( keyold == 0 && g_PadStateOld[number].button[button] == 0 ) /* ‘O‰ñOFF‚Å‚ ‚é */
+        if( keyold == 0 && g_PadStateOld[number].button[button] == 0 ) /* å‰å›OFFã§ã‚ã‚‹ */
         {
-            g_PadState[number].count[button] = 0;                           /* ƒJƒEƒ“ƒg‰Šú‰» */
-            return Qtrue;                                                   /* ‚È‚É‚Í‚Æ‚à‚ ‚êTrue */
+            g_PadState[number].count[button] = 0;                           /* ã‚«ã‚¦ãƒ³ãƒˆåˆæœŸåŒ– */
+            return Qtrue;                                                   /* ãªã«ã¯ã¨ã‚‚ã‚ã‚ŒTrue */
         }
-        else                                                           /* ‘O‰ñON‚¾‚Á‚½ */
+        else                                                           /* å‰å›ONã ã£ãŸ */
         {
-            if( g_PadState[number].wait[button] <= g_PadState[number].count[button] ) /* ƒEƒFƒCƒgƒ^ƒCƒ€‚ğ’´‚¦‚½‚© */
+            if( g_PadState[number].wait[button] <= g_PadState[number].count[button] ) /* ã‚¦ã‚§ã‚¤ãƒˆã‚¿ã‚¤ãƒ ã‚’è¶…ãˆãŸã‹ */
             {
                 if( g_PadState[number].interval[button] != 0 &&
                    (g_PadState[number].count[button] - g_PadState[number].wait[button])
-                    % g_PadState[number].interval[button] == 0 )   /* ƒCƒ“ƒ^[ƒoƒ‹ƒ^ƒCƒ€‚²‚Æ‚É */
+                    % g_PadState[number].interval[button] == 0 )   /* ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«ã‚¿ã‚¤ãƒ ã”ã¨ã« */
                 {
                     return Qtrue;                                                           /* True */
                 }
@@ -1140,9 +1140,9 @@ static VALUE Input_padPush( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   —£‚µ‚½uŠÔ‚¾‚¯true‚É‚È‚éBˆø”‚Íƒ{ƒ^ƒ“”Ô†B
+   é›¢ã—ãŸç¬é–“ã ã‘trueã«ãªã‚‹ã€‚å¼•æ•°ã¯ãƒœã‚¿ãƒ³ç•ªå·ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Input_padRelease( int argc, VALUE *argv, VALUE obj )
 {
@@ -1171,11 +1171,11 @@ static VALUE Input_padRelease( int argc, VALUE *argv, VALUE obj )
         }
     }
 
-    if( key == 0 && g_PadState[number].button[button] == 0 ) /* “ü—Í‚³‚ê‚Ä‚¢‚È‚¢ */
+    if( key == 0 && g_PadState[number].button[button] == 0 ) /* å…¥åŠ›ã•ã‚Œã¦ã„ãªã„ */
     {
-        if( keyold == 1 || g_PadStateOld[number].button[button] == 1 ) /* ‘O‰ñON‚Å‚ ‚é */
+        if( keyold == 1 || g_PadStateOld[number].button[button] == 1 ) /* å‰å›ONã§ã‚ã‚‹ */
         {
-            return Qtrue;                                                   /* ‚È‚É‚Í‚Æ‚à‚ ‚êTrue */
+            return Qtrue;                                                   /* ãªã«ã¯ã¨ã‚‚ã‚ã‚ŒTrue */
         }
     }
 
@@ -1184,13 +1184,13 @@ static VALUE Input_padRelease( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒpƒbƒh‚ÆƒL[‚Ì‘Î‰‚ğİ’è‚·‚é
+   ãƒ‘ãƒƒãƒ‰ã¨ã‚­ãƒ¼ã®å¯¾å¿œã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static void Input_SetConfig( int number, int pad, int key )
 {
     int i, j;
 
-    if( pad == -1 )    /* ƒL[‚É‘Î‚·‚éƒpƒbƒhŠ„‚è“–‚Ä‰ğœˆ— */
+    if( pad == -1 )    /* ã‚­ãƒ¼ã«å¯¾ã™ã‚‹ãƒ‘ãƒƒãƒ‰å‰²ã‚Šå½“ã¦è§£é™¤å‡¦ç† */
     {
         g_diKeyConfig[key] = -1;
         for( i = 0; i < PADMAX; i++)
@@ -1204,7 +1204,7 @@ static void Input_SetConfig( int number, int pad, int key )
             }
         }
     }
-    else if( key == -1 || key == 0 ) /* ƒpƒbƒh‚É‘Î‚·‚éƒL[Š„‚è“–‚Ä‰ğœˆ— */
+    else if( key == -1 || key == 0 ) /* ãƒ‘ãƒƒãƒ‰ã«å¯¾ã™ã‚‹ã‚­ãƒ¼å‰²ã‚Šå½“ã¦è§£é™¤å‡¦ç† */
     {
         g_PadState[number].PadConfig[pad] = -1;
         for( i = 0; i < 256; i++)
@@ -1215,7 +1215,7 @@ static void Input_SetConfig( int number, int pad, int key )
             }
         }
     }
-    else    /* Š„‚è“–‚Äˆ— */
+    else    /* å‰²ã‚Šå½“ã¦å‡¦ç† */
     {
         g_PadState[number].PadConfig[pad] = key;
         //g_diKeyConfig[key] = number * 20 + pad;     //check
@@ -1249,7 +1249,7 @@ static VALUE Input_setconfig( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒEƒXƒzƒC[ƒ‹‚Ìó‘Ô‚ğ•Ô‚·
+   ãƒã‚¦ã‚¹ãƒ›ã‚¤ãƒ¼ãƒ«ã®çŠ¶æ…‹ã‚’è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_getmousewheelpos( VALUE obj )
 {
@@ -1258,7 +1258,7 @@ static VALUE Input_getmousewheelpos( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒEƒXƒzƒC[ƒ‹‚Ìó‘Ô‚ğİ’è‚·‚é
+   ãƒã‚¦ã‚¹ãƒ›ã‚¤ãƒ¼ãƒ«ã®çŠ¶æ…‹ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Input_setmousewheelpos( VALUE obj, VALUE wheelpos )
 {
@@ -1269,7 +1269,7 @@ static VALUE Input_setmousewheelpos( VALUE obj, VALUE wheelpos )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒEƒX‚Ìƒ{ƒ^ƒ“ó‘Ô‚ğ•Ô‚·
+   ãƒã‚¦ã‚¹ã®ãƒœã‚¿ãƒ³çŠ¶æ…‹ã‚’è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_mouseDown( VALUE obj, VALUE button )
 {
@@ -1314,7 +1314,7 @@ static VALUE Input_mouseDown( VALUE obj, VALUE button )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒEƒX‚Ìƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Æ‚«‚Étrue
+   ãƒã‚¦ã‚¹ã®ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã¨ãã«true
  ---------------------------------------------------------------------*/
 static VALUE Input_mousePush( VALUE obj, VALUE button )
 {
@@ -1359,7 +1359,7 @@ static VALUE Input_mousePush( VALUE obj, VALUE button )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒEƒX‚Ìƒ{ƒ^ƒ“‚ª—£‚³‚ê‚½‚Æ‚«‚Étrue
+   ãƒã‚¦ã‚¹ã®ãƒœã‚¿ãƒ³ãŒé›¢ã•ã‚ŒãŸã¨ãã«true
  ---------------------------------------------------------------------*/
 static VALUE Input_mouseRelease( VALUE obj, VALUE button )
 {
@@ -1404,7 +1404,7 @@ static VALUE Input_mouseRelease( VALUE obj, VALUE button )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ÌˆÊ’u‚ğ•Ô‚·
+   ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®ä½ç½®ã‚’è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_getmouseposx( VALUE obj )
 {
@@ -1417,7 +1417,7 @@ static VALUE Input_getmouseposx( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ÌˆÊ’u‚ğ•Ô‚·
+   ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®ä½ç½®ã‚’è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_getmouseposy( VALUE obj )
 {
@@ -1431,7 +1431,7 @@ static VALUE Input_getmouseposy( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ÌˆÊ’u‚ğİ’è‚·‚é
+   ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®ä½ç½®ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Input_setmousepos( VALUE klass, VALUE vx, VALUE vy )
 {
@@ -1447,7 +1447,7 @@ static VALUE Input_setmousepos( VALUE klass, VALUE vx, VALUE vy )
 
 
 /*--------------------------------------------------------------------
-   ƒ}ƒEƒX•`‰æ‚·‚é‚©‚Ç‚¤‚©‚Ìİ’è
+   ãƒã‚¦ã‚¹æç”»ã™ã‚‹ã‹ã©ã†ã‹ã®è¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE Input_enablemouse( VALUE obj, VALUE vdrawflag )
 {
@@ -1465,7 +1465,7 @@ static VALUE Input_enablemouse( VALUE obj, VALUE vdrawflag )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ì‘SƒL[ƒI[ƒgƒŠƒs[ƒgó‘Ôİ’è
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®å…¨ã‚­ãƒ¼ã‚ªãƒ¼ãƒˆãƒªãƒ”ãƒ¼ãƒˆçŠ¶æ…‹è¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE Input_setrepeat( VALUE obj , VALUE vwait, VALUE vinterval )
 {
@@ -1494,7 +1494,7 @@ static VALUE Input_setrepeat( VALUE obj , VALUE vwait, VALUE vinterval )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚ÌƒL[ƒI[ƒgƒŠƒs[ƒgó‘Ôİ’è
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ã‚­ãƒ¼ã‚ªãƒ¼ãƒˆãƒªãƒ”ãƒ¼ãƒˆçŠ¶æ…‹è¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE Input_setkeyrepeat( VALUE obj , VALUE vkey, VALUE vwait, VALUE vinterval )
 {
@@ -1517,7 +1517,7 @@ static VALUE Input_setkeyrepeat( VALUE obj , VALUE vkey, VALUE vwait, VALUE vint
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚ÌƒpƒbƒhƒI[ƒgƒŠƒs[ƒgó‘Ôİ’è
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‘ãƒƒãƒ‰ã‚ªãƒ¼ãƒˆãƒªãƒ”ãƒ¼ãƒˆçŠ¶æ…‹è¨­å®š
  ---------------------------------------------------------------------*/
 static VALUE Input_setpadrepeat( int argc, VALUE *argv, VALUE obj )
 {
@@ -1545,9 +1545,9 @@ static VALUE Input_setpadrepeat( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   ‰Ÿ‚³‚ê‚Ä‚¢‚éƒL[‚Ì”z—ñ‚ğ•Ô‚·B
+   æŠ¼ã•ã‚Œã¦ã„ã‚‹ã‚­ãƒ¼ã®é…åˆ—ã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Input_getKeys( VALUE obj )
 {
@@ -1556,7 +1556,7 @@ static VALUE Input_getKeys( VALUE obj )
 
     for( i = 0, j = 0; i < 256; i++ )
     {
-        if( g_diKeyState[i] & 0x80 ) /* “ü—Í‚³‚ê‚Ä‚¢‚é */
+        if( g_diKeyState[i] & 0x80 ) /* å…¥åŠ›ã•ã‚Œã¦ã„ã‚‹ */
         {
             buf[j++] = INT2FIX( i );
         }
@@ -1567,9 +1567,9 @@ static VALUE Input_getKeys( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   Inputƒ‚ƒWƒ…[ƒ‹‚Ìƒf[ƒ^æ“¾
+   Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã®ãƒ‡ãƒ¼ã‚¿å–å¾—
 
-   ‰Ÿ‚³‚ê‚Ä‚¢‚éƒpƒbƒh‚Ì”z—ñ‚ğ•Ô‚·B
+   æŠ¼ã•ã‚Œã¦ã„ã‚‹ãƒ‘ãƒƒãƒ‰ã®é…åˆ—ã‚’è¿”ã™ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Input_getPads( int argc, VALUE *argv, VALUE obj )
 {
@@ -1594,7 +1594,7 @@ static VALUE Input_getPads( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒpƒbƒh‚Ì”‚ğ•Ô‚·
+   ãƒ‘ãƒƒãƒ‰ã®æ•°ã‚’è¿”ã™
  ---------------------------------------------------------------------*/
 static VALUE Input_getPadNum( VALUE obj )
 {
@@ -1603,7 +1603,7 @@ static VALUE Input_getPadNum( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒAƒiƒƒO²æ“¾
+   ã‚¢ãƒŠãƒ­ã‚°è»¸å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Input_getPadAxis( int argc, VALUE *argv, VALUE obj )
 {
@@ -1630,7 +1630,7 @@ static VALUE Input_getPadAxis( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ¶ƒXƒeƒBƒbƒNæ“¾
+   å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Input_getPadLStick( int argc, VALUE *argv, VALUE obj )
 {
@@ -1653,7 +1653,7 @@ static VALUE Input_getPadLStick( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ‰EƒXƒeƒBƒbƒNæ“¾
+   å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Input_getPadRStick( int argc, VALUE *argv, VALUE obj )
 {
@@ -1676,7 +1676,7 @@ static VALUE Input_getPadRStick( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   POVæ“¾
+   POVå–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Input_getPadPov( int argc, VALUE *argv, VALUE obj )
 {
@@ -1697,7 +1697,7 @@ static VALUE Input_getPadPov( int argc, VALUE *argv, VALUE obj )
 
 
 ///*--------------------------------------------------------------------
-//   ƒGƒtƒFƒNƒgŠJn
+//   ã‚¨ãƒ•ã‚§ã‚¯ãƒˆé–‹å§‹
 // ---------------------------------------------------------------------*/
 //static VALUE Input_ff_start( VALUE obj )
 //{
@@ -1705,7 +1705,7 @@ static VALUE Input_getPadPov( int argc, VALUE *argv, VALUE obj )
 //    return Qnil;
 //}
 ///*--------------------------------------------------------------------
-//   ƒGƒtƒFƒNƒg’â~
+//   ã‚¨ãƒ•ã‚§ã‚¯ãƒˆåœæ­¢
 // ---------------------------------------------------------------------*/
 //static VALUE Input_ff_stop( VALUE obj )
 //{
@@ -1715,7 +1715,7 @@ static VALUE Input_getPadPov( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒJ[ƒ\ƒ‹Œ`ó•ÏX
+   ã‚«ãƒ¼ã‚½ãƒ«å½¢çŠ¶å¤‰æ›´
  ---------------------------------------------------------------------*/
 static VALUE Input_setCursor( VALUE obj , VALUE vcursor )
 {
@@ -1727,7 +1727,7 @@ static VALUE Input_setCursor( VALUE obj , VALUE vcursor )
 
 #ifdef DXRUBY15
 /*--------------------------------------------------------------------
-   IME•¶š—ñ“ü—Í
+   IMEæ–‡å­—åˆ—å…¥åŠ›
  ---------------------------------------------------------------------*/
 static VALUE Input_IME_getstring( VALUE obj )
 {
@@ -1741,7 +1741,7 @@ UINT DI_KeyList[][2] = { {VK_UP,DIK_UP}, {VK_DOWN,DIK_DOWN}, {VK_LEFT,DIK_LEFT},
  {VK_DIVIDE,DIK_DIVIDE} };
 
 /*--------------------------------------------------------------------
-   IME‰Ÿ‚µ‚½ƒL[ˆê——
+   IMEæŠ¼ã—ãŸã‚­ãƒ¼ä¸€è¦§
  ---------------------------------------------------------------------*/
 static VALUE Input_IME_getpushkeys( VALUE obj )
 {
@@ -1777,7 +1777,7 @@ static VALUE Input_IME_getpushkeys( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   IME—£‚µ‚½ƒL[ˆê——
+   IMEé›¢ã—ãŸã‚­ãƒ¼ä¸€è¦§
  ---------------------------------------------------------------------*/
 static VALUE Input_IME_getreleasekeys( VALUE obj )
 {
@@ -1813,7 +1813,7 @@ static VALUE Input_IME_getreleasekeys( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   IME‚Ìenable
+   IMEã®enable
  ---------------------------------------------------------------------*/
 static VALUE Input_IME_setenable( VALUE obj, VALUE vflag )
 {
@@ -1823,7 +1823,7 @@ static VALUE Input_IME_setenable( VALUE obj, VALUE vflag )
 
 
 /*--------------------------------------------------------------------
-   IME‚Ìenableæ“¾
+   IMEã®enableå–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Input_IME_getenable( VALUE obj )
 {
@@ -1832,7 +1832,7 @@ static VALUE Input_IME_getenable( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   IME‚Ìó‘Ôæ“¾
+   IMEã®çŠ¶æ…‹å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Input_IME_getcompositing( VALUE obj )
 {
@@ -1840,7 +1840,7 @@ static VALUE Input_IME_getcompositing( VALUE obj )
 }
 
 /*--------------------------------------------------------------------
-   IME‚Ì•ÏŠ·’†•¶š—ñæ“¾
+   IMEã®å¤‰æ›ä¸­æ–‡å­—åˆ—å–å¾—
  ---------------------------------------------------------------------*/
 static VALUE Input_IME_getcompositioninfo( VALUE obj )
 {
@@ -1858,12 +1858,12 @@ static VALUE Input_IME_getcompositioninfo( VALUE obj )
 #endif
 
 
-/* ƒfƒoƒCƒX—ñ‹“ŠÖ” */
+/* ãƒ‡ãƒã‚¤ã‚¹åˆ—æŒ™é–¢æ•° */
 BOOL CALLBACK EnumJoysticksCallback( const DIDEVICEINSTANCE* pdidInstance, void* pContext )
 {
     HRESULT hr;
 
-    /* —ñ‹“‚³‚ê‚½ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚Ö‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğæ“¾‚·‚é */
+    /* åˆ—æŒ™ã•ã‚ŒãŸã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã¸ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’å–å¾—ã™ã‚‹ */
     hr = g_pDInput->lpVtbl->CreateDevice( g_pDInput,
                             &pdidInstance->guidInstance,
                             &g_pDIDJoyPad[g_JoystickCount],
@@ -1876,7 +1876,7 @@ BOOL CALLBACK EnumJoysticksCallback( const DIDEVICEINSTANCE* pdidInstance, void*
     return DIENUM_STOP;
 }
 
-/* ƒIƒuƒWƒFƒNƒgi²j—ñ‹“ŠÖ” */
+/* ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆï¼ˆè»¸ï¼‰åˆ—æŒ™é–¢æ•° */
 BOOL CALLBACK EnumAxisCallback( const DIDEVICEOBJECTINSTANCE* pdidoi, void *pContext )
 {
     HRESULT hr;
@@ -1889,7 +1889,7 @@ BOOL CALLBACK EnumAxisCallback( const DIDEVICEOBJECTINSTANCE* pdidoi, void *pCon
     diprg.diph.dwObj = pdidoi->dwType;
 
     /*========================================================*/
-    /* æ“¾ */
+    /* å–å¾— */
     hr =  pad->pDIDJoyPad->lpVtbl->GetProperty( pad->pDIDJoyPad, DIPROP_RANGE, &diprg.diph );
 
     if( FAILED( hr ) )
@@ -1898,7 +1898,7 @@ BOOL CALLBACK EnumAxisCallback( const DIDEVICEOBJECTINSTANCE* pdidoi, void *pCon
         return DIENUM_STOP;
     }
 
-    /* x² */
+    /* xè»¸ */
     if( memcmp( &pdidoi->guidType, &GUID_XAxis ,sizeof(GUID)) == 0 )
     {
         pad->x_flg = 1;
@@ -1911,7 +1911,7 @@ BOOL CALLBACK EnumAxisCallback( const DIDEVICEOBJECTINSTANCE* pdidoi, void *pCon
         }
     }
 
-    /* y² */
+    /* yè»¸ */
     if( memcmp( &pdidoi->guidType, &GUID_YAxis ,sizeof(GUID)) == 0 )
     {
         pad->y_flg = 1;
@@ -1924,7 +1924,7 @@ BOOL CALLBACK EnumAxisCallback( const DIDEVICEOBJECTINSTANCE* pdidoi, void *pCon
         }
     }
 
-    /* z² */
+    /* zè»¸ */
     if( memcmp( &pdidoi->guidType, &GUID_ZAxis ,sizeof(GUID)) == 0 )
     {
         pad->z_flg = 1;
@@ -1933,7 +1933,7 @@ BOOL CALLBACK EnumAxisCallback( const DIDEVICEOBJECTINSTANCE* pdidoi, void *pCon
         pad->z_max = diprg.lMax;
     }
 
-    /* x²‰ñ“] */
+    /* xè»¸å›è»¢ */
     if( memcmp( &pdidoi->guidType, &GUID_RxAxis ,sizeof(GUID)) == 0 )
     {
         pad->rx_flg = 1;
@@ -1942,7 +1942,7 @@ BOOL CALLBACK EnumAxisCallback( const DIDEVICEOBJECTINSTANCE* pdidoi, void *pCon
         pad->rx_max = diprg.lMax;
     }
 
-    /* y²‰ñ“] */
+    /* yè»¸å›è»¢ */
     if( memcmp( &pdidoi->guidType, &GUID_RyAxis ,sizeof(GUID)) == 0 )
     {
         pad->ry_flg = 1;
@@ -1951,7 +1951,7 @@ BOOL CALLBACK EnumAxisCallback( const DIDEVICEOBJECTINSTANCE* pdidoi, void *pCon
         pad->ry_max = diprg.lMax;
     }
 
-    /* z²‰ñ“] */
+    /* zè»¸å›è»¢ */
     if( memcmp( &pdidoi->guidType, &GUID_RzAxis ,sizeof(GUID)) == 0 )
     {
         pad->rz_flg = 1;
@@ -1964,16 +1964,16 @@ BOOL CALLBACK EnumAxisCallback( const DIDEVICEOBJECTINSTANCE* pdidoi, void *pCon
 }
 
 /*--------------------------------------------------------------------
-  i“à•”ŠÖ”jDirectInput‰Šú‰»
+  ï¼ˆå†…éƒ¨é–¢æ•°ï¼‰DirectInputåˆæœŸåŒ–
  ---------------------------------------------------------------------*/
 int InitDirectInput( void )
 {
     HRESULT hr;
     int i;
 
-/* DirectInput‰Šú‰» */
+/* DirectInputåˆæœŸåŒ– */
 
-    /* DirectInputƒIƒuƒWƒFƒNƒg‚Ìì¬ */
+    /* DirectInputã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆ */
     hr = DirectInput8Create( g_hInstance, DIRECTINPUT_VERSION,
                              &IID_IDirectInput8, (void **)&g_pDInput, NULL );
 
@@ -1983,9 +1983,9 @@ int InitDirectInput( void )
         return MainThreadError;
     }
 
-/* ƒL[ƒ{[ƒh */
+/* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ */
 
-    /* ƒfƒoƒCƒXEƒIƒuƒWƒFƒNƒg‚ğì¬iƒL[ƒ{[ƒhj */
+    /* ãƒ‡ãƒã‚¤ã‚¹ãƒ»ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆï¼ˆã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ï¼‰ */
     hr = g_pDInput->lpVtbl->CreateDevice( g_pDInput, &GUID_SysKeyboard, &g_pDIDKeyBoard, NULL );
 
     if( FAILED( hr ) )
@@ -1994,7 +1994,7 @@ int InitDirectInput( void )
         return MainThreadError;
     }
 
-    /* ƒf[ƒ^Œ`®‚ğİ’èiƒL[ƒ{[ƒh‚Å‚·‚æj */
+    /* ãƒ‡ãƒ¼ã‚¿å½¢å¼ã‚’è¨­å®šï¼ˆã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã§ã™ã‚ˆï¼‰ */
     hr = g_pDIDKeyBoard->lpVtbl->SetDataFormat( g_pDIDKeyBoard, &c_dfDIKeyboard );
 
     if( FAILED( hr ) )
@@ -2003,7 +2003,7 @@ int InitDirectInput( void )
         return MainThreadError;
     }
 
-    /* ƒL[ƒ{[ƒh‚Ìƒ‚[ƒh‚ğİ’èiƒtƒHƒAƒOƒ‰ƒEƒ“ƒh•”ñ”r‘¼ƒ‚[ƒhj */
+    /* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ãƒ¢ãƒ¼ãƒ‰ã‚’è¨­å®šï¼ˆãƒ•ã‚©ã‚¢ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ï¼†éæ’ä»–ãƒ¢ãƒ¼ãƒ‰ï¼‰ */
     hr = g_pDIDKeyBoard->lpVtbl->SetCooperativeLevel( g_pDIDKeyBoard, g_hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND );
 
     if( FAILED( hr ) )
@@ -2012,11 +2012,11 @@ int InitDirectInput( void )
         return MainThreadError;
     }
 
-    /* “ü—Í§ŒäŠJn */
+    /* å…¥åŠ›åˆ¶å¾¡é–‹å§‹ */
     g_pDIDKeyBoard->lpVtbl->Acquire( g_pDIDKeyBoard );
 
 
-/* ƒQ[ƒ€ƒpƒbƒh */
+/* ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ */
 
     for( i = 0; i < PADMAX; i++)
     {
@@ -2024,7 +2024,7 @@ int InitDirectInput( void )
     }
     g_JoystickCount = 0;
 
-    /* ƒQ[ƒ€ƒfƒoƒCƒX—ñ‹“ */
+    /* ã‚²ãƒ¼ãƒ ãƒ‡ãƒã‚¤ã‚¹åˆ—æŒ™ */
     hr = g_pDInput->lpVtbl->EnumDevices( g_pDInput, DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, NULL, DIEDFL_ATTACHEDONLY );
 
     if( MainThreadError != 0 )
@@ -2038,10 +2038,10 @@ int InitDirectInput( void )
         return MainThreadError;
     }
 
-    /* ƒQ[ƒ€ƒfƒoƒCƒX‰Šú‰» */
+    /* ã‚²ãƒ¼ãƒ ãƒ‡ãƒã‚¤ã‚¹åˆæœŸåŒ– */
     for ( i = 0; i < g_JoystickCount; i++ )
     {
-        /* ƒf[ƒ^Œ`®‚ğİ’è */
+        /* ãƒ‡ãƒ¼ã‚¿å½¢å¼ã‚’è¨­å®š */
         hr = g_pDIDJoyPad[i]->lpVtbl->SetDataFormat( g_pDIDJoyPad[i], &c_dfDIJoystick );
 
         if( FAILED( hr ) )
@@ -2050,7 +2050,7 @@ int InitDirectInput( void )
             return MainThreadError;
         }
 
-        /* ƒL[ƒ{[ƒh‚Ìƒ‚[ƒh‚ğİ’èiƒtƒHƒAƒOƒ‰ƒEƒ“ƒh•”ñ”r‘¼ƒ‚[ƒhj */
+        /* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ãƒ¢ãƒ¼ãƒ‰ã‚’è¨­å®šï¼ˆãƒ•ã‚©ã‚¢ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ï¼†éæ’ä»–ãƒ¢ãƒ¼ãƒ‰ï¼‰ */
         hr = g_pDIDJoyPad[i]->lpVtbl->SetCooperativeLevel( g_pDIDJoyPad[i], g_hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND );
 
         if( FAILED( hr ) )
@@ -2059,7 +2059,7 @@ int InitDirectInput( void )
             return MainThreadError;
         }
 
-        /* ²ƒIƒuƒWƒFƒNƒg—ñ‹“ */
+        /* è»¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåˆ—æŒ™ */
         g_PadInfo[i].pDIDJoyPad = g_pDIDJoyPad[i];
         g_PadInfo[i].x_flg  = g_PadInfo[i].y_flg  = g_PadInfo[i].z_flg = 
         g_PadInfo[i].rx_flg = g_PadInfo[i].ry_flg = g_PadInfo[i].rz_flg = 
@@ -2077,7 +2077,7 @@ int InitDirectInput( void )
             return MainThreadError;
         }
 
-//        /* ƒtƒH[ƒXƒtƒB[ƒhƒoƒbƒN‚ ‚è */
+//        /* ãƒ•ã‚©ãƒ¼ã‚¹ãƒ•ã‚£ãƒ¼ãƒ‰ãƒãƒƒã‚¯ã‚ã‚Š */
 //        if( g_PadInfo[i].x_ff_flg + g_PadInfo[i].y_ff_flg > 0 )
 //        {
 //
@@ -2105,12 +2105,12 @@ int InitDirectInput( void )
 //
 //            hr = g_pDIDJoyPad[i]->lpVtbl->CreateEffect( g_pDIDJoyPad[i], &GUID_ConstantForce, &eff, &g_lpDIEffect, NULL );
 //            if ( FAILED( hr ) ){
-//                rb_raise( eDXRubyError, "DirectInput‚Ì‰Šú‰»‚É¸”s‚µ‚Ü‚µ‚½ - CreateEffect" );
+//                rb_raise( eDXRubyError, "DirectInputã®åˆæœŸåŒ–ã«å¤±æ•—ã—ã¾ã—ãŸ - CreateEffect" );
 //            }
 //
 //        }
 
-        /* “ü—Í§ŒäŠJn */
+        /* å…¥åŠ›åˆ¶å¾¡é–‹å§‹ */
         g_pDIDJoyPad[i]->lpVtbl->Acquire( g_pDIDJoyPad[i] );
     }
 
@@ -2127,26 +2127,26 @@ void Input_release( void )
 
     for( i = 0 ; i < g_JoystickCount; i++ )
     {
-        /* DirectInputDevice(JoyPad)ƒIƒuƒWƒFƒNƒg‚Ìg—pI—¹ */
+        /* DirectInputDevice(JoyPad)ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ç”¨çµ‚äº† */
         if( g_pDIDJoyPad[i] )
         {
             g_pDIDJoyPad[i]->lpVtbl->Unacquire( g_pDIDJoyPad[i] ); 
         }
 
-        /* DirectInputDevide(JoyPad)ƒIƒuƒWƒFƒNƒg‚Ì”jŠü */
+        /* DirectInputDevide(JoyPad)ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç ´æ£„ */
         RELEASE( g_pDIDJoyPad[i] );
     }
 
-    /* DirectInputDevice(Keyboard)ƒIƒuƒWƒFƒNƒg‚Ìg—pI—¹ */
+    /* DirectInputDevice(Keyboard)ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½¿ç”¨çµ‚äº† */
     if( g_pDIDKeyBoard )
     {
            g_pDIDKeyBoard->lpVtbl->Unacquire( g_pDIDKeyBoard ); 
     }
 
-    /* DirectInputDevide(Keyboard)ƒIƒuƒWƒFƒNƒg‚Ì”jŠü */
+    /* DirectInputDevide(Keyboard)ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç ´æ£„ */
     RELEASE( g_pDIDKeyBoard );
 
-    /* DirectInputƒIƒuƒWƒFƒNƒg‚Ì”jŠü */
+    /* DirectInputã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ç ´æ£„ */
     RELEASE( g_pDInput );
 }
 
@@ -2154,10 +2154,10 @@ void Init_dxruby_Input( void )
 {
     int i, j;
 
-    /* Inputƒ‚ƒWƒ…[ƒ‹“o˜^ */
+    /* Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ç™»éŒ² */
     mInput = rb_define_module_under( mDXRuby, "Input" );
 
-    /* Inputƒ‚ƒWƒ…[ƒ‹‚Éƒƒ\ƒbƒh“o˜^ */
+    /* Inputãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã«ãƒ¡ã‚½ãƒƒãƒ‰ç™»éŒ² */
     rb_define_singleton_method( mInput, "x"              , Input_x               , -1 );
     rb_define_singleton_method( mInput, "y"              , Input_y               , -1 );
     rb_define_singleton_method( mInput, "set_mouse_pos"  , Input_setmousepos     , 2  );
@@ -2215,7 +2215,7 @@ void Init_dxruby_Input( void )
 //    rb_define_singleton_method( mInput, "start"        , Input_ff_start        , 0 );
 //    rb_define_singleton_method( mInput, "stop"        , Input_ff_stop        , 0 );
 
-    /* ‰EƒXƒeƒBƒbƒN‚Æ\šƒ{ƒ^ƒ“‚Ìƒƒ\ƒbƒh’Ç‰Á*/
+    /* å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã¨åå­—ãƒœã‚¿ãƒ³ã®ãƒ¡ã‚½ãƒƒãƒ‰è¿½åŠ */
     rb_define_singleton_method( mInput, "pad_lx"             , Input_lx              , -1 );
     rb_define_singleton_method( mInput, "pad_ly"             , Input_ly              , -1 );
     rb_define_singleton_method( mInput, "pad_rx"             , Input_rx              , -1 );
@@ -2225,7 +2225,7 @@ void Init_dxruby_Input( void )
     rb_define_singleton_method( mInput, "set_cursor"         , Input_setCursor       , 1 );
 
 
-    /* ƒL[ƒ{[ƒh‚ÌƒXƒLƒƒƒ“ƒR[ƒh’è”İ’è */
+    /* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ã‚¹ã‚­ãƒ£ãƒ³ã‚³ãƒ¼ãƒ‰å®šæ•°è¨­å®š */
     rb_define_const( mDXRuby, "K_ESCAPE"     , INT2FIX(DIK_ESCAPE) );
     rb_define_const( mDXRuby, "K_1"          , INT2FIX(DIK_1) );
     rb_define_const( mDXRuby, "K_2"          , INT2FIX(DIK_2) );
@@ -2425,22 +2425,22 @@ void Init_dxruby_Input( void )
     rb_define_const( mDXRuby, "M_RBUTTON"    , INT2FIX(M_RBUTTON)  );
     rb_define_const( mDXRuby, "M_MBUTTON"    , INT2FIX(M_MBUTTON)  );
 
-    /* Š„‚è“–‚Ä‰Šú‰» */
+    /* å‰²ã‚Šå½“ã¦åˆæœŸåŒ– */
     for( i = 0; i < 256; i++)
     {
         g_diKeyConfig[i] = -1;
-        g_diKeyCount[i] = 0; /* ƒJƒEƒ“ƒg‰Šú‰» */
+        g_diKeyCount[i] = 0; /* ã‚«ã‚¦ãƒ³ãƒˆåˆæœŸåŒ– */
     }
     for( i = 0; i < PADMAX; i++)
     {
         for( j = 0; j < PADBUTTON_MAX; j++)
         {
             g_PadState[i].PadConfig[j] = -1;
-            g_PadState[i].count[j] = 0; /* ƒJƒEƒ“ƒg‰Šú‰» */
+            g_PadState[i].count[j] = 0; /* ã‚«ã‚¦ãƒ³ãƒˆåˆæœŸåŒ– */
         }
     }
 
-    /* ƒfƒtƒHƒ‹ƒg‚ÌŠ„‚è“–‚Ä */
+    /* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®å‰²ã‚Šå½“ã¦ */
     Input_SetConfig( 0, P_LEFT   , DIK_LEFT  );
     Input_SetConfig( 0, P_RIGHT  , DIK_RIGHT );
     Input_SetConfig( 0, P_UP     , DIK_UP    );
@@ -2477,10 +2477,10 @@ void Init_dxruby_Input( void )
     rb_define_const( mDXRuby, "IDC_HELP"       , INT2FIX(32651) );
 
 #ifdef DXRUBY15
-    /* Input::IMEƒ‚ƒWƒ…[ƒ‹“o˜^ */
+    /* Input::IMEãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ç™»éŒ² */
     mIME = rb_define_module_under( mInput, "IME" );
 
-    /* Input::IMEƒ‚ƒWƒ…[ƒ‹‚Éƒƒ\ƒbƒh“o˜^ */
+    /* Input::IMEãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã«ãƒ¡ã‚½ãƒƒãƒ‰ç™»éŒ² */
     rb_define_singleton_method( mIME, "get_string" , Input_IME_getstring , 0 );
     rb_define_singleton_method( mIME, "getString" ,  Input_IME_getstring , 0 );
     rb_define_singleton_method( mIME, "enabled?"  ,  Input_IME_getenable , 0 );

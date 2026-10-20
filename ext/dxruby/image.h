@@ -1,11 +1,11 @@
-/* ImageƒIƒuƒWƒFƒNƒg‚Ì’†g */
+/* Imageã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä¸­èº« */
 struct DXRubyImage {
     struct DXRubyTexture *texture;
-    int x;     /* xn“_ˆÊ’u      */
-    int y;     /* yn“_ˆÊ’u      */
-    int width; /* ƒCƒ[ƒW‚Ì•   */
-    int height;/* ƒCƒ[ƒW‚Ì‚‚³ */
-//    int lockcount;    /* ƒƒbƒNƒJƒEƒ“ƒg */
+    int x;     /* xå§‹ç‚¹ä½ç½®      */
+    int y;     /* yå§‹ç‚¹ä½ç½®      */
+    int width; /* ã‚¤ãƒ¡ãƒ¼ã‚¸ã®å¹…   */
+    int height;/* ã‚¤ãƒ¡ãƒ¼ã‚¸ã®é«˜ã• */
+//    int lockcount;    /* ãƒ­ãƒƒã‚¯ã‚«ã‚¦ãƒ³ãƒˆ */
 };
 
 void Init_dxruby_Image( void );

@@ -1,14 +1,14 @@
-/* ƒtƒHƒ“ƒgƒf[ƒ^ */
+/* ãƒ•ã‚©ãƒ³ãƒˆãƒ‡ãƒ¼ã‚¿ */
 struct DXRubyFont {
-    LPD3DXFONT pD3DXFont;       /* ƒtƒHƒ“ƒgƒIƒuƒWƒFƒNƒg   */
-    HFONT hFont;                /* Image•`‰æ‚ÉŽg‚¤ƒtƒHƒ“ƒg  */
-    int size;                   /* ƒtƒHƒ“ƒgƒTƒCƒY */
-    VALUE vfontname;            /* ƒtƒHƒ“ƒg–¼Ì */
-    VALUE vweight;              /* ‘¾‚³ */
-    VALUE vitalic;              /* ƒCƒ^ƒŠƒbƒNƒtƒ‰ƒO */
-    VALUE vglyph_naa;           /* ƒOƒŠƒtƒLƒƒƒbƒVƒ…(AA‚È‚µ) */
-    VALUE vglyph_aa;            /* ƒOƒŠƒtƒLƒƒƒbƒVƒ…(AA‚ ‚è) */
-    VALUE vauto_fitting;        /* ŽÀÛ‚Ì•`‰æ•¶Žš‚ªŽw’èƒTƒCƒY‚É‚È‚é‚æ‚¤Šg‘å‚·‚é */
+    LPD3DXFONT pD3DXFont;       /* ãƒ•ã‚©ãƒ³ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ   */
+    HFONT hFont;                /* Imageæç”»ã«ä½¿ã†ãƒ•ã‚©ãƒ³ãƒˆ  */
+    int size;                   /* ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º */
+    VALUE vfontname;            /* ãƒ•ã‚©ãƒ³ãƒˆåç§° */
+    VALUE vweight;              /* å¤ªã• */
+    VALUE vitalic;              /* ã‚¤ã‚¿ãƒªãƒƒã‚¯ãƒ•ãƒ©ã‚° */
+    VALUE vglyph_naa;           /* ã‚°ãƒªãƒ•ã‚­ãƒ£ãƒƒã‚·ãƒ¥(AAãªã—) */
+    VALUE vglyph_aa;            /* ã‚°ãƒªãƒ•ã‚­ãƒ£ãƒƒã‚·ãƒ¥(AAã‚ã‚Š) */
+    VALUE vauto_fitting;        /* å®Ÿéš›ã®æç”»æ–‡å­—ãŒæŒ‡å®šã‚µã‚¤ã‚ºã«ãªã‚‹ã‚ˆã†æ‹¡å¤§ã™ã‚‹ */
 };
 
 void Init_dxruby_Font( void );

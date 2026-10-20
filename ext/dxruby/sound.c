@@ -1,4 +1,4 @@
-#define WINVER 0x0500                                  /* ƒo[ƒWƒ‡ƒ“’è‹` Windows2000ˆÈã */
+#define WINVER 0x0500                                  /* ãƒãƒ¼ã‚¸ãƒ§ãƒ³å®šç¾© Windows2000ä»¥ä¸Š */
 #define DIRECTSOUND_VERSION 0x0900
 #define _WIN32_WINNT WINVER
 
@@ -22,50 +22,50 @@ GUID DS3DALG_DEFAULT = {0};
 #define WAVE_SAW 2
 #define WAVE_TRI 3
 
-static VALUE cSound;        /* ƒTƒEƒ“ƒhƒNƒ‰ƒX       */
-static VALUE cSoundEffect;  /* ¶¬Œø‰Ê‰¹ƒNƒ‰ƒX     */
+static VALUE cSound;        /* ã‚µã‚¦ãƒ³ãƒ‰ã‚¯ãƒ©ã‚¹       */
+static VALUE cSoundEffect;  /* ç”ŸæˆåŠ¹æœéŸ³ã‚¯ãƒ©ã‚¹     */
 
-static IDirectMusicPerformance8 *g_pDMPerformance = NULL;       /* DirectMusicPerformance8ƒCƒ“ƒ^[ƒtƒFƒCƒX */
-static IDirectMusicLoader8      *g_pDMLoader = NULL;            /* ƒ[ƒ_[ */
-static LPDIRECTSOUND8           g_pDSound = NULL;               /* DirectSoundƒCƒ“ƒ^[ƒtƒFƒCƒX */
-static int g_iRefDM = 0; /* DirectMusicƒpƒtƒH[ƒ}ƒ“ƒX‚ÌQÆƒJƒEƒ“ƒg */
-static int g_iRefDS = 0; /* DirectSound‚ÌQÆƒJƒEƒ“ƒg */
+static IDirectMusicPerformance8 *g_pDMPerformance = NULL;       /* DirectMusicPerformance8ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ */
+static IDirectMusicLoader8      *g_pDMLoader = NULL;            /* ãƒ­ãƒ¼ãƒ€ãƒ¼ */
+static LPDIRECTSOUND8           g_pDSound = NULL;               /* DirectSoundã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ */
+static int g_iRefDM = 0; /* DirectMusicãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã®å‚ç…§ã‚«ã‚¦ãƒ³ãƒˆ */
+static int g_iRefDS = 0; /* DirectSoundã®å‚ç…§ã‚«ã‚¦ãƒ³ãƒˆ */
 
-/* SoundƒIƒuƒWƒFƒNƒg */
+/* Soundã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ */
 struct DXRubySound {
-    IDirectMusicAudioPath8   *pDMDefAudioPath; /* ƒfƒtƒHƒ‹ƒgƒI[ƒfƒBƒIƒpƒX */
-    IDirectMusicSegment8     *pDMSegment;        /* ƒZƒOƒƒ“ƒg       */
+    IDirectMusicAudioPath8   *pDMDefAudioPath; /* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ‘ã‚¹ */
+    IDirectMusicSegment8     *pDMSegment;        /* ã‚»ã‚°ãƒ¡ãƒ³ãƒˆ       */
     int start;
     int loopstart;
     int loopend;
     int loopcount;
-    int midwavflag; /* mid‚Í0Awav‚Í1 */
+    int midwavflag; /* midã¯0ã€wavã¯1 */
     VALUE vbuffer;
 };
 
-/* SoundEffectƒIƒuƒWƒFƒNƒg */
+/* SoundEffectã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ */
 struct DXRubySoundEffect {
-    LPDIRECTSOUNDBUFFER pDSBuffer;    /* ƒoƒbƒtƒ@         */
+    LPDIRECTSOUNDBUFFER pDSBuffer;    /* ãƒãƒƒãƒ•ã‚¡         */
 };
 
 
 
 /*********************************************************************
- * SoundƒNƒ‰ƒX
+ * Soundã‚¯ãƒ©ã‚¹
  *
- * DirectMusic‚ğg—p‚µ‚Ä‰¹‚ğ–Â‚ç‚·B
- * ‚Æ‚è‚ ‚¦‚¸‰¹‚ğo‚»‚¤‚ÆŠæ’£‚Á‚Ä‚¢‚éB
+ * DirectMusicã‚’ä½¿ç”¨ã—ã¦éŸ³ã‚’é³´ã‚‰ã™ã€‚
+ * ã¨ã‚Šã‚ãˆãšéŸ³ã‚’å‡ºãã†ã¨é ‘å¼µã£ã¦ã„ã‚‹ã€‚
  *********************************************************************/
 
 /*--------------------------------------------------------------------
-   QÆ‚³‚ê‚È‚­‚È‚Á‚½‚Æ‚«‚ÉGC‚©‚çŒÄ‚Î‚ê‚éŠÖ”
+   å‚ç…§ã•ã‚Œãªããªã£ãŸã¨ãã«GCã‹ã‚‰å‘¼ã°ã‚Œã‚‹é–¢æ•°
  ---------------------------------------------------------------------*/
 static void Sound_free( struct DXRubySound *sound )
 {
     HRESULT hr;
 
-    /* ƒTƒEƒ“ƒhƒIƒuƒWƒFƒNƒg‚ÌŠJ•ú */
-    /* ƒoƒ“ƒh‰ğ•ú */
+    /* ã‚µã‚¦ãƒ³ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®é–‹æ”¾ */
+    /* ãƒãƒ³ãƒ‰è§£æ”¾ */
     if ( sound->pDMSegment )
     {
         hr = sound->pDMSegment->lpVtbl->Unload( sound->pDMSegment, (IUnknown* )sound->pDMDefAudioPath );
@@ -73,18 +73,18 @@ static void Sound_free( struct DXRubySound *sound )
         {
             rb_raise( eDXRubyError, "Band release failed - Unload" );
         }
-        /* ƒZƒOƒƒ“ƒg‚ğŠJ•ú */
+        /* ã‚»ã‚°ãƒ¡ãƒ³ãƒˆã‚’é–‹æ”¾ */
         RELEASE( sound->pDMSegment );
     }
 
-    /* ƒfƒtƒHƒ‹ƒgƒI[ƒfƒBƒIƒpƒX‚ğŠJ•ú */
+    /* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ‘ã‚¹ã‚’é–‹æ”¾ */
     RELEASE( sound->pDMDefAudioPath );
 
     g_iRefDM--;
 
     if( g_iRefDM <= 0 )
     {
-        /* ‰‰‘t’â~ */
+        /* æ¼”å¥åœæ­¢ */
         if ( g_pDMPerformance )
         {
             hr = g_pDMPerformance->lpVtbl->Stop( g_pDMPerformance, NULL, NULL, 0, 0 );
@@ -96,7 +96,7 @@ static void Sound_free( struct DXRubySound *sound )
         }
         RELEASE(g_pDMPerformance);
 
-        /* ƒ[ƒ_‚ğŠJ•ú */
+        /* ãƒ­ãƒ¼ãƒ€ã‚’é–‹æ”¾ */
         RELEASE(g_pDMLoader);
     }
 }
@@ -135,7 +135,7 @@ const rb_data_type_t Sound_data_type = {
 #endif
 
 /*--------------------------------------------------------------------
-   SoundƒNƒ‰ƒX‚ÌdisposeB
+   Soundã‚¯ãƒ©ã‚¹ã®disposeã€‚
  ---------------------------------------------------------------------*/
 static VALUE Sound_dispose( VALUE self )
 {
@@ -146,7 +146,7 @@ static VALUE Sound_dispose( VALUE self )
 }
 
 /*--------------------------------------------------------------------
-   SoundƒNƒ‰ƒX‚Ìdisposed?B
+   Soundã‚¯ãƒ©ã‚¹ã®disposed?ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Sound_check_disposed( VALUE self )
 {
@@ -159,14 +159,14 @@ static VALUE Sound_check_disposed( VALUE self )
 }
 
 /*--------------------------------------------------------------------
-   SoundƒNƒ‰ƒX‚ÌallocateBƒƒ‚ƒŠ‚ğŠm•Û‚·‚éˆ×‚Éinitialize‘O‚ÉŒÄ‚Î‚ê‚éB
+   Soundã‚¯ãƒ©ã‚¹ã®allocateã€‚ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã™ã‚‹ç‚ºã«initializeå‰ã«å‘¼ã°ã‚Œã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Sound_allocate( VALUE klass )
 {
     VALUE obj;
     struct DXRubySound *sound;
 
-    /* DXRubyImage‚Ìƒƒ‚ƒŠæ“¾•ImageƒIƒuƒWƒFƒNƒg¶¬ */
+    /* DXRubyImageã®ãƒ¡ãƒ¢ãƒªå–å¾—ï¼†Imageã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ */
     sound = malloc(sizeof(struct DXRubySound));
     if( sound == NULL ) rb_raise( eDXRubyError, "Out of memory - Sound_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
@@ -174,7 +174,7 @@ static VALUE Sound_allocate( VALUE klass )
 #else
     obj = Data_Wrap_Struct(klass, 0, Sound_release, sound);
 #endif
-    /* ‚Æ‚è‚ ‚¦‚¸ƒTƒEƒ“ƒhƒIƒuƒWƒFƒNƒg‚ÍNULL‚É‚µ‚Ä‚¨‚­ */
+    /* ã¨ã‚Šã‚ãˆãšã‚µã‚¦ãƒ³ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯NULLã«ã—ã¦ãŠã */
     sound->pDMSegment = NULL;
     sound->vbuffer = Qnil;
 
@@ -183,7 +183,7 @@ static VALUE Sound_allocate( VALUE klass )
 
 
 /*--------------------------------------------------------------------
-   SoundƒNƒ‰ƒX‚Ìload_from_memoryBƒtƒ@ƒCƒ‹‚ğƒƒ‚ƒŠ‚©‚çƒ[ƒh‚·‚éB
+   Soundã‚¯ãƒ©ã‚¹ã®load_from_memoryã€‚ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ¡ãƒ¢ãƒªã‹ã‚‰ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
 {
@@ -202,7 +202,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
 
     if( g_iRefDM == 0 )
     {
-        /* ƒpƒtƒH[ƒ}ƒ“ƒX‚Ìì¬ */
+        /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã®ä½œæˆ */
         hr = CoCreateInstance( &CLSID_DirectMusicPerformance, NULL,
                                CLSCTX_INPROC_SERVER, &IID_IDirectMusicPerformance8,
                                (void**)&g_pDMPerformance );
@@ -211,21 +211,21 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
             rb_raise( eDXRubyError, "DirectMusic initialize error - CoCreateInstance" );
         }
 
-        /* ƒpƒtƒH[ƒ}ƒ“ƒX‚Ì‰Šú‰» */
+        /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã®åˆæœŸåŒ– */
         hr = g_pDMPerformance->lpVtbl->InitAudio( g_pDMPerformance,
-                                                  NULL,                  /* IDirectMusicƒCƒ“ƒ^[ƒtƒFƒCƒX‚Í•s—v */
-                                                  NULL,                  /* IDirectSoundƒCƒ“ƒ^[ƒtƒFƒCƒX‚Í•s—v */
-                                                  g_hWnd,               /* ƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹ */
-                                                  DMUS_APATH_SHARED_STEREOPLUSREVERB,  /* ƒfƒtƒHƒ‹ƒg‚ÌƒI[ƒfƒBƒIƒpƒXEƒ^ƒCƒv */
-                                                  64,                    /* ƒpƒtƒH[ƒ}ƒ“ƒXEƒ`ƒƒƒ“ƒlƒ‹‚Ì” */
-                                                  DMUS_AUDIOF_ALL,       /* ƒVƒ“ƒZƒTƒCƒU‚Ì‹@”\ */
-                                                  NULL );                /* ƒI[ƒfƒBƒIEƒpƒ‰ƒ[ƒ^‚É‚ÍƒfƒtƒHƒ‹ƒg‚ğg—p */
+                                                  NULL,                  /* IDirectMusicã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã¯ä¸è¦ */
+                                                  NULL,                  /* IDirectSoundã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã¯ä¸è¦ */
+                                                  g_hWnd,               /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ« */
+                                                  DMUS_APATH_SHARED_STEREOPLUSREVERB,  /* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ‘ã‚¹ãƒ»ã‚¿ã‚¤ãƒ— */
+                                                  64,                    /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ãƒ»ãƒãƒ£ãƒ³ãƒãƒ«ã®æ•° */
+                                                  DMUS_AUDIOF_ALL,       /* ã‚·ãƒ³ã‚»ã‚µã‚¤ã‚¶ã®æ©Ÿèƒ½ */
+                                                  NULL );                /* ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ»ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«ã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚’ä½¿ç”¨ */
         if( FAILED( hr ) )
         {
             rb_raise( eDXRubyError, "DirectMusic initialize error - InitAudio" );
         }
 
-        /* ƒ[ƒ_[‚Ìì¬ */
+        /* ãƒ­ãƒ¼ãƒ€ãƒ¼ã®ä½œæˆ */
         hr = CoCreateInstance( &CLSID_DirectMusicLoader, NULL, 
                                CLSCTX_INPROC_SERVER, &IID_IDirectMusicLoader8,
                                (void**)&g_pDMLoader );
@@ -234,17 +234,17 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
             rb_raise( eDXRubyError, "DirectMusic initialize error - CoCreateInstance" );
         }
 
-        /* ƒ[ƒ_[‚Ì‰Šú‰»iŒŸõƒpƒX‚ğƒJƒŒƒ“ƒgEƒfƒBƒŒƒNƒgƒŠ‚Éİ’èj */
+        /* ãƒ­ãƒ¼ãƒ€ãƒ¼ã®åˆæœŸåŒ–ï¼ˆæ¤œç´¢ãƒ‘ã‚¹ã‚’ã‚«ãƒ¬ãƒ³ãƒˆãƒ»ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«è¨­å®šï¼‰ */
         i = GetCurrentDirectory( MAX_PATH, strPath );
         if ( i == 0 || MAX_PATH < i )
         {
             rb_raise( eDXRubyError, "Get current directory failed - GetCurrentDirectory" );
         }
 
-        /* ƒ}ƒ‹ƒ`EƒoƒCƒg•¶š‚ğUNICODE‚É•ÏŠ· */
+        /* ãƒãƒ«ãƒãƒ»ãƒã‚¤ãƒˆæ–‡å­—ã‚’UNICODEã«å¤‰æ› */
         MultiByteToWideChar( CP_ACP, 0, strPath, -1, wstrSearchPath, MAX_PATH );
 
-        /* ƒ[ƒ_[‚ÉŒŸõƒpƒX‚ğİ’è */
+        /* ãƒ­ãƒ¼ãƒ€ãƒ¼ã«æ¤œç´¢ãƒ‘ã‚¹ã‚’è¨­å®š */
         hr = g_pDMLoader->lpVtbl->SetSearchDirectory( g_pDMLoader, &GUID_DirectMusicAllTypes,
                                                       wstrSearchPath, FALSE );
         if( FAILED( hr ) )
@@ -254,7 +254,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
     }
     g_iRefDM++;
 
-    /* ƒTƒEƒ“ƒhƒIƒuƒWƒFƒNƒgæ“¾ */
+    /* ã‚µã‚¦ãƒ³ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå–å¾— */
     obj = Sound_allocate( klass );
     sound = DXRUBY_GET_STRUCT( Sound, obj );
     if( sound->pDMSegment )
@@ -265,12 +265,12 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
         g_iRefAll--;
     }
 
-    /* ƒI[ƒfƒBƒIEƒpƒXì¬ */
+    /* ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ»ãƒ‘ã‚¹ä½œæˆ */
     hr = g_pDMPerformance->lpVtbl->CreateStandardAudioPath( g_pDMPerformance,
-        DMUS_APATH_DYNAMIC_STEREO,      /* ƒpƒX‚Ìí—ŞB */
-        64,                             /* ƒpƒtƒH[ƒ}ƒ“ƒX ƒ`ƒƒƒ“ƒlƒ‹‚Ì”B */
-        TRUE,                           /* ‚±‚±‚ÅƒAƒNƒeƒBƒu‚É‚È‚éB */
-        &sound->pDMDefAudioPath );      /* ƒI[ƒfƒBƒIƒpƒX‚ğó‚¯æ‚éƒ|ƒCƒ“ƒ^B */
+        DMUS_APATH_DYNAMIC_STEREO,      /* ãƒ‘ã‚¹ã®ç¨®é¡ã€‚ */
+        64,                             /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ ãƒãƒ£ãƒ³ãƒãƒ«ã®æ•°ã€‚ */
+        TRUE,                           /* ã“ã“ã§ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ãªã‚‹ã€‚ */
+        &sound->pDMDefAudioPath );      /* ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ‘ã‚¹ã‚’å—ã‘å–ã‚‹ãƒã‚¤ãƒ³ã‚¿ã€‚ */
 
     if ( FAILED( hr ) )
     {
@@ -286,8 +286,8 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
         desc.dwSize      = sizeof(DMUS_OBJECTDESC);
         desc.dwValidData = DMUS_OBJ_MEMORY | DMUS_OBJ_CLASS;
         desc.guidClass   = CLSID_DirectMusicSegment;
-        desc.llMemLength = (LONGLONG)RSTRING_LEN(vstr);      // ƒoƒbƒtƒ@‚ÌƒTƒCƒY
-        desc.pbMemData   = (LPBYTE)RSTRING_PTR(vstr);        // ƒf[ƒ^‚Ì“ü‚Á‚Ä‚¢‚éƒoƒbƒtƒ@
+        desc.llMemLength = (LONGLONG)RSTRING_LEN(vstr);      // ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º
+        desc.pbMemData   = (LPBYTE)RSTRING_PTR(vstr);        // ãƒ‡ãƒ¼ã‚¿ã®å…¥ã£ã¦ã„ã‚‹ãƒãƒƒãƒ•ã‚¡
 
         hr = g_pDMLoader->lpVtbl->GetObject( g_pDMLoader, &desc, &IID_IDirectMusicSegment8, (void**)&sound->pDMSegment );
     }
@@ -302,7 +302,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
     sound->loopstart = 0;
     sound->loopend = 0;
 
-    /* MIDI‚Ìê‡ */
+    /* MIDIã®å ´åˆ */
     if( NUM2INT( vtype ) == 0 )
     {
         hr = sound->pDMSegment->lpVtbl->SetParam( sound->pDMSegment, &GUID_StandardMIDIFile,
@@ -313,7 +313,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
         }
         sound->loopcount = DMUS_SEG_REPEAT_INFINITE;
         sound->midwavflag = 0;
-        /* ƒ‹[ƒv‰ñ”İ’è */
+        /* ãƒ«ãƒ¼ãƒ—å›æ•°è¨­å®š */
         hr = sound->pDMSegment->lpVtbl->SetRepeats( sound->pDMSegment, sound->loopcount );
 
         if( FAILED( hr ) )
@@ -327,7 +327,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
         sound->midwavflag = 1;
     }
 
-    /* ƒoƒ“ƒhƒ_ƒEƒ“ƒ[ƒh */
+    /* ãƒãƒ³ãƒ‰ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ */
     hr = sound->pDMSegment->lpVtbl->Download( sound->pDMSegment, (IUnknown* )sound->pDMDefAudioPath );
 
     if( FAILED( hr ) )
@@ -336,7 +336,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
     }
 
 
-    /* ‰¹—Êİ’è */
+    /* éŸ³é‡è¨­å®š */
     hr = sound->pDMDefAudioPath->lpVtbl->SetVolume( sound->pDMDefAudioPath, 230 * 9600 / 255 - 9600 , 0 );
 
     if( FAILED( hr ) )
@@ -349,7 +349,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
 
 
 /*--------------------------------------------------------------------
-   SoundƒNƒ‰ƒX‚ÌinitializeBƒtƒ@ƒCƒ‹‚ğƒ[ƒh‚·‚éB
+   Soundã‚¯ãƒ©ã‚¹ã®initializeã€‚ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 {
@@ -367,7 +367,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 
     if( g_iRefDM == 0 )
 	{
-	    /* ƒpƒtƒH[ƒ}ƒ“ƒX‚Ìì¬ */
+	    /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã®ä½œæˆ */
 	    hr = CoCreateInstance( &CLSID_DirectMusicPerformance, NULL,
 	                           CLSCTX_INPROC_SERVER, &IID_IDirectMusicPerformance8,
 	                           (void**)&g_pDMPerformance );
@@ -376,21 +376,21 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 	        rb_raise( eDXRubyError, "DirectMusic initialize error - CoCreateInstance" );
 	    }
 
-	    /* ƒpƒtƒH[ƒ}ƒ“ƒX‚Ì‰Šú‰» */
+	    /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ã®åˆæœŸåŒ– */
 	    hr = g_pDMPerformance->lpVtbl->InitAudio( g_pDMPerformance,
-	                                              NULL,                  /* IDirectMusicƒCƒ“ƒ^[ƒtƒFƒCƒX‚Í•s—v */
-	                                              NULL,                  /* IDirectSoundƒCƒ“ƒ^[ƒtƒFƒCƒX‚Í•s—v */
-	                                              g_hWnd,               /* ƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹ */
-	                                              DMUS_APATH_SHARED_STEREOPLUSREVERB,  /* ƒfƒtƒHƒ‹ƒg‚ÌƒI[ƒfƒBƒIƒpƒXEƒ^ƒCƒv */
-	                                              64,                    /* ƒpƒtƒH[ƒ}ƒ“ƒXEƒ`ƒƒƒ“ƒlƒ‹‚Ì” */
-	                                              DMUS_AUDIOF_ALL,       /* ƒVƒ“ƒZƒTƒCƒU‚Ì‹@”\ */
-	                                              NULL );                /* ƒI[ƒfƒBƒIEƒpƒ‰ƒ[ƒ^‚É‚ÍƒfƒtƒHƒ‹ƒg‚ğg—p */
+	                                              NULL,                  /* IDirectMusicã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã¯ä¸è¦ */
+	                                              NULL,                  /* IDirectSoundã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã¯ä¸è¦ */
+	                                              g_hWnd,               /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ« */
+	                                              DMUS_APATH_SHARED_STEREOPLUSREVERB,  /* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ‘ã‚¹ãƒ»ã‚¿ã‚¤ãƒ— */
+	                                              64,                    /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ãƒ»ãƒãƒ£ãƒ³ãƒãƒ«ã®æ•° */
+	                                              DMUS_AUDIOF_ALL,       /* ã‚·ãƒ³ã‚»ã‚µã‚¤ã‚¶ã®æ©Ÿèƒ½ */
+	                                              NULL );                /* ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ»ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«ã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚’ä½¿ç”¨ */
 	    if( FAILED( hr ) )
 	    {
 	        rb_raise( eDXRubyError, "DirectMusic initialize error - InitAudio" );
 	    }
 
-	    /* ƒ[ƒ_[‚Ìì¬ */
+	    /* ãƒ­ãƒ¼ãƒ€ãƒ¼ã®ä½œæˆ */
 	    hr = CoCreateInstance( &CLSID_DirectMusicLoader, NULL, 
 	                           CLSCTX_INPROC_SERVER, &IID_IDirectMusicLoader8,
 	                           (void**)&g_pDMLoader );
@@ -399,27 +399,27 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 	        rb_raise( eDXRubyError, "DirectMusic initialize error - CoCreateInstance" );
 	    }
 
-	    /* ƒ[ƒ_[‚Ì‰Šú‰»iŒŸõƒpƒX‚ğƒJƒŒƒ“ƒgEƒfƒBƒŒƒNƒgƒŠ‚Éİ’èj */
+	    /* ãƒ­ãƒ¼ãƒ€ãƒ¼ã®åˆæœŸåŒ–ï¼ˆæ¤œç´¢ãƒ‘ã‚¹ã‚’ã‚«ãƒ¬ãƒ³ãƒˆãƒ»ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«è¨­å®šï¼‰ */
 	    i = GetCurrentDirectory( MAX_PATH, strPath );
 	    if ( i == 0 || MAX_PATH < i )
 	    {
 	        rb_raise( eDXRubyError, "Get current directory failed - GetCurrentDirectory" );
 	    }
 
-	    /* ƒ}ƒ‹ƒ`EƒoƒCƒg•¶š‚ğUNICODE‚É•ÏŠ· */
+	    /* ãƒãƒ«ãƒãƒ»ãƒã‚¤ãƒˆæ–‡å­—ã‚’UNICODEã«å¤‰æ› */
 	    MultiByteToWideChar( CP_ACP, 0, strPath, -1, wstrSearchPath, MAX_PATH );
 
-	    /* ƒ[ƒ_[‚ÉŒŸõƒpƒX‚ğİ’è */
+	    /* ãƒ­ãƒ¼ãƒ€ãƒ¼ã«æ¤œç´¢ãƒ‘ã‚¹ã‚’è¨­å®š */
 	    hr = g_pDMLoader->lpVtbl->SetSearchDirectory( g_pDMLoader, &GUID_DirectMusicAllTypes,
 	                                                  wstrSearchPath, FALSE );
 	    if( FAILED( hr ) )
 	    {
 	        rb_raise( eDXRubyError, "Set directory failed - SetSearchDirectory" );
 	    }
-	}
+    }
     g_iRefDM++;
 
-	/* ƒTƒEƒ“ƒhƒIƒuƒWƒFƒNƒgæ“¾ */
+	/* ã‚µã‚¦ãƒ³ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå–å¾— */
     sound = DXRUBY_GET_STRUCT( Sound, obj );
     if( sound->pDMSegment )
     {
@@ -429,19 +429,19 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
         g_iRefAll--;
     }
 
-	/* ƒI[ƒfƒBƒIEƒpƒXì¬ */
+	/* ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ»ãƒ‘ã‚¹ä½œæˆ */
 	hr = g_pDMPerformance->lpVtbl->CreateStandardAudioPath( g_pDMPerformance,
-		DMUS_APATH_DYNAMIC_STEREO,      /* ƒpƒX‚Ìí—ŞB */
-		64,                             /* ƒpƒtƒH[ƒ}ƒ“ƒX ƒ`ƒƒƒ“ƒlƒ‹‚Ì”B */
-		TRUE,                           /* ‚±‚±‚ÅƒAƒNƒeƒBƒu‚É‚È‚éB */
-		&sound->pDMDefAudioPath );      /* ƒI[ƒfƒBƒIƒpƒX‚ğó‚¯æ‚éƒ|ƒCƒ“ƒ^B */
+		DMUS_APATH_DYNAMIC_STEREO,      /* ãƒ‘ã‚¹ã®ç¨®é¡ã€‚ */
+		64,                             /* ãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹ ãƒãƒ£ãƒ³ãƒãƒ«ã®æ•°ã€‚ */
+		TRUE,                           /* ã“ã“ã§ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ãªã‚‹ã€‚ */
+		&sound->pDMDefAudioPath );      /* ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒ‘ã‚¹ã‚’å—ã‘å–ã‚‹ãƒã‚¤ãƒ³ã‚¿ã€‚ */
 
 	if ( FAILED( hr ) )
 	{
         rb_raise( eDXRubyError, "AudioPath set error - CreateStandardAudioPath" );
 	}
 
-    /* ƒtƒ@ƒCƒ‹ƒ[ƒh */
+    /* ãƒ•ã‚¡ã‚¤ãƒ«ãƒ­ãƒ¼ãƒ‰ */
     if( rb_enc_get_index( vfilename ) != 0 )
     {
         vsjisstr = rb_str_export_to_enc( vfilename, g_enc_sys );
@@ -466,7 +466,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
     sound->loopstart = 0;
     sound->loopend = 0;
 
-    /* MIDI‚Ìê‡ */
+    /* MIDIã®å ´åˆ */
     if( strstr( RSTRING_PTR( vsjisstr ), ".mid" ) != NULL )
     {
         hr = sound->pDMSegment->lpVtbl->SetParam( sound->pDMSegment, &GUID_StandardMIDIFile,
@@ -477,7 +477,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
         }
         sound->loopcount = DMUS_SEG_REPEAT_INFINITE;
         sound->midwavflag = 0;
-        /* ƒ‹[ƒv‰ñ”İ’è */
+        /* ãƒ«ãƒ¼ãƒ—å›æ•°è¨­å®š */
         hr = sound->pDMSegment->lpVtbl->SetRepeats( sound->pDMSegment, sound->loopcount );
 
         if( FAILED( hr ) )
@@ -491,7 +491,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
         sound->midwavflag = 1;
     }
 
-    /* ƒoƒ“ƒhƒ_ƒEƒ“ƒ[ƒh */
+    /* ãƒãƒ³ãƒ‰ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ */
     hr = sound->pDMSegment->lpVtbl->Download( sound->pDMSegment, (IUnknown* )sound->pDMDefAudioPath );
 
     if( FAILED( hr ) )
@@ -500,7 +500,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
     }
 
 
-    /* ‰¹—Êİ’è */
+    /* éŸ³é‡è¨­å®š */
     hr = sound->pDMDefAudioPath->lpVtbl->SetVolume( sound->pDMDefAudioPath, 230 * 9600 / 255 - 9600 , 0 );
 
     if( FAILED( hr ) )
@@ -513,7 +513,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
 
 
 /*--------------------------------------------------------------------
-   ŠJnˆÊ’u‚ğİ’è‚·‚é
+   é–‹å§‹ä½ç½®ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_setStart( VALUE obj, VALUE vstart )
 {
@@ -524,7 +524,7 @@ static VALUE Sound_setStart( VALUE obj, VALUE vstart )
     DXRUBY_CHECK_DISPOSE( sound, pDMSegment );
     sound->start = NUM2INT( vstart );
 
-    if( sound->midwavflag == 1 && sound->start > 0 )    /* wav‚Ìê‡ */
+    if( sound->midwavflag == 1 && sound->start > 0 )    /* wavã®å ´åˆ */
     {
         hr = sound->pDMSegment->lpVtbl->SetLength( sound->pDMSegment, sound->start * DMUS_PPQ / 768 + 1 );
         if( FAILED( hr ) )
@@ -533,7 +533,7 @@ static VALUE Sound_setStart( VALUE obj, VALUE vstart )
         }
     }
 
-    /* ƒZƒOƒƒ“ƒgÄ¶ƒXƒ^[ƒgˆÊ’uİ’è */
+    /* ã‚»ã‚°ãƒ¡ãƒ³ãƒˆå†ç”Ÿã‚¹ã‚¿ãƒ¼ãƒˆä½ç½®è¨­å®š */
     hr = sound->pDMSegment->lpVtbl->SetStartPoint( sound->pDMSegment, sound->start * DMUS_PPQ / 768 );
 
     if( FAILED( hr ) )
@@ -546,7 +546,7 @@ static VALUE Sound_setStart( VALUE obj, VALUE vstart )
 
 
 /*--------------------------------------------------------------------
-   ƒ‹[ƒvŠJnˆÊ’u‚ğİ’è‚·‚é
+   ãƒ«ãƒ¼ãƒ—é–‹å§‹ä½ç½®ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_setLoopStart( VALUE obj, VALUE vloopstart )
 {
@@ -564,7 +564,7 @@ static VALUE Sound_setLoopStart( VALUE obj, VALUE vloopstart )
 
     if( sound->loopstart <= sound->loopend )
     {
-        /* ƒ‹[ƒv”ÍˆÍİ’è */
+        /* ãƒ«ãƒ¼ãƒ—ç¯„å›²è¨­å®š */
         hr = sound->pDMSegment->lpVtbl->SetLoopPoints( sound->pDMSegment, sound->loopstart * DMUS_PPQ / 768
                                                                         , sound->loopend * DMUS_PPQ / 768 );
         if( FAILED( hr ) )
@@ -574,7 +574,7 @@ static VALUE Sound_setLoopStart( VALUE obj, VALUE vloopstart )
     }
     else
     {
-        /* ƒ‹[ƒv”ÍˆÍİ’è */
+        /* ãƒ«ãƒ¼ãƒ—ç¯„å›²è¨­å®š */
         hr = sound->pDMSegment->lpVtbl->SetLoopPoints( sound->pDMSegment, 0, 0 );
 
         if( FAILED( hr ) )
@@ -588,7 +588,7 @@ static VALUE Sound_setLoopStart( VALUE obj, VALUE vloopstart )
 
 
 /*--------------------------------------------------------------------
-   ƒ‹[ƒvI—¹ˆÊ’u‚ğİ’è‚·‚é
+   ãƒ«ãƒ¼ãƒ—çµ‚äº†ä½ç½®ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_setLoopEnd( VALUE obj, VALUE vloopend )
 {
@@ -606,7 +606,7 @@ static VALUE Sound_setLoopEnd( VALUE obj, VALUE vloopend )
 
     if( sound->loopstart <= sound->loopend )
     {
-        /* ƒ‹[ƒv”ÍˆÍİ’è */
+        /* ãƒ«ãƒ¼ãƒ—ç¯„å›²è¨­å®š */
         hr = sound->pDMSegment->lpVtbl->SetLoopPoints( sound->pDMSegment, sound->loopstart * DMUS_PPQ / 768
                                                                         , sound->loopend * DMUS_PPQ / 768 );
         if( FAILED( hr ) )
@@ -616,7 +616,7 @@ static VALUE Sound_setLoopEnd( VALUE obj, VALUE vloopend )
     }
     else
     {
-        /* ƒ‹[ƒv”ÍˆÍİ’è */
+        /* ãƒ«ãƒ¼ãƒ—ç¯„å›²è¨­å®š */
         hr = sound->pDMSegment->lpVtbl->SetLoopPoints( sound->pDMSegment, 0, 0 );
 
         if( FAILED( hr ) )
@@ -631,7 +631,7 @@ static VALUE Sound_setLoopEnd( VALUE obj, VALUE vloopend )
 
 
 /*--------------------------------------------------------------------
-   ƒ‹[ƒv‰ñ”‚ğİ’è‚·‚é
+   ãƒ«ãƒ¼ãƒ—å›æ•°ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_setLoopCount( VALUE obj, VALUE vloopcount )
 {
@@ -642,7 +642,7 @@ static VALUE Sound_setLoopCount( VALUE obj, VALUE vloopcount )
     DXRUBY_CHECK_DISPOSE( sound, pDMSegment );
     sound->loopcount = NUM2INT( vloopcount );
 
-    /* ƒ‹[ƒv‰ñ”İ’è */
+    /* ãƒ«ãƒ¼ãƒ—å›æ•°è¨­å®š */
     hr = sound->pDMSegment->lpVtbl->SetRepeats( sound->pDMSegment, sound->loopcount );
 
     if( FAILED( hr ) )
@@ -655,7 +655,7 @@ static VALUE Sound_setLoopCount( VALUE obj, VALUE vloopcount )
 
 
 /*--------------------------------------------------------------------
-   ‰¹—Ê‚ğİ’è‚·‚é
+   éŸ³é‡ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_setVolume( int argc, VALUE *argv, VALUE obj )
 {
@@ -671,7 +671,7 @@ static VALUE Sound_setVolume( int argc, VALUE *argv, VALUE obj )
     sound = DXRUBY_GET_STRUCT( Sound, obj );
     DXRUBY_CHECK_DISPOSE( sound, pDMSegment );
 
-    /* ‰¹—Êİ’è */
+    /* éŸ³é‡è¨­å®š */
     hr = sound->pDMDefAudioPath->lpVtbl->SetVolume( sound->pDMDefAudioPath, volume * 9600 / 255 - 9600, time );
 
     if( FAILED( hr ) )
@@ -684,7 +684,7 @@ static VALUE Sound_setVolume( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ƒpƒ“‚ğæ“¾‚·‚é
+   ãƒ‘ãƒ³ã‚’å–å¾—ã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_getPan( VALUE self )
 {
@@ -703,7 +703,7 @@ static VALUE Sound_getPan( VALUE self )
         rb_raise( eDXRubyError, "internal error - GetPan" );
     }
 
-    /* ƒpƒ“æ“¾ */
+    /* ãƒ‘ãƒ³å–å¾— */
     hr = pDS3DBuffer->lpVtbl->GetPan( pDS3DBuffer, &result );
 
     if( FAILED( hr ) )
@@ -718,7 +718,7 @@ static VALUE Sound_getPan( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ƒpƒ“‚ğİ’è‚·‚é
+   ãƒ‘ãƒ³ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_setPan( VALUE self, VALUE vpan )
 {
@@ -736,7 +736,7 @@ static VALUE Sound_setPan( VALUE self, VALUE vpan )
         rb_raise( eDXRubyError, "internal error - SetPan" );
     }
 
-    /* ƒpƒ“İ’è */
+    /* ãƒ‘ãƒ³è¨­å®š */
     hr = pDS3DBuffer->lpVtbl->SetPan( pDS3DBuffer, NUM2INT( vpan ) );
 
     if( FAILED( hr ) )
@@ -751,7 +751,7 @@ static VALUE Sound_setPan( VALUE self, VALUE vpan )
 
 
 /*--------------------------------------------------------------------
-   ü”g”‚ğæ“¾‚·‚é
+   å‘¨æ³¢æ•°ã‚’å–å¾—ã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_getFrequency( VALUE self )
 {
@@ -770,7 +770,7 @@ static VALUE Sound_getFrequency( VALUE self )
         rb_raise( eDXRubyError, "internal error - GetPan" );
     }
 
-    /* ü”g”æ“¾ */
+    /* å‘¨æ³¢æ•°å–å¾— */
     hr = pDS3DBuffer->lpVtbl->GetFrequency( pDS3DBuffer, &result );
 
     if( FAILED( hr ) )
@@ -785,7 +785,7 @@ static VALUE Sound_getFrequency( VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ü”g”‚ğİ’è‚·‚é
+   å‘¨æ³¢æ•°ã‚’è¨­å®šã™ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_setFrequency( VALUE self, VALUE vfrequency )
 {
@@ -803,7 +803,7 @@ static VALUE Sound_setFrequency( VALUE self, VALUE vfrequency )
         rb_raise( eDXRubyError, "internal error - SetPan" );
     }
 
-    /* ü”g”İ’è */
+    /* å‘¨æ³¢æ•°è¨­å®š */
     hr = pDS3DBuffer->lpVtbl->SetFrequency( pDS3DBuffer, NUM2UINT( vfrequency ) );
 
     if( FAILED( hr ) )
@@ -818,7 +818,7 @@ static VALUE Sound_setFrequency( VALUE self, VALUE vfrequency )
 
 
 /*--------------------------------------------------------------------
-   ‰¹‚ğ–Â‚ç‚·
+   éŸ³ã‚’é³´ã‚‰ã™
  ---------------------------------------------------------------------*/
 static VALUE Sound_play( VALUE obj )
 {
@@ -828,7 +828,7 @@ static VALUE Sound_play( VALUE obj )
     sound = DXRUBY_GET_STRUCT( Sound, obj );
     DXRUBY_CHECK_DISPOSE( sound, pDMSegment );
 
-    /* Ä¶ */
+    /* å†ç”Ÿ */
     if( sound->midwavflag == 0 )
     {
         hr = g_pDMPerformance->lpVtbl->PlaySegmentEx( g_pDMPerformance, (IUnknown* )sound->pDMSegment, NULL, NULL,
@@ -849,7 +849,7 @@ static VALUE Sound_play( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ‰¹‚ğ~‚ß‚é
+   éŸ³ã‚’æ­¢ã‚ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE Sound_stop( VALUE obj )
 {
@@ -859,7 +859,7 @@ static VALUE Sound_stop( VALUE obj )
     sound = DXRUBY_GET_STRUCT( Sound, obj );
     DXRUBY_CHECK_DISPOSE( sound, pDMSegment );
 
-    /* Ä¶ */
+    /* å†ç”Ÿ */
     hr = g_pDMPerformance->lpVtbl->StopEx( g_pDMPerformance, (IUnknown* )sound->pDMSegment, 0, 0 );
 
     if( FAILED( hr ) )
@@ -873,18 +873,18 @@ static VALUE Sound_stop( VALUE obj )
 
 
 /*********************************************************************
- * SoundEffectƒNƒ‰ƒX
+ * SoundEffectã‚¯ãƒ©ã‚¹
  *
- * DirectSound‚ğg—p‚µ‚Ä‰¹‚ğ–Â‚ç‚·B
- * ‚Æ‚è‚ ‚¦‚¸‰¹‚ğo‚»‚¤‚ÆŠæ’£‚Á‚Ä‚¢‚éB
+ * DirectSoundã‚’ä½¿ç”¨ã—ã¦éŸ³ã‚’é³´ã‚‰ã™ã€‚
+ * ã¨ã‚Šã‚ãˆãšéŸ³ã‚’å‡ºãã†ã¨é ‘å¼µã£ã¦ã„ã‚‹ã€‚
  *********************************************************************/
 
 /*--------------------------------------------------------------------
-   QÆ‚³‚ê‚È‚­‚È‚Á‚½‚Æ‚«‚ÉGC‚©‚çŒÄ‚Î‚ê‚éŠÖ”
+   å‚ç…§ã•ã‚Œãªããªã£ãŸã¨ãã«GCã‹ã‚‰å‘¼ã°ã‚Œã‚‹é–¢æ•°
  ---------------------------------------------------------------------*/
 static void SoundEffect_free( struct DXRubySoundEffect *soundeffect )
 {
-    /* ƒTƒEƒ“ƒhƒoƒbƒtƒ@‚ğŠJ•ú */
+    /* ã‚µã‚¦ãƒ³ãƒ‰ãƒãƒƒãƒ•ã‚¡ã‚’é–‹æ”¾ */
     RELEASE( soundeffect->pDSBuffer );
 
     g_iRefDS--;
@@ -925,7 +925,7 @@ const rb_data_type_t SoundEffect_data_type = {
 #endif
 
 /*--------------------------------------------------------------------
-   SoundEffectƒNƒ‰ƒX‚ÌdisposeB
+   SoundEffectã‚¯ãƒ©ã‚¹ã®disposeã€‚
  ---------------------------------------------------------------------*/
 static VALUE SoundEffect_dispose( VALUE self )
 {
@@ -936,7 +936,7 @@ static VALUE SoundEffect_dispose( VALUE self )
 }
 
 /*--------------------------------------------------------------------
-   SoundEffectƒNƒ‰ƒX‚Ìdisposed?B
+   SoundEffectã‚¯ãƒ©ã‚¹ã®disposed?ã€‚
  ---------------------------------------------------------------------*/
 static VALUE SoundEffect_check_disposed( VALUE self )
 {
@@ -949,14 +949,14 @@ static VALUE SoundEffect_check_disposed( VALUE self )
 }
 
 /*--------------------------------------------------------------------
-   SoundEffectƒNƒ‰ƒX‚ÌallocateBƒƒ‚ƒŠ‚ğŠm•Û‚·‚éˆ×‚Éinitialize‘O‚ÉŒÄ‚Î‚ê‚éB
+   SoundEffectã‚¯ãƒ©ã‚¹ã®allocateã€‚ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿ã™ã‚‹ç‚ºã«initializeå‰ã«å‘¼ã°ã‚Œã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE SoundEffect_allocate( VALUE klass )
 {
     VALUE obj;
     struct DXRubySoundEffect *soundeffect;
 
-    /* DXRubySoundEffect‚Ìƒƒ‚ƒŠæ“¾•SoundEffectƒIƒuƒWƒFƒNƒg¶¬ */
+    /* DXRubySoundEffectã®ãƒ¡ãƒ¢ãƒªå–å¾—ï¼†SoundEffectã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ */
     soundeffect = malloc(sizeof(struct DXRubySoundEffect));
     if( soundeffect == NULL ) rb_raise( eDXRubyError, "Out of memory - SoundEffect_allocate" );
 #ifdef DXRUBY_USE_TYPEDDATA
@@ -965,7 +965,7 @@ static VALUE SoundEffect_allocate( VALUE klass )
     obj = Data_Wrap_Struct(klass, 0, SoundEffect_release, soundeffect);
 #endif
 
-    /* ‚Æ‚è‚ ‚¦‚¸ƒTƒEƒ“ƒhƒIƒuƒWƒFƒNƒg‚ÍNULL‚É‚µ‚Ä‚¨‚­ */
+    /* ã¨ã‚Šã‚ãˆãšã‚µã‚¦ãƒ³ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¯NULLã«ã—ã¦ãŠã */
     soundeffect->pDSBuffer = NULL;
 
     return obj;
@@ -976,13 +976,13 @@ static short calcwave(int type, double vol, double count, double p, double duty)
 {
 	switch( type )
 	{
-	case 1: /* ƒTƒCƒ“”g */
+	case 1: /* ã‚µã‚¤ãƒ³æ³¢ */
 		return (short)((sin( (3.141592653589793115997963468544185161590576171875f * 2) * (double)count / (double)p )) * (double)vol * 128);
 		break;
-	case 2: /* ƒmƒRƒMƒŠ”g */
+	case 2: /* ãƒã‚³ã‚®ãƒªæ³¢ */
 		return (short)(((double)count / (double)p - 0.5) * (double)vol * 256);
 		break;
-	case 3: /* OŠp”g */
+	case 3: /* ä¸‰è§’æ³¢ */
 		if( count < p / 4 )			/* 1/4 */
 		{
 			return (short)((double)count / ((double)p / 4) * (double)vol * 128);
@@ -995,18 +995,18 @@ static short calcwave(int type, double vol, double count, double p, double duty)
 		{
 			return (short)(-((double)count - (double)p / 2)/ ((double)p / 4) * (double)vol * 128);
 		}
-		else											/* ÅŒã */
+		else											/* æœ€å¾Œ */
 		{
 			return (short)(-((double)p - (double)count) / ((double)p / 4) * (double)vol * 128);
 		}
 		break;
-	case 0: /* ‹éŒ`”g */
-	default: /* ƒfƒtƒHƒ‹ƒg */
-		if( count < p * duty )	/* ‘O”¼ */
+	case 0: /* çŸ©å½¢æ³¢ */
+	default: /* ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ */
+		if( count < p * duty )	/* å‰åŠ */
 		{
 			return (short)(vol * 128);
 		}
-		else									/* Œã”¼ */
+		else									/* å¾ŒåŠ */
 		{
 		    return (short)(-vol * 128);
 		}
@@ -1016,7 +1016,7 @@ static short calcwave(int type, double vol, double count, double p, double duty)
 
 
 /*--------------------------------------------------------------------
-   SoundEffectƒNƒ‰ƒX‚ÌinitializeB”gŒ`‚ğ¶¬‚·‚éB
+   SoundEffectã‚¯ãƒ©ã‚¹ã®initializeã€‚æ³¢å½¢ã‚’ç”Ÿæˆã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
 {
@@ -1041,7 +1041,7 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
     type       = vtype       == Qnil ? 0    : NUM2INT( vtype );
     resolution = vresolution == Qnil ? 1000 : (NUM2INT( vresolution ) > 44100 ? 44100 : NUM2INT( vresolution ));
 
-    /* DirectSoundƒIƒuƒWƒFƒNƒg‚Ìì¬ */
+    /* DirectSoundã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆ */
     if( g_iRefDS == 0 )
     {
         hr = DirectSoundCreate8( &DSDEVID_DefaultPlayback, &g_pDSound, NULL );
@@ -1058,7 +1058,7 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
     }
     g_iRefDS++;
 
-    /* ƒTƒEƒ“ƒhƒIƒuƒWƒFƒNƒgì¬ */
+    /* ã‚µã‚¦ãƒ³ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆä½œæˆ */
     soundeffect = DXRUBY_GET_STRUCT( SoundEffect, obj );
     if( soundeffect->pDSBuffer )
     {
@@ -1068,7 +1068,7 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
         g_iRefAll++;
     }
 
-    /* ƒTƒEƒ“ƒhƒoƒbƒtƒ@ì¬ */
+    /* ã‚µã‚¦ãƒ³ãƒ‰ãƒãƒƒãƒ•ã‚¡ä½œæˆ */
     pcmwf.wFormatTag = WAVE_FORMAT_PCM;
     pcmwf.nChannels = 1;
     pcmwf.nSamplesPerSec = 44100;
@@ -1102,7 +1102,7 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
         rb_raise( eDXRubyError, "Failure to create the SoundBuffer - CreateSoundBuffer" );
     }
 
-    /* ƒƒbƒN */
+    /* ãƒ­ãƒƒã‚¯ */
     hr = soundeffect->pDSBuffer->lpVtbl->Lock( soundeffect->pDSBuffer, 0, 0, (LPVOID *)&pointer, &size, (LPVOID *)&pointer2, &size2, DSBLOCK_ENTIREBUFFER );
     if( FAILED( hr ) || size2 != 0 )
     {
@@ -1111,7 +1111,7 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
 
     if( TYPE( vsize ) == T_ARRAY )
     {
-        /* ‰¹ƒoƒbƒtƒ@¶¬ */
+        /* éŸ³ãƒãƒƒãƒ•ã‚¡ç”Ÿæˆ */
         for( i = 0; i < desc.dwBufferBytes / (pcmwf.wBitsPerSample / 8); i++ )
         {
             double tmp = NUM2DBL( RARRAY_AREF( vsize, i ) );
@@ -1129,7 +1129,7 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
     }
     else
     {
-        /* ‰¹ƒoƒbƒtƒ@‰Šú‰» */
+        /* éŸ³ãƒãƒƒãƒ•ã‚¡åˆæœŸåŒ– */
         for( i = 0; i < desc.dwBufferBytes / (pcmwf.wBitsPerSample / 8); i++ )
         {
             pointer[i] = 0;
@@ -1137,10 +1137,10 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
 
         count = 0;
 
-        /* ”gŒ`¶¬ */
+        /* æ³¢å½¢ç”Ÿæˆ */
         for( i = 0; i < desc.dwBufferBytes / (pcmwf.wBitsPerSample / 8); i++ )
         {
-            /* w’èŠÔ’PˆÊ‚ÅƒuƒƒbƒN‚ğŒÄ‚Ño‚· */
+            /* æŒ‡å®šæ™‚é–“å˜ä½ã§ãƒ–ãƒ­ãƒƒã‚¯ã‚’å‘¼ã³å‡ºã™ */
             if ( i % (pcmwf.nSamplesPerSec / resolution) == 0 )
             {
                 vf = rb_yield( obj );
@@ -1156,7 +1156,7 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
                 {
                     duty = NUM2DBL(rb_ary_entry(vf, 2));
                 }
-                /* Å‘å/Å’áü”g”‚ÆÅ‘åƒ{ƒŠƒ…[ƒ€‚Ì§ŒÀ */
+                /* æœ€å¤§/æœ€ä½å‘¨æ³¢æ•°ã¨æœ€å¤§ãƒœãƒªãƒ¥ãƒ¼ãƒ ã®åˆ¶é™ */
                 f = f > pcmwf.nSamplesPerSec / 2.0f ? pcmwf.nSamplesPerSec / 2.0f : f;
                 f = f < 20 ? 20 : f;
                 vol = vol > 255 ? 255 : vol;
@@ -1171,7 +1171,7 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
         }
     }
 
-    /* ƒAƒ“ƒƒbƒN */
+    /* ã‚¢ãƒ³ãƒ­ãƒƒã‚¯ */
     hr = soundeffect->pDSBuffer->lpVtbl->Unlock( soundeffect->pDSBuffer, pointer, size, pointer2, size2 );
     if( FAILED( hr ) )
     {
@@ -1184,7 +1184,7 @@ static VALUE SoundEffect_initialize( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ”gŒ`‚ğ‡¬‚·‚éB
+   æ³¢å½¢ã‚’åˆæˆã™ã‚‹ã€‚
  ---------------------------------------------------------------------*/
 static VALUE SoundEffect_add( int argc, VALUE *argv, VALUE obj )
 {
@@ -1207,11 +1207,11 @@ static VALUE SoundEffect_add( int argc, VALUE *argv, VALUE obj )
 	type       = vtype       == Qnil ? 0    : NUM2INT( vtype );
 	resolution = vresolution == Qnil ? 1000 : (NUM2INT( vresolution ) > 44100 ? 44100 : NUM2INT( vresolution ));
 
-    /* ƒTƒEƒ“ƒhƒIƒuƒWƒFƒNƒgæ“¾ */
+    /* ã‚µã‚¦ãƒ³ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå–å¾— */
     soundeffect = DXRUBY_GET_STRUCT( SoundEffect, obj );
     DXRUBY_CHECK_DISPOSE( soundeffect, pDSBuffer );
 
-	/* ƒƒbƒN */
+	/* ãƒ­ãƒƒã‚¯ */
 	hr = soundeffect->pDSBuffer->lpVtbl->Lock( soundeffect->pDSBuffer, 0, 0, (LPVOID *)&pointer, &size, (LPVOID *)&pointer2, &size2, DSBLOCK_ENTIREBUFFER );
     if( FAILED( hr ) || size2 != 0 )
     {
@@ -1227,10 +1227,10 @@ static VALUE SoundEffect_add( int argc, VALUE *argv, VALUE obj )
 
 	count = 0;
 
-	/* ”gŒ`¶¬ */
+	/* æ³¢å½¢ç”Ÿæˆ */
 	for( i = 0; i < desc.dwBufferBytes / (pcmwf.wBitsPerSample / 8); i++ )
 	{
-		/* w’èŠÔ’PˆÊ‚ÅƒuƒƒbƒN‚ğŒÄ‚Ño‚· */
+		/* æŒ‡å®šæ™‚é–“å˜ä½ã§ãƒ–ãƒ­ãƒƒã‚¯ã‚’å‘¼ã³å‡ºã™ */
 		if ( i % (pcmwf.nSamplesPerSec / resolution) == 0 )
 		{
 			vf = rb_yield( obj );
@@ -1246,7 +1246,7 @@ static VALUE SoundEffect_add( int argc, VALUE *argv, VALUE obj )
             {
                 duty = NUM2DBL(rb_ary_entry(vf, 2));
             }
-			/* Å‘å/Å’áü”g”‚ÆÅ‘åƒ{ƒŠƒ…[ƒ€‚Ì§ŒÀ */
+			/* æœ€å¤§/æœ€ä½å‘¨æ³¢æ•°ã¨æœ€å¤§ãƒœãƒªãƒ¥ãƒ¼ãƒ ã®åˆ¶é™ */
 			f = f > pcmwf.nSamplesPerSec / 2.0f ? pcmwf.nSamplesPerSec / 2.0f : f;
 			f = f < 20 ? 20 : f;
 			vol = vol > 255 ? 255 : vol;
@@ -1274,7 +1274,7 @@ static VALUE SoundEffect_add( int argc, VALUE *argv, VALUE obj )
 		}
 	}
 
-	/* ƒAƒ“ƒƒbƒN */
+	/* ã‚¢ãƒ³ãƒ­ãƒƒã‚¯ */
 	hr = soundeffect->pDSBuffer->lpVtbl->Unlock( soundeffect->pDSBuffer, pointer, size, pointer2, size2 );
     if( FAILED( hr ) )
     {
@@ -1287,7 +1287,7 @@ static VALUE SoundEffect_add( int argc, VALUE *argv, VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   ‰¹‚ğ–Â‚ç‚·
+   éŸ³ã‚’é³´ã‚‰ã™
  ---------------------------------------------------------------------*/
 static VALUE SoundEffect_play( int argc, VALUE *argv, VALUE self )
 {
@@ -1298,7 +1298,7 @@ static VALUE SoundEffect_play( int argc, VALUE *argv, VALUE self )
 
     rb_scan_args( argc, argv, "01", &vflag );
 
-    /* ‚Æ‚ß‚é */
+    /* ã¨ã‚ã‚‹ */
     hr = se->pDSBuffer->lpVtbl->Stop( se->pDSBuffer );
     if( FAILED( hr ) )
     {
@@ -1311,7 +1311,7 @@ static VALUE SoundEffect_play( int argc, VALUE *argv, VALUE self )
         rb_raise( eDXRubyError, "Sound play failed - SoundEffect_play" );
     }
 
-    /* Ä¶ */
+    /* å†ç”Ÿ */
     hr = se->pDSBuffer->lpVtbl->Play( se->pDSBuffer, 0, 0, RTEST(vflag) ? DSBPLAY_LOOPING : 0 );
     if( FAILED( hr ) )
     {
@@ -1322,7 +1322,7 @@ static VALUE SoundEffect_play( int argc, VALUE *argv, VALUE self )
 
 
 /*--------------------------------------------------------------------
-   ‰¹‚ğ~‚ß‚é
+   éŸ³ã‚’æ­¢ã‚ã‚‹
  ---------------------------------------------------------------------*/
 static VALUE SoundEffect_stop( VALUE obj )
 {
@@ -1332,11 +1332,11 @@ static VALUE SoundEffect_stop( VALUE obj )
     soundeffect = DXRUBY_GET_STRUCT( SoundEffect, obj );
     DXRUBY_CHECK_DISPOSE( soundeffect, pDSBuffer );
 
-    /* ‚Æ‚ß‚é */
+    /* ã¨ã‚ã‚‹ */
     hr = soundeffect->pDSBuffer->lpVtbl->Stop( soundeffect->pDSBuffer );
     if( FAILED( hr ) )
     {
-        rb_raise( eDXRubyError, "‰¹‚Ì’â~‚É¸”s‚µ‚Ü‚µ‚½ - Stop" );
+        rb_raise( eDXRubyError, "éŸ³ã®åœæ­¢ã«å¤±æ•—ã—ã¾ã—ãŸ - Stop" );
     }
 
     return obj;
@@ -1344,7 +1344,7 @@ static VALUE SoundEffect_stop( VALUE obj )
 
 
 /*--------------------------------------------------------------------
-   wavƒtƒ@ƒCƒ‹o—Í
+   wavãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›
  ---------------------------------------------------------------------*/
 static VALUE SoundEffect_save( VALUE self, VALUE vfilename )
 {
@@ -1359,7 +1359,7 @@ static VALUE SoundEffect_save( VALUE self, VALUE vfilename )
 
     DXRUBY_CHECK_DISPOSE( se, pDSBuffer );
 
-    /* ƒƒbƒN */
+    /* ãƒ­ãƒƒã‚¯ */
     hr = se->pDSBuffer->lpVtbl->Lock( se->pDSBuffer, 0, 0, (LPVOID *)&pointer, &size, (LPVOID *)&pointer2, &size2, DSBLOCK_ENTIREBUFFER );
     if( FAILED( hr ) || size2 != 0 )
     {
@@ -1399,7 +1399,7 @@ static VALUE SoundEffect_save( VALUE self, VALUE vfilename )
 
     CloseHandle( hfile );
 
-    /* ƒAƒ“ƒƒbƒN */
+    /* ã‚¢ãƒ³ãƒ­ãƒƒã‚¯ */
     hr = se->pDSBuffer->lpVtbl->Unlock( se->pDSBuffer, pointer, size, pointer2, size2 );
     if( FAILED( hr ) )
     {
@@ -1411,7 +1411,7 @@ static VALUE SoundEffect_save( VALUE self, VALUE vfilename )
 
 
 /*--------------------------------------------------------------------
-   ”z—ñ‰»
+   é…åˆ—åŒ–
  ---------------------------------------------------------------------*/
 static VALUE SoundEffect_to_a( VALUE self )
 {
@@ -1424,7 +1424,7 @@ static VALUE SoundEffect_to_a( VALUE self )
 
     DXRUBY_CHECK_DISPOSE( se, pDSBuffer );
 
-    /* ƒƒbƒN */
+    /* ãƒ­ãƒƒã‚¯ */
     hr = se->pDSBuffer->lpVtbl->Lock( se->pDSBuffer, 0, 0, (LPVOID *)&pointer, &size, (LPVOID *)&pointer2, &size2, DSBLOCK_ENTIREBUFFER );
     if( FAILED( hr ) || size2 != 0 )
     {
@@ -1446,7 +1446,7 @@ static VALUE SoundEffect_to_a( VALUE self )
         rb_ary_push( ary, rb_float_new( tmp ) );
     }
 
-    /* ƒAƒ“ƒƒbƒN */
+    /* ã‚¢ãƒ³ãƒ­ãƒƒã‚¯ */
     hr = se->pDSBuffer->lpVtbl->Unlock( se->pDSBuffer, pointer, size, pointer2, size2 );
     if( FAILED( hr ) )
     {
@@ -1459,12 +1459,12 @@ static VALUE SoundEffect_to_a( VALUE self )
 
 void Init_dxruby_Sound( void )
 {
-    /* SoundƒNƒ‰ƒX’è‹` */
+    /* Soundã‚¯ãƒ©ã‚¹å®šç¾© */
     cSound = rb_define_class_under( mDXRuby, "Sound", rb_cObject );
     rb_define_singleton_method( cSound, "load_from_memory", Sound_load_from_memory, 2 );
     rb_define_singleton_method( cSound, "loadFromMemory", Sound_load_from_memory, 2 );
 
-    /* SoundƒNƒ‰ƒX‚Éƒƒ\ƒbƒh“o˜^*/
+    /* Soundã‚¯ãƒ©ã‚¹ã«ãƒ¡ã‚½ãƒƒãƒ‰ç™»éŒ²*/
     rb_define_private_method( cSound, "initialize"   , Sound_initialize   , 1 );
     rb_define_method( cSound, "dispose"      , Sound_dispose   , 0 );
     rb_define_method( cSound, "disposed?"    , Sound_check_disposed, 0 );
@@ -1484,14 +1484,14 @@ void Init_dxruby_Sound( void )
     rb_define_method( cSound, "loop_count="  , Sound_setLoopCount , 1 );
     rb_define_method( cSound, "loopCount="   , Sound_setLoopCount , 1 );
 
-    /* SoundƒIƒuƒWƒFƒNƒg‚ğ¶¬‚µ‚½‚Éinitialize‚Ì‘O‚ÉŒÄ‚Î‚ê‚éƒƒ‚ƒŠŠ„‚è“–‚ÄŠÖ”“o˜^ */
+    /* Soundã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã—ãŸæ™‚ã«initializeã®å‰ã«å‘¼ã°ã‚Œã‚‹ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦é–¢æ•°ç™»éŒ² */
     rb_define_alloc_func( cSound, Sound_allocate );
 
 
-    /* SoundEffectƒNƒ‰ƒX’è‹` */
+    /* SoundEffectã‚¯ãƒ©ã‚¹å®šç¾© */
     cSoundEffect = rb_define_class_under( mDXRuby, "SoundEffect", rb_cObject );
 
-    /* SoundEffectƒNƒ‰ƒX‚Éƒƒ\ƒbƒh“o˜^*/
+    /* SoundEffectã‚¯ãƒ©ã‚¹ã«ãƒ¡ã‚½ãƒƒãƒ‰ç™»éŒ²*/
     rb_define_private_method( cSoundEffect, "initialize", SoundEffect_initialize, -1 );
     rb_define_method( cSoundEffect, "dispose"   , SoundEffect_dispose   , 0 );
     rb_define_method( cSoundEffect, "disposed?" , SoundEffect_check_disposed, 0 );
@@ -1502,7 +1502,7 @@ void Init_dxruby_Sound( void )
 #ifdef DXRUBY15
     rb_define_method( cSoundEffect, "to_a"      , SoundEffect_to_a      , 0 );
 #endif
-    /* SoundEffectƒIƒuƒWƒFƒNƒg‚ğ¶¬‚µ‚½‚Éinitialize‚Ì‘O‚ÉŒÄ‚Î‚ê‚éƒƒ‚ƒŠŠ„‚è“–‚ÄŠÖ”“o˜^ */
+    /* SoundEffectã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã—ãŸæ™‚ã«initializeã®å‰ã«å‘¼ã°ã‚Œã‚‹ãƒ¡ãƒ¢ãƒªå‰²ã‚Šå½“ã¦é–¢æ•°ç™»éŒ² */
     rb_define_alloc_func( cSoundEffect, SoundEffect_allocate );
 
     rb_define_const( mDXRuby, "WAVE_SIN"     , INT2FIX(WAVE_SIN) );
@@ -1513,4 +1513,3 @@ void Init_dxruby_Sound( void )
     rb_define_const( mDXRuby, "TYPE_MIDI"    , INT2FIX(0) );
     rb_define_const( mDXRuby, "TYPE_WAV"     , INT2FIX(1) );
 }
-

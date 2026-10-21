@@ -173,7 +173,7 @@ static int ParseWav(const BYTE *data, size_t length, WavPcm *pcm, const char **e
     ZeroMemory(&pcm->wfx, sizeof(pcm->wfx));
     memcpy(&pcm->wfx, data + fmtPos, fmtSize < sizeof(WAVEFORMATEX) ? fmtSize : sizeof(WAVEFORMATEX));
     if (fmtSize >= sizeof(WAVEFORMATEXTENSIBLE) && pcm->wfx.wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
-        const BYTE *sub = data + fmtPos + 22;  /* WAVEFORMATEXTENSIBLE.SubFormatの位置 */
+        const BYTE *sub = data + fmtPos + 24;  /* WAVEFORMATEXTENSIBLE.SubFormatの位置 */
         if (memcmp(sub, &DXRUBY_SUBTYPE_FLOAT, sizeof(GUID)) == 0) isFloat = 1;
         else if (memcmp(sub, &DXRUBY_SUBTYPE_PCM, sizeof(GUID)) == 0) isFloat = 0;
         else { if (error) *error = "Unsupported WAV format"; return 0; }
@@ -207,19 +207,22 @@ static int ParseWav(const BYTE *data, size_t length, WavPcm *pcm, const char **e
     return 1;
 }
 
-/* 音量をDirectSoundの減衰値から0..255マスター音量へ変換(midi.cのSetVolumeと同一の写像) */
-static int DbToMasterVolume(int volume)
+/* 音量をDirectSoundの減衰値へ変換する。
+ * フェードは旧DirectMusic実装(dmime.dllのAudioPath::SetVolume)と同じ
+ * 「CC7(0..127)=振幅スケール領域での線形ランプ」で行うため、
+ * dB↔CC7の変換表(DXRUBY_VolumeToCC7 / DXRUBY_CC7ToDB)を用いる。 */
+static int MasterToDb(int master)
 {
-    volume = (volume + 9600) * 255 / 9600;
-    if (volume < 0) volume = 0;
-    if (volume > 255) volume = 255;
-    return volume;
+    /* masterは0..127のCC7値 */
+    if (master < 0) master = 0;
+    if (master > 127) master = 127;
+    return (int)DXRUBY_CC7ToDB[master];
 }
 
 static void UpdateFade(DXRubyWav *w)
 {
     unsigned long long now = GetTickCount64();
-    int volume, sendNow;
+    int db, sendNow;
     EnterCriticalSection(&w->sendLock);
     if (w->fading) {
         int elapsed = (int)(now - w->fadeStart);
@@ -228,17 +231,23 @@ static void UpdateFade(DXRubyWav *w)
             w->fading = 0;
             w->fadeTime = 0;
         } else {
-            w->volume = w->volumeStart + (w->volumeTarget - w->volumeStart) * elapsed / w->fadeTime;
+            /* CC7(振幅)領域で線形ランプしてからdBへ変換する */
+            int c0 = (int)DXRUBY_VolumeToCC7(w->volumeStart);
+            int c1 = (int)DXRUBY_VolumeToCC7(w->volumeTarget);
+            int c = c0 + (c1 - c0) * elapsed / w->fadeTime;
+            if (c < 0) c = 0;
+            if (c > 127) c = 127;
+            w->volume = MasterToDb(c);
         }
     } else {
         w->volume = w->volumeTarget;
     }
-    volume = (int)w->volume;
-    sendNow = volume != w->lastSentVolume;
-    if (sendNow) w->lastSentVolume = volume;
+    db = (int)w->volume;
+    sendNow = db != w->lastSentVolume;
+    if (sendNow) w->lastSentVolume = db;
     LeaveCriticalSection(&w->sendLock);
     if (sendNow && w->buffer) {
-        w->buffer->lpVtbl->SetVolume(w->buffer, volume * 9600 / 255 - 9600);
+        w->buffer->lpVtbl->SetVolume(w->buffer, db);
     }
 }
 
@@ -262,6 +271,7 @@ static unsigned __stdcall WavWorker(void *arg)
 {
     DXRubyWav *w = (DXRubyWav *)arg;
     HANDLE waitHandles[2];
+    int ended = 0;
     waitHandles[0] = w->stopEvent;
     waitHandles[1] = w->quitEvent;
     while (!InterlockedCompareExchange(&w->terminate, 0, 0)) {
@@ -275,7 +285,20 @@ static unsigned __stdcall WavWorker(void *arg)
                 ResetEvent(w->stopEvent);
                 w->buffer->lpVtbl->SetCurrentPosition(w->buffer, StartPosition(w));
                 w->buffer->lpVtbl->Play(w->buffer, 0, 0, 0);
+            } else {
+                ended = 1;
             }
+        }
+        /* 再生終了後はフェードの完了を待ってワーカーを終了する。
+         * 終了判定とフェード状態を同じロック内で見ることで、
+         * 終了直後のSetVolumeがフェード開始と競合しないようにする。 */
+        if (ended) {
+            int finished;
+            EnterCriticalSection(&w->sendLock);
+            finished = !w->fading;
+            if (finished) InterlockedExchange(&w->terminate, 1);
+            LeaveCriticalSection(&w->sendLock);
+            if (finished) break;
         }
     }
     return 0;
@@ -306,20 +329,20 @@ static void StopPlayback(DXRubyWav *w)
 static HRESULT WavDev_PlaySegmentEx(DXRubySoundDev *dev)
 {
     DXRubyWav *w = (DXRubyWav *)dev;
-    int master;
+    int db;
     HRESULT hr;
     StopPlayback(w);
     ResetEvent(w->stopEvent);
     /* 前回再生途中のフェード状態を破棄し、目標音量で再生を開始する */
     EnterCriticalSection(&w->sendLock);
-    master = w->volumeTarget;
-    w->volume = master;
+    db = w->volumeTarget;
+    w->volume = db;
     w->fading = 0;
     w->fadeTime = 0;
-    w->lastSentVolume = master;
+    w->lastSentVolume = db;
     LeaveCriticalSection(&w->sendLock);
-    w->buffer->lpVtbl->SetVolume(w->buffer, master * 9600 / 255 - 9600);
-    w->playsLeft = (w->loopCount < 0) ? 1 : ((w->loopCount == 0) ? 1 : (DWORD)w->loopCount);
+    w->buffer->lpVtbl->SetVolume(w->buffer, db);
+    w->playsLeft = (w->loopCount < 0) ? 1 : (DWORD)w->loopCount + 1;
     hr = w->buffer->lpVtbl->SetCurrentPosition(w->buffer, StartPosition(w));
     if (FAILED(hr)) return hr;
     InterlockedExchange(&w->looping, w->loopCount < 0 ? 1 : 0);
@@ -378,31 +401,35 @@ static HRESULT WavDev_SetVolume(DXRubySoundDev *dev, int volume, int time)
 {
     DXRubyWav *w = (DXRubyWav *)dev;
     unsigned long long now = GetTickCount64();
-    int master;
+    int db;
     int fade;
-    if (volume < -10000) volume = -10000;
+    if (volume < -9600) volume = -9600;
     if (volume > 0) volume = 0;
     if (time < 0) time = 0;
-    master = DbToMasterVolume(volume);
-    fade = (time > 0 && w->worker != NULL);
+    db = volume;
     EnterCriticalSection(&w->sendLock);
+    /* ワーカーが終了済みならフェードは行わず即時反映する */
+    fade = (time > 0 && w->worker != NULL &&
+            InterlockedCompareExchange(&w->terminate, 0, 0) == 0);
     if (fade) {
-        /* 演奏中は現在値から目標値へtimeミリ秒かけてなめらかに変化させる */
+        /* 演奏中は現在値から目標値へtimeミリ秒かけてなめらかに変化させる
+         * (旧DirectMusic実装と同じくCC7(振幅)領域で線形ランプする) */
         w->volumeStart = (int)w->volume;
-        w->volumeTarget = master;
+        w->volumeTarget = db;
         w->fadeTime = time;
         w->fadeStart = now;
         w->fading = 1;
     } else {
-        w->volume = master;
-        w->volumeTarget = master;
+        w->volume = db;
+        w->volumeTarget = db;
         w->fading = 0;
         w->fadeTime = 0;
-        w->lastSentVolume = master;
+        w->lastSentVolume = db;
     }
     LeaveCriticalSection(&w->sendLock);
-    if (!fade && w->buffer) {
-        w->buffer->lpVtbl->SetVolume(w->buffer, master * 9600 / 255 - 9600);
+    if (!fade) {
+        if (!w->buffer) return E_POINTER;
+        return w->buffer->lpVtbl->SetVolume(w->buffer, db);
     }
     return S_OK;
 }
@@ -479,12 +506,14 @@ static DXRubySoundDev *CreateDevice(WavPcm *pcm, const char **error)
     w->wfx = pcm->wfx;
     w->dataBytes = pcm->size;
     w->blockAlign = pcm->wfx.nBlockAlign;
-    /* ループ回数はN=合計再生回数(-1=無限)。midiのloopCount(-1=無限)と同じ扱い */
-    w->loopCount = 1;
+    /* ループ回数はDirectMusicのSetRepeatsと同じ数え方(0で1回のみ、-1で無限) */
+    w->loopCount = 0;
     w->start = 0;
-    w->volume = 230;
-    w->volumeTarget = 230;
-    w->lastSentVolume = 230;
+    /* 初期音量は0(最大音量)。旧DirectMusic実装のAudioPathの初期値と同じで、
+     * 実際の減衰はSound.cが読み込み時にSetVolume(-942)で行う */
+    w->volume = 0;
+    w->volumeTarget = 0;
+    w->lastSentVolume = 0;
 
     hr = WavAcquireSound();
     if (FAILED(hr)) { if (error) *error = "DirectSound initialize failed"; goto fail; }

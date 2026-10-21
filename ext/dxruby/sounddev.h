@@ -54,4 +54,19 @@ struct DXRubySoundDev {
     const struct DXRubySoundDevVtbl *lpVtbl;
 };
 
+/* 音量(dB)とMIDI CC7の相互変換テーブル。
+ * 旧DirectMusic実装のボリュームカーブと同じ、CC7=振幅スケールの曲線。
+ *   DXRUBY_CC7ToDB[n]  : CC7値(0..127) → DirectSoundの減衰値(-9600..0、1/100dB単位)
+ *                        INT(-log10(n^2/127^2)*2000)、ただしn==0では-9600
+ *   DXRUBY_DBToCC7[i]  : 減衰量(i dB、0..96) → CC7値(0..127)
+ *                        INT(pow(10, -i/40)*127)
+ * DXRuby_InitSoundVolumeTables()がInit_dxruby_Sound()から一度だけ呼ばれる。
+ * 減衰値からの参照はDXRUBY_VolumeToCC7()(減衰値-9600..0を受け取り、
+ * 1dB(100)刻みでテーブル引き+線形補間する)を使用する。 */
+extern long DXRUBY_CC7ToDB[128];
+extern BYTE DXRUBY_DBToCC7[97];
+
+void DXRuby_InitSoundVolumeTables(void);
+BYTE DXRUBY_VolumeToCC7(long volume);
+
 #endif

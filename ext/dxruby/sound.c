@@ -200,7 +200,7 @@ static VALUE Sound_load_from_memory( VALUE klass, VALUE vstr, VALUE vtype )
                                                 (size_t)RSTRING_LEN(vstr), &error);
         if( !sound->dev )
             rb_raise( eDXRubyError, "Load error - LoadObjectFromFile" );
-        sound->loopcount = 1;
+        sound->loopcount = 0;
         sound->midwavflag = 1;
     }
 
@@ -265,7 +265,7 @@ static VALUE Sound_initialize( VALUE obj, VALUE vfilename )
             rb_raise( eDXRubyError, "Load error - LoadObjectFromFile" );
         sound->vbuffer = Qnil;
         sound->start = sound->loopstart = sound->loopend = 0;
-        sound->loopcount = 1;
+        sound->loopcount = 0;
         sound->midwavflag = 1;
     }
 
@@ -1145,6 +1145,9 @@ static VALUE SoundEffect_to_a( VALUE self )
 
 void Init_dxruby_Sound( void )
 {
+    /* 音量変換テーブルの初期化 */
+    DXRuby_InitSoundVolumeTables();
+
     /* Soundクラス定義 */
     cSound = rb_define_class_under( mDXRuby, "Sound", rb_cObject );
     rb_define_singleton_method( cSound, "load_from_memory", Sound_load_from_memory, 2 );

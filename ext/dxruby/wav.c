@@ -12,16 +12,86 @@
 
 #include "wav.h"
 
+#include "g711.h"   /* G.711 (A-law/mu-law) デコーダ。wav.c専用のためヘッダとしてincludeする */
+
+#ifndef WAVE_FORMAT_ALAW
+#define WAVE_FORMAT_ALAW 0x0006
+#endif
+#ifndef WAVE_FORMAT_MULAW
+#define WAVE_FORMAT_MULAW 0x0007
+#endif
+
 extern HANDLE g_hWnd;
 
-/* WAVEのSubFormat GUID (KSDATAFORMAT_SUBTYPE_PCM / IEEE_FLOAT) */
+/* WAVEのSubFormat GUID (KSDATAFORMAT_SUBTYPE_PCM / IEEE_FLOAT / ALAW / MULAW) */
 static const GUID DXRUBY_SUBTYPE_PCM   = {0x00000001,0x0000,0x0010,{0x80,0x00,0x00,0xaa,0x00,0x38,0x9b,0x71}};
 static const GUID DXRUBY_SUBTYPE_FLOAT = {0x00000003,0x0000,0x0010,{0x80,0x00,0x00,0xaa,0x00,0x38,0x9b,0x71}};
+static const GUID DXRUBY_SUBTYPE_ALAW  = {0x00000006,0x0000,0x0010,{0x80,0x00,0x00,0xaa,0x00,0x38,0x9b,0x71}};
+static const GUID DXRUBY_SUBTYPE_MULAW = {0x00000007,0x0000,0x0010,{0x80,0x00,0x00,0xaa,0x00,0x38,0x9b,0x71}};
+
+static int CountChannelBits(DWORD mask)
+{
+    int n = 0;
+    while (mask) {
+        mask &= mask - 1;
+        ++n;
+    }
+    return n;
+}
+
+/* 非Extensibleの3ch以上のWAVにはチャンネルマスクが無いため、標準的な配置を割り当てる。
+ * (3ch=FL/FR/FC, 4ch=クアッド, 6ch=5.1, 8ch=7.1) */
+static DWORD DefaultChannelMask(int channels)
+{
+    switch (channels) {
+    case 3:
+        return SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER;
+    case 4:
+        return SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT;
+    case 5:
+        return SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER |
+               SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT;
+    case 6:
+        return SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER |
+               SPEAKER_LOW_FREQUENCY | SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT;
+    case 7:
+        return SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER |
+               SPEAKER_LOW_FREQUENCY | SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT | SPEAKER_BACK_CENTER;
+    case 8:
+        return SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER |
+               SPEAKER_LOW_FREQUENCY | SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT |
+               SPEAKER_SIDE_LEFT | SPEAKER_SIDE_RIGHT;
+    default:
+        return 0;
+    }
+}
+
+/* DirectSoundで3ch以上を再生するにはWAVEFORMATEXTENSIBLEとチャンネルマスクが必要。
+ * 2ch以下は従来どおりWAVEFORMATEXのまま扱う。 */
+static WAVEFORMATEX *GetBufferFormat(const WAVEFORMATEX *wfx, DWORD channelMask,
+                                     WAVEFORMATEXTENSIBLE *ext)
+{
+    if (wfx->nChannels <= 2) return (WAVEFORMATEX *)wfx;
+    ZeroMemory(ext, sizeof(*ext));
+    ext->Format = *wfx;
+    ext->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+    ext->Format.cbSize = sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
+    ext->Samples.wValidBitsPerSample = wfx->wBitsPerSample;
+    ext->dwChannelMask = channelMask;
+    switch (wfx->wFormatTag) {
+    case WAVE_FORMAT_IEEE_FLOAT: ext->SubFormat = DXRUBY_SUBTYPE_FLOAT; break;
+    case WAVE_FORMAT_ALAW:       ext->SubFormat = DXRUBY_SUBTYPE_ALAW;  break;
+    case WAVE_FORMAT_MULAW:      ext->SubFormat = DXRUBY_SUBTYPE_MULAW; break;
+    default:                     ext->SubFormat = DXRUBY_SUBTYPE_PCM;   break;
+    }
+    return (WAVEFORMATEX *)ext;
+}
 
 typedef struct WavPcm {
     BYTE *data;                 /* 保持する全PCMデータ(自前確保、CreateDevice後に解放) */
     DWORD size;                 /* データバイト数 */
     WAVEFORMATEX wfx;
+    DWORD channelMask;          /* 3ch以上のバッファ作成に使うチャンネルマスク */
 } WavPcm;
 
 typedef struct DXRubyWav DXRubyWav;
@@ -59,6 +129,36 @@ struct DXRubyWav {
 static IDirectSound8 *g_wavDSound;
 static LONG g_wavDSoundRefs;
 
+/* 環境によっては、DirectSoundオブジェクトで最初に生成する5.1/7.1バッファが
+ * 2chに落ちて3ch以上が無音になる(Windows/ドライバ側の挙動)。
+ * 4chバッファを一度生成しておくと以降のマルチチャンネル出力が正常になるため、
+ * デバイス生成時にプライミングしておく。失敗しても無視する。 */
+static void PrimeMultiChannel(IDirectSound8 *ds)
+{
+    WAVEFORMATEXTENSIBLE wfxt;
+    DSBUFFERDESC desc;
+    IDirectSoundBuffer *buf = NULL;
+
+    ZeroMemory(&wfxt, sizeof(wfxt));
+    wfxt.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+    wfxt.Format.nChannels = 4;
+    wfxt.Format.nSamplesPerSec = 44100;
+    wfxt.Format.wBitsPerSample = 16;
+    wfxt.Format.nBlockAlign = 8;
+    wfxt.Format.nAvgBytesPerSec = 44100 * 8;
+    wfxt.Format.cbSize = sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
+    wfxt.Samples.wValidBitsPerSample = 16;
+    wfxt.dwChannelMask = DefaultChannelMask(4);
+    wfxt.SubFormat = DXRUBY_SUBTYPE_PCM;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.dwSize = sizeof(desc);
+    desc.dwBufferBytes = 4096;
+    desc.lpwfxFormat = &wfxt.Format;
+    if (SUCCEEDED(ds->lpVtbl->CreateSoundBuffer(ds, &desc, &buf, NULL))) {
+        buf->lpVtbl->Release(buf);
+    }
+}
+
 static HRESULT WavAcquireSound(void)
 {
     HRESULT hr;
@@ -71,6 +171,7 @@ static HRESULT WavAcquireSound(void)
             g_wavDSound = NULL;
             return hr;
         }
+        PrimeMultiChannel(g_wavDSound);
     }
     InterlockedIncrement(&g_wavDSoundRefs);
     return S_OK;
@@ -113,7 +214,11 @@ static BYTE *ConvertTo16bit(const BYTE *data, DWORD size, WAVEFORMATEX *wfx)
             else           ((short *)out)[i] = f <= -1.0f ? -32768 : (short)(f * 32768.0f);
         } else {
             int v = 0;
-            switch (bytes) {
+            if (wfx->wFormatTag == WAVE_FORMAT_ALAW) {
+                v = alaw2linear((int)data[i * bytes]);
+            } else if (wfx->wFormatTag == WAVE_FORMAT_MULAW) {
+                v = ulaw2linear((int)data[i * bytes]);
+            } else switch (bytes) {
             case 1: /* 8bit unsigned */
                 v = ((int)data[i * bytes] - 128) << 8;
                 break;
@@ -174,17 +279,28 @@ static int ParseWav(const BYTE *data, size_t length, WavPcm *pcm, const char **e
     memcpy(&pcm->wfx, data + fmtPos, fmtSize < sizeof(WAVEFORMATEX) ? fmtSize : sizeof(WAVEFORMATEX));
     if (fmtSize >= sizeof(WAVEFORMATEXTENSIBLE) && pcm->wfx.wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
         const BYTE *sub = data + fmtPos + 24;  /* WAVEFORMATEXTENSIBLE.SubFormatの位置 */
-        if (memcmp(sub, &DXRUBY_SUBTYPE_FLOAT, sizeof(GUID)) == 0) isFloat = 1;
-        else if (memcmp(sub, &DXRUBY_SUBTYPE_PCM, sizeof(GUID)) == 0) isFloat = 0;
-        else { if (error) *error = "Unsupported WAV format"; return 0; }
+        pcm->channelMask = ReadLE32(data + fmtPos + 20);  /* WAVEFORMATEXTENSIBLE.dwChannelMask */
+        if (memcmp(sub, &DXRUBY_SUBTYPE_FLOAT, sizeof(GUID)) == 0) {
+            isFloat = 1;
+        } else if (memcmp(sub, &DXRUBY_SUBTYPE_PCM, sizeof(GUID)) == 0) {
+            pcm->wfx.wFormatTag = WAVE_FORMAT_PCM;
+        } else if (memcmp(sub, &DXRUBY_SUBTYPE_ALAW, sizeof(GUID)) == 0) {
+            pcm->wfx.wFormatTag = WAVE_FORMAT_ALAW;
+        } else if (memcmp(sub, &DXRUBY_SUBTYPE_MULAW, sizeof(GUID)) == 0) {
+            pcm->wfx.wFormatTag = WAVE_FORMAT_MULAW;
+        } else {
+            if (error) *error = "Unsupported WAV format";
+            return 0;
+        }
     } else if (pcm->wfx.wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
         isFloat = 1;
-    }
-    if (pcm->wfx.wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
-        /* 上でSubFormatを確認済み。PCMとして扱う */
+    } else if (pcm->wfx.wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+        /* SubFormatを読めない不完全なfmtチャンクは従来どおりPCMとして扱う */
         pcm->wfx.wFormatTag = WAVE_FORMAT_PCM;
     }
-    if (!isFloat && pcm->wfx.wFormatTag != WAVE_FORMAT_PCM) {
+    if (!isFloat && pcm->wfx.wFormatTag != WAVE_FORMAT_PCM &&
+        pcm->wfx.wFormatTag != WAVE_FORMAT_ALAW &&
+        pcm->wfx.wFormatTag != WAVE_FORMAT_MULAW) {
         if (error) *error = "Unsupported WAV format";
         return 0;
     }
@@ -192,8 +308,20 @@ static int ParseWav(const BYTE *data, size_t length, WavPcm *pcm, const char **e
         if (error) *error = "Unsupported WAV float format";
         return 0;
     }
+    if (pcm->wfx.wFormatTag == WAVE_FORMAT_ALAW || pcm->wfx.wFormatTag == WAVE_FORMAT_MULAW) {
+        /* G.711は8bit固定(3ch以上も16bitへデコードして再生する) */
+        if (pcm->wfx.wBitsPerSample != 8) {
+            if (error) *error = "Unsupported WAV format";
+            return 0;
+        }
+    }
     if (!pcm->wfx.nChannels || pcm->wfx.nChannels > 8) { if (error) *error = "Invalid WAV format"; return 0; }
     if (!pcm->wfx.nSamplesPerSec || !pcm->wfx.wBitsPerSample) { if (error) *error = "Invalid WAV format"; return 0; }
+    if (pcm->wfx.nChannels > 2 &&
+        (pcm->channelMask == 0 || CountChannelBits(pcm->channelMask) != pcm->wfx.nChannels)) {
+        /* マスクが無い/チャンネル数と一致しない場合は標準配置を割り当てる */
+        pcm->channelMask = DefaultChannelMask(pcm->wfx.nChannels);
+    }
     pcm->wfx.nBlockAlign = (WORD)(pcm->wfx.nChannels * pcm->wfx.wBitsPerSample / 8);
     if (!pcm->wfx.nBlockAlign) { if (error) *error = "Invalid WAV format"; return 0; }
     pcm->wfx.nAvgBytesPerSec = pcm->wfx.nSamplesPerSec * pcm->wfx.nBlockAlign;
@@ -491,6 +619,7 @@ static DXRubySoundDev *CreateDevice(WavPcm *pcm, const char **error)
     DXRubyWav *w;
     HRESULT hr;
     DSBUFFERDESC desc;
+    WAVEFORMATEXTENSIBLE wfxt;
     void *lock1, *lock2;
     DWORD size1, size2;
     DSBPOSITIONNOTIFY notifyPos;
@@ -525,7 +654,7 @@ static DXRubySoundDev *CreateDevice(WavPcm *pcm, const char **error)
                    DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_GLOBALFOCUS;
     if (pcm->wfx.wBitsPerSample > 16) desc.dwFlags |= DSBCAPS_LOCSOFTWARE;
     desc.dwBufferBytes = pcm->size;
-    desc.lpwfxFormat = &pcm->wfx;
+    desc.lpwfxFormat = GetBufferFormat(&pcm->wfx, pcm->channelMask, &wfxt);
     w->buffer = NULL;
     hr = g_wavDSound->lpVtbl->CreateSoundBuffer(g_wavDSound, &desc, &w->buffer, NULL);
     if (FAILED(hr) && pcm->wfx.wBitsPerSample != 16) {
@@ -541,7 +670,7 @@ static DXRubySoundDev *CreateDevice(WavPcm *pcm, const char **error)
             w->blockAlign = pcm->wfx.nBlockAlign;
             w->dataBytes = pcm->size;
             desc.dwFlags &= ~DSBCAPS_LOCSOFTWARE;
-            desc.lpwfxFormat = &pcm->wfx;
+            desc.lpwfxFormat = GetBufferFormat(&pcm->wfx, pcm->channelMask, &wfxt);
             desc.dwBufferBytes = pcm->size;
             w->buffer = NULL;
             hr = g_wavDSound->lpVtbl->CreateSoundBuffer(g_wavDSound, &desc, &w->buffer, NULL);

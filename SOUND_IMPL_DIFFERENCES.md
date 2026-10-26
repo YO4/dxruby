@@ -65,7 +65,27 @@
 | 1 | **`start=` の挙動** | `SetLength(start+1)`＋`SetStartPoint(start)` で波形が `start+1`tickに切り詰められ、**ほぼ無音**（実測: `SetLength`/`SetStartPoint`が呼ばれる） | `SetCurrentPosition(start ms)` で**start位置から最後まで再生**（実測: 44100HzStereoの`176400`=1秒目から） | **最も大きい差分**。旧は実質使えない挙動のため、新は素直な動作に統一（意図的な仕様変更） |
 | 2 | **再生サンプルレート** | 出力バッファが **22050Hz**（InitAudioデフォルト） | **元WAVのフォーマットを保持**（例: 44100Hz） | ピッチは同一だが、帯域/high-cutが僅かに異なる。WAVが22050Hz以外の場合に差が出る |
 | 3 | **音量の適用先** | `AudioPath::SetVolume`（ボリュームカーブ＝CC7域） | `IDirectSoundBuffer::SetVolume` にdB値を直接設定 | 静的音量は**新の方が誤差0**（旧はCC7往復で最大約0.5dBの丸め）。フェードは旧の曲線（CC7域ランプ）に合わせてあるため同一 |
-| 4 | **24bit / float32 WAV** | 未検証（DMの変換方式は未計測） | 16bit PCMへ変換してDirectSoundで再生 | 32bit floatはDirectSoundが受け付けないため変換が必要 |
+| 4 | **24bit / float32 / `WAVE_FORMAT_EXTENSIBLE` WAV** | **ロード不可**（`LoadObjectFromFile`が`E_INVALIDARG`。Windows 11 32bit DirectMusicで実測） | 24bit/float32はDirectSoundが受け付ける場合はそのまま再生し、16bit以外で受け付けない場合のみ16bit PCMへ変換。Extensibleはチャンネルマスクを保持して再生 | 新実装で初めて再生可能（本環境では24bit/float32も変換なしで再生） |
+| 5 | **8bit A-law / μ-law WAV** | **1〜2chのみ再生可**（ACM経由。`fact`チャンクが無いと`DSERR_BADFORMAT`）。3ch以上はロード不可 | 1〜2chは従来どおり16bitへデコード。3ch以上も16bitへデコードしてマルチチャンネル再生 | 3ch以上は新実装で初めて再生可能 |
+| 6 | **マルチチャンネル(3〜8ch) WAV** | 非Extensibleの16bit PCM（実測: 3/4/6/7/8ch）がロード可。**先頭2chのみ再生**され、ch3以降は破棄（ダウンミックスされない） | Extensible/非Extensibleとも3〜8chを再生（ファイルの`dwChannelMask`、無い場合は既定マスクを付与。DirectSoundがスピーカー構成に合わせてダウンミックス） | 旧の「先頭2chのみ」を解消 |
+
+#### マルチチャンネル再生の実測メモ（2026-10）
+
+- 旧DirectMusic（32bit）: 非Extensible PCM(16bit) 3/4/6/7/8chはロード/再生自体は成功するが、
+  WASAPIループバックで確認すると**先頭2chのみ**が出力される（ch3以降は無音）。
+  Extensible（2chでも）、24bit、float、3ch以上のG.711は`LoadObjectFromFile`で失敗する。
+  なおG.711の1〜2chはACM経由で再生できる（`fact`チャンク必須）。
+- 上記「先頭2chのみ」はWASAPIループバックの影響ではないことを次の2点で確認した:
+  - チャンネル分離ファイル（6chのch3/ch5/ch6のみに音）ではDirectMusicは無音、
+    同じファイルを新DirectSoundで再生すると該当音（700/1100/1300Hz）が出力される。
+    同じループバック経路でch3以降を記録できているため、キャプチャ側の制限ではない。
+  - `IDirectMusicAudioPath8::GetObjectInPath`で取得したオーディオパスのバッファ形式は
+    **2ch / 22050Hz / 16bit**（WASAPIを経由せず確認）。DirectMusicの出力段自体がステレオ。
+- 新DirectSound: `WAVEFORMATEXTENSIBLE`+チャンネルマスクで3〜8chを再生でき、
+  ステレオ構成のデバイスではDirectSoundが全chをL/Rへダウンミックスする（実測）。
+- 環境依存: Windows 11 + Realtekでは、DirectSoundオブジェクトで**最初に生成する
+  5.1/7.1バッファ**が2chに落ちる現象を確認した。4chバッファを一度生成すると解消するため、
+  `wav.c`の`PrimeMultiChannel()`でデバイス生成時に4chバッファを生成して初期化している。
 
 ### 2.2 一致を確認済み
 
@@ -86,11 +106,14 @@
 
 | 項目 | 旧実装 | 新実装 |
 |---|---|---|
-| WAVのフォーマット | 24bit/8bit/floatの変換方式はDM内部控制 | 自作RIFF/WAVEパーサで自前変換（DirectSoundが受け付けない形式のみ16bitへ変換） |
-| WAVのパース | DMローダ | 自作RIFF/WAVEパーサ（`fmt`/`data`チャンク、`WAVE_FORMAT_EXTENSIBLE`対応） |
+| WAVのフォーマット | DM内部で変換（8/16bit PCMとG.711(1〜2ch)がロード可。マルチchは先頭2chのみ） | 自作RIFF/WAVEパーサで自前変換（DirectSoundが受け付けない形式のみ16bitへ変換）。8bitのA-law/μ-law(G.711)も`g711.h`で16bitへデコード。3ch以上は`WAVEFORMATEXTENSIBLE`+チャンネルマスクでDirectSoundに渡す |
+| WAVのパース | DMローダ（Extensible/24bit/floatは非対応） | 自作RIFF/WAVEパーサ（`fmt`/`data`チャンク、`WAVE_FORMAT_EXTENSIBLE`対応。マスクが無い/チャンネル数と不整合なら標準配置を合成） |
 | MIDIファイルローダ | `dmime`ローダ | 自作SMFパーサ |
 | 複数MIDI同時再生 | Performance＋Sound毎のAudioPath | ポート共有＋チャンネルグループ割当（`MIDI_GROUPS`個） |
 | 破棄時 | 個別NoteOff | `AllNotesOff`（CC120/CC123） |
+
+G.711デコーダは `ext\dxruby\g711.h`（Sun Microsystems実装を同梱）。`wav.c` から `#include` して
+使用するヘッダのため拡張子は `.h`（旧 `g711.c` から改名。ファイル内のコメントは `g711.c` のまま）。
 
 ---
 
@@ -100,7 +123,11 @@
   送出順が完全一致するまで修正済み（6.3節・6.6節参照）。
 - 旧にあった「stop後も先行バッファ約130ms分が発音され続ける」挙動は
   未再現（新実装はリアルタイム生成のため、この違いは残る、1.1節 #7）。
-- 旧実装の24bit/float WAVの変換・再生結果は未計測（新は16bit変換で再生）。
+- 旧実装の24bit/float/Extensible WAVはロード不可（Windows 11 32bit DirectMusicで実測）。
+  新は24bit/floatをそのまま再生し（16bit以外でDirectSoundが受け付けない場合のみ16bitへ変換）、Extensibleはマスク保持で再生。
+- 旧実装のマルチチャンネルWAVは非Extensibleの16bit PCMの先頭2chのみ再生。新は3〜8chを再生（上記2.1の実測メモ参照）。
+- DirectSoundの「最初の5.1/7.1バッファが2chに落ちる」環境依存挙動は`PrimeMultiChannel()`で回避しているが、
+  この現象自体はWindows/ドライバ側のもので、DirectSoundを使う他アプリにも影響しうる。
 - 旧実装の `start=`（wav）が「ほぼ無音」になる点の挙動は、
   旧ソース（`old_sound.c`）から推定したものであり、
   聴取による確認は未実施。

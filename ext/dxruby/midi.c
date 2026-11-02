@@ -20,6 +20,27 @@
 
 extern HANDLE g_hWnd;
 
+/* IKsControl経由でDirectMusicのプロパティを操作するための最小定義 */
+typedef struct DXRubyKSPROPERTY {
+    GUID Set;
+    ULONG Id;
+    ULONG Flags;
+} DXRubyKSPROPERTY;
+
+typedef struct DXRubyIKsControl DXRubyIKsControl;
+typedef struct DXRubyIKsControlVtbl {
+    HRESULT (WINAPI *QueryInterface)(DXRubyIKsControl *, const GUID *, void **);
+    ULONG (WINAPI *AddRef)(DXRubyIKsControl *);
+    ULONG (WINAPI *Release)(DXRubyIKsControl *);
+    HRESULT (WINAPI *KsProperty)(DXRubyIKsControl *, DXRubyKSPROPERTY *, ULONG,
+                                 void *, ULONG, ULONG *);
+} DXRubyIKsControlVtbl;
+struct DXRubyIKsControl { const DXRubyIKsControlVtbl *lpVtbl; };
+
+static const GUID DXRuby_IID_IKsControl =
+    {0x28F54685, 0x06FD, 0x11D2, {0xB2, 0x7A, 0x00, 0xA0, 0xC9, 0x22, 0x31, 0x96}};
+#define DXRUBY_KSPROPERTY_TYPE_SET 0x00000002
+
 typedef struct MidiEvent {
     DWORD tick;
     DWORD order;
@@ -65,6 +86,7 @@ struct DXRubyMidi {
     HANDLE worker;
     HANDLE stopEvent;
     CRITICAL_SECTION sendLock;
+    int bufferDirty;        /* bufferに未送信のPack済みイベントがあるか */
 
     volatile LONG stopRequested;
     volatile LONG volume;       /* 現在のマスター音量(0-255) */
@@ -400,7 +422,26 @@ static HRESULT SetupPortBuffer(DXRubyMidi *m)
     if (FAILED(hr)) { g_error = "SetDirectSound"; return hr; }
     hr = m->dsb->lpVtbl->Play(m->dsb, 0, 0, DSBPLAY_LOOPING);
     if (FAILED(hr)) { g_error = "Play"; return hr; }
+    /* 旧DirectMusic(1.4.7)のAudioPath出力レベルに合わせる固定減衰 */
+    m->dsb->lpVtbl->SetVolume(m->dsb, -328);
     return S_OK;
+}
+
+static HRESULT SetMidiReverb(DXRubyMidi *m, const DMUS_WAVES_REVERB_PARAMS *params)
+{
+    DXRubyIKsControl *ks = NULL;
+    DXRubyKSPROPERTY prop;
+    ULONG returned = 0;
+    HRESULT hr;
+    if (!m->port) return E_FAIL;
+    hr = m->port->lpVtbl->QueryInterface(m->port, &DXRuby_IID_IKsControl, (void **)&ks);
+    if (FAILED(hr) || !ks) return FAILED(hr) ? hr : E_FAIL;
+    prop.Set = GUID_DMUS_PROP_WavesReverb;
+    prop.Id = 0;
+    prop.Flags = DXRUBY_KSPROPERTY_TYPE_SET;
+    hr = ks->lpVtbl->KsProperty(ks, &prop, sizeof(prop), (void *)params, sizeof(*params), &returned);
+    ks->lpVtbl->Release(ks);
+    return hr;
 }
 
 static HRESULT OpenMidiDevice(DXRubyMidi *m)
@@ -436,9 +477,11 @@ static HRESULT OpenMidiDevice(DXRubyMidi *m)
     ZeroMemory(&params, sizeof(params));
     params.dwSize = sizeof(params);
     params.dwValidParams = DMUS_PORTPARAMS_VOICES | DMUS_PORTPARAMS_CHANNELGROUPS |
-                           DMUS_PORTPARAMS_SAMPLERATE | DMUS_PORTPARAMS_EFFECTS;
-    params.dwVoices = 128;
-    params.dwChannelGroups = 1;
+                           DMUS_PORTPARAMS_AUDIOCHANNELS | DMUS_PORTPARAMS_SAMPLERATE |
+                           DMUS_PORTPARAMS_EFFECTS;
+    params.dwVoices = 64;
+    params.dwChannelGroups = 4;
+    params.dwAudioChannels = 1;
     /* DirectMusicのInitAudioデフォルトに合わす */
     params.dwSampleRate = 22050;
     params.dwEffectFlags = DMUS_EFFECT_REVERB | DMUS_EFFECT_CHORUS;
@@ -448,6 +491,15 @@ static HRESULT OpenMidiDevice(DXRubyMidi *m)
     if (FAILED(hr)) return hr;
     hr = m->port->lpVtbl->Activate(m->port, TRUE);
     if (FAILED(hr)) { g_error = "Activate"; return hr; }
+    {
+        /* x86 DirectMusicのリバーブに聴感を合わせる(fReverbMix=-20dB) */
+        DMUS_WAVES_REVERB_PARAMS rp;
+        rp.fInGain = 0.0f;
+        rp.fReverbMix = -20.0f;
+        rp.fReverbTime = 1000.0f;
+        rp.fHighFreqRTRatio = 0.001f;
+        SetMidiReverb(m, &rp);
+    }
     hr = m->port->lpVtbl->GetLatencyClock(m->port, &m->clock);
     if (FAILED(hr)) { g_error = "GetLatencyClock"; return hr; }
     m->group = 1;
@@ -456,16 +508,58 @@ static HRESULT OpenMidiDevice(DXRubyMidi *m)
     return S_OK;
 }
 
-static void SendShort(DXRubyMidi *m, REFERENCE_TIME time, BYTE status, BYTE d1, BYTE d2)
+/* bufferにPackだけ行う(PlayBuffer/Flushは行わない)。bufferが満杯の場合は
+ * 一旦Commitしてから再試行する。呼び出し側がロックを保持している前提。 */
+static void PackShort(DXRubyMidi *m, REFERENCE_TIME time, BYTE status, BYTE d1, BYTE d2)
 {
     DWORD value = status | ((DWORD)d1 << 8) | ((DWORD)d2 << 16);
+    HRESULT hr;
+    if (!m->port || !m->buffer) return;
+    hr = m->buffer->lpVtbl->PackStructured(m->buffer, time, m->group, value);
+    if (FAILED(hr)) {
+        /* buffer満杯の可能性: 一旦送信して空にしてから再試行 */
+        if (m->bufferDirty) {
+            m->port->lpVtbl->PlayBuffer(m->port, m->buffer);
+            m->buffer->lpVtbl->Flush(m->buffer);
+            m->bufferDirty = 0;
+        }
+        hr = m->buffer->lpVtbl->PackStructured(m->buffer, time, m->group, value);
+    }
+    if (SUCCEEDED(hr)) m->bufferDirty = 1;
+}
+
+static void PackLong(DXRubyMidi *m, REFERENCE_TIME time, const BYTE *data, DWORD length)
+{
+    HRESULT hr;
+    if (!m->port || !m->buffer) return;
+    hr = m->buffer->lpVtbl->PackUnstructured(m->buffer, time, m->group, length, (LPBYTE)data);
+    if (FAILED(hr)) {
+        if (m->bufferDirty) {
+            m->port->lpVtbl->PlayBuffer(m->port, m->buffer);
+            m->buffer->lpVtbl->Flush(m->buffer);
+            m->bufferDirty = 0;
+        }
+        hr = m->buffer->lpVtbl->PackUnstructured(m->buffer, time, m->group, length, (LPBYTE)data);
+    }
+    if (SUCCEEDED(hr)) m->bufferDirty = 1;
+}
+
+/* 未送信のPack済みイベントがあればPlayBuffer+Flushで送信する。ロック保持前提。 */
+static void CommitBufferLocked(DXRubyMidi *m)
+{
+    if (!m->port || !m->buffer || !m->bufferDirty) return;
+    m->port->lpVtbl->PlayBuffer(m->port, m->buffer);
+    m->buffer->lpVtbl->Flush(m->buffer);
+    m->bufferDirty = 0;
+}
+
+static void SendShort(DXRubyMidi *m, REFERENCE_TIME time, BYTE status, BYTE d1, BYTE d2)
+{
     if (!m->port) return;
     MidiLock();
     EnterCriticalSection(&m->sendLock);
-    if (SUCCEEDED(m->buffer->lpVtbl->PackStructured(m->buffer, time, m->group, value))) {
-        m->port->lpVtbl->PlayBuffer(m->port, m->buffer);
-        m->buffer->lpVtbl->Flush(m->buffer);
-    }
+    PackShort(m, time, status, d1, d2);
+    CommitBufferLocked(m);
     LeaveCriticalSection(&m->sendLock);
     LeaveCriticalSection(&g_managerLock);
 }
@@ -475,10 +569,8 @@ static void SendLong(DXRubyMidi *m, REFERENCE_TIME time, const BYTE *data, DWORD
     if (!m->port) return;
     MidiLock();
     EnterCriticalSection(&m->sendLock);
-    if (SUCCEEDED(m->buffer->lpVtbl->PackUnstructured(m->buffer, time, m->group, length, (LPBYTE)data))) {
-        m->port->lpVtbl->PlayBuffer(m->port, m->buffer);
-        m->buffer->lpVtbl->Flush(m->buffer);
-    }
+    PackLong(m, time, data, length);
+    CommitBufferLocked(m);
     LeaveCriticalSection(&m->sendLock);
     LeaveCriticalSection(&g_managerLock);
 }
@@ -537,7 +629,7 @@ BYTE DXRUBY_VolumeToCC7(long volume)
 
 /* チャンネル音量(曲側CC7)にマスター音量(DXRUBY_VolumeToCC7変換後の0..127)を合成して送信する。
  * dmime.dllの0x10009b0fと同一の式: DXRUBY_VolumeToCC7(DXRUBY_CC7ToDB[cc] + DXRUBY_CC7ToDB[master]) */
-static void SendChannelVolume(DXRubyMidi *m, BYTE ch, REFERENCE_TIME time)
+static void PackChannelVolume(DXRubyMidi *m, BYTE ch, REFERENCE_TIME time)
 {
     BYTE cc = m->channelVolume[ch];
     int master = (int)m->volume;
@@ -546,13 +638,30 @@ static void SendChannelVolume(DXRubyMidi *m, BYTE ch, REFERENCE_TIME time)
     if (master < 0) master = 0;
     if (master > 127) master = 127;
     vol = (master == 127) ? cc : DXRUBY_VolumeToCC7(DXRUBY_CC7ToDB[cc] + DXRUBY_CC7ToDB[master]);
-    SendShort(m, time, (BYTE)(0xb0 | ch), 7, vol);
+    PackShort(m, time, (BYTE)(0xb0 | ch), 7, vol);
+}
+
+static void SendChannelVolume(DXRubyMidi *m, BYTE ch, REFERENCE_TIME time)
+{
+    if (!m->port) return;
+    MidiLock();
+    EnterCriticalSection(&m->sendLock);
+    PackChannelVolume(m, ch, time);
+    CommitBufferLocked(m);
+    LeaveCriticalSection(&m->sendLock);
+    LeaveCriticalSection(&g_managerLock);
 }
 
 static void SendChannelVolumesAll(DXRubyMidi *m, REFERENCE_TIME time)
 {
     BYTE ch;
-    for (ch = 0; ch < 16; ++ch) SendChannelVolume(m, ch, time);
+    if (!m->port) return;
+    MidiLock();
+    EnterCriticalSection(&m->sendLock);
+    for (ch = 0; ch < 16; ++ch) PackChannelVolume(m, ch, time);
+    CommitBufferLocked(m);
+    LeaveCriticalSection(&m->sendLock);
+    LeaveCriticalSection(&g_managerLock);
 }
 
 /* フェード中の音量を更新し、変化があれば全チャンネルへ送信する */
@@ -582,10 +691,16 @@ static void UpdateFade(DXRubyMidi *m)
 static void AllNotesOff(DXRubyMidi *m, REFERENCE_TIME t)
 {
     BYTE ch;
+    if (!m->port) return;
+    MidiLock();
+    EnterCriticalSection(&m->sendLock);
     for (ch = 0; ch < 16; ++ch) {
-        SendShort(m, t, (BYTE)(0xb0 | ch), 120, 0);
-        SendShort(m, t, (BYTE)(0xb0 | ch), 123, 0);
+        PackShort(m, t, (BYTE)(0xb0 | ch), 120, 0);
+        PackShort(m, t, (BYTE)(0xb0 | ch), 123, 0);
     }
+    CommitBufferLocked(m);
+    LeaveCriticalSection(&m->sendLock);
+    LeaveCriticalSection(&g_managerLock);
 }
 
 static DWORD ApiToFileTickRaw(const DXRubyMidi *m, unsigned long long tick)
@@ -652,12 +767,12 @@ static void MarkOrphanNotes(DXRubyMidi *m)
     }
 }
 
-static void SendEvent(DXRubyMidi *m, const MidiEvent *e, REFERENCE_TIME time)
+static void SendEventLocked(DXRubyMidi *m, const MidiEvent *e, REFERENCE_TIME time)
 {
     BYTE kind = e->status & 0xf0;
     BYTE ch = e->status & 0x0f;
     if (e->isLong) {
-        SendLong(m, time, e->longData, e->longLength);
+        PackLong(m, time, e->longData, e->longLength);
     } else if (kind == 0x90 || kind == 0x80 || kind == 0xa0) {
         /* NoteOn vel=0はNoteOffとして送る */
         BYTE off = (kind == 0x90 && e->data2 == 0) || kind == 0x80;
@@ -665,8 +780,8 @@ static void SendEvent(DXRubyMidi *m, const MidiEvent *e, REFERENCE_TIME time)
         BYTE note = ShiftNote(m, e->data1, ch);
         if (!off && kind == 0x90 && e->orphan) {
             /* 孤立NoteOn: 直後にNoteOffを送出する(DirectMusicと同じ) */
-            SendShort(m, time, st, e->data1, e->data2);
-            SendShort(m, time, (BYTE)(0x80 | ch), note, 0);
+            PackShort(m, time, st, e->data1, e->data2);
+            PackShort(m, time, (BYTE)(0x80 | ch), note, 0);
             return;
         }
         /* 発音中ノートを記録する(stop時に個別のNoteOffを送るため) */
@@ -679,14 +794,25 @@ static void SendEvent(DXRubyMidi *m, const MidiEvent *e, REFERENCE_TIME time)
                 else m->noteOn[9][e->data1] = 1;
             }
         }
-        SendShort(m, time, st, e->data1, e->data2);
+        PackShort(m, time, st, e->data1, e->data2);
     } else if (kind == 0xb0 && e->data1 == 7) {
         /* チャンネル音量を記憶してマスター音量を掛けて送信 */
         m->channelVolume[ch] = e->data2;
-        SendChannelVolume(m, ch, time);
+        PackChannelVolume(m, ch, time);
     } else {
-        SendShort(m, time, e->status, e->data1, e->data2);
+        PackShort(m, time, e->status, e->data1, e->data2);
     }
+}
+
+static void SendEvent(DXRubyMidi *m, const MidiEvent *e, REFERENCE_TIME time)
+{
+    if (!m->port) return;
+    MidiLock();
+    EnterCriticalSection(&m->sendLock);
+    SendEventLocked(m, e, time);
+    CommitBufferLocked(m);
+    LeaveCriticalSection(&m->sendLock);
+    LeaveCriticalSection(&g_managerLock);
 }
 
 /* 記録済みの発音中ノートへ個別のNoteOffを送る(DirectMusicのstopと同じ) */
@@ -694,14 +820,20 @@ static void SendTrackedNoteOffs(DXRubyMidi *m)
 {
     BYTE ch, note;
     REFERENCE_TIME now = CurrentTime(m);
+    if (!m->port) { ZeroMemory(m->noteOn, sizeof(m->noteOn)); return; }
+    MidiLock();
+    EnterCriticalSection(&m->sendLock);
     for (ch = 0; ch < 16; ++ch) {
         for (note = 0; note < 128; ++note) {
             if (m->noteOn[ch][note]) {
                 /* 記録されているのはシフト適用済みのノート番号 */
-                SendShort(m, now, (BYTE)(0x80 | ch), note, 0);
+                PackShort(m, now, (BYTE)(0x80 | ch), note, 0);
             }
         }
     }
+    CommitBufferLocked(m);
+    LeaveCriticalSection(&m->sendLock);
+    LeaveCriticalSection(&g_managerLock);
     ZeroMemory(m->noteOn, sizeof(m->noteOn));
 }
 
@@ -730,22 +862,26 @@ static int PlayRange(DXRubyMidi *m, DWORD first, DWORD last, int includeLast,
 static void ResetChannels(DXRubyMidi *m, REFERENCE_TIME time)
 {
     BYTE ch;
-    for (ch = 0; ch < 16; ++ch) {
-        SendShort(m, time, (BYTE)(0xb0 | ch), 120, 0);
-        SendShort(m, time, (BYTE)(0xb0 | ch), 123, 0);
-        SendShort(m, time, (BYTE)(0xb0 | ch), 121, 0);
-        SendShort(m, time, (BYTE)(0xb0 | ch), 0, 0);
-        SendShort(m, time, (BYTE)(0xb0 | ch), 32, 0);
-        SendShort(m, time, (BYTE)(0xc0 | ch), 0, 0);
-        m->channelVolume[ch] = 100;
-        SendChannelVolume(m, ch, time);
-        SendShort(m, time, (BYTE)(0xb0 | ch), 10, 64);
-        SendShort(m, time, (BYTE)(0xb0 | ch), 91, 40);
-        SendShort(m, time, (BYTE)(0xb0 | ch), 93, 0);
-    }
+    if (!m->port) return;
+    MidiLock();
     EnterCriticalSection(&m->sendLock);
+    for (ch = 0; ch < 16; ++ch) {
+        PackShort(m, time, (BYTE)(0xb0 | ch), 120, 0);
+        PackShort(m, time, (BYTE)(0xb0 | ch), 123, 0);
+        PackShort(m, time, (BYTE)(0xb0 | ch), 121, 0);
+        PackShort(m, time, (BYTE)(0xb0 | ch), 0, 0);
+        PackShort(m, time, (BYTE)(0xb0 | ch), 32, 0);
+        PackShort(m, time, (BYTE)(0xc0 | ch), 0, 0);
+        m->channelVolume[ch] = 100;
+        PackChannelVolume(m, ch, time);
+        PackShort(m, time, (BYTE)(0xb0 | ch), 10, 64);
+        PackShort(m, time, (BYTE)(0xb0 | ch), 91, 40);
+        PackShort(m, time, (BYTE)(0xb0 | ch), 93, 0);
+    }
     m->lastSentVolume = (int)m->volume;
+    CommitBufferLocked(m);
     LeaveCriticalSection(&m->sendLock);
+    LeaveCriticalSection(&g_managerLock);
 }
 
 /* 開始位置が曲の途中(seek)の場合に、そこまでのチャンネル状態を復元する。
@@ -770,13 +906,17 @@ static void SeekRestore(DXRubyMidi *m, DWORD first, REFERENCE_TIME time)
     ZeroMemory(pitchValid, sizeof(pitchValid));
     ZeroMemory(cAfValid, sizeof(cAfValid));
 
+    if (!m->port) return;
+    MidiLock();
+    EnterCriticalSection(&m->sendLock);
+
     for (i = 0; i < m->eventCount; ++i) {
         const MidiEvent *e = &m->events[i];
         BYTE kind, ch;
         if (e->tick >= first) break;
         if (e->isTempo) continue;
         if (e->isLong) {
-            SendLong(m, time, e->longData, e->longLength);
+            PackLong(m, time, e->longData, e->longLength);
             continue;
         }
         kind = e->status & 0xf0;
@@ -787,7 +927,7 @@ static void SeekRestore(DXRubyMidi *m, DWORD first, REFERENCE_TIME time)
             case 0: case 6: case 32: case 38: case 98: case 99:
             case 100: case 101: case 126: case 127:
                 /* バンクセレクト・RPN系はシーケンスの順序が重要なので即時送信 */
-                SendShort(m, time, e->status, e->data1, e->data2);
+                PackShort(m, time, e->status, e->data1, e->data2);
                 break;
             case 111: /* GGSのループマーカー */
             case 120: case 121: case 123: case 124: case 125:
@@ -824,14 +964,17 @@ static void SeekRestore(DXRubyMidi *m, DWORD first, REFERENCE_TIME time)
             ev.status = (BYTE)(0xb0 | ch);
             ev.data1 = (BYTE)ccnum;
             ev.data2 = cc[ch][ccnum];
-            SendEvent(m, &ev, time);
+            SendEventLocked(m, &ev, time);
         }
-        if (programValid[ch]) SendShort(m, time, (BYTE)(0xc0 | ch), program[ch], 0);
+        if (programValid[ch]) PackShort(m, time, (BYTE)(0xc0 | ch), program[ch], 0);
         if (pitchValid[ch]) {
-            SendShort(m, time, (BYTE)(0xe0 | ch), (BYTE)(pitch[ch] & 0x7f), (BYTE)((pitch[ch] >> 7) & 0x7f));
+            PackShort(m, time, (BYTE)(0xe0 | ch), (BYTE)(pitch[ch] & 0x7f), (BYTE)((pitch[ch] >> 7) & 0x7f));
         }
-        if (cAfValid[ch]) SendShort(m, time, (BYTE)(0xd0 | ch), cAf[ch], 0);
+        if (cAfValid[ch]) PackShort(m, time, (BYTE)(0xd0 | ch), cAf[ch], 0);
     }
+    CommitBufferLocked(m);
+    LeaveCriticalSection(&m->sendLock);
+    LeaveCriticalSection(&g_managerLock);
 }
 
 static unsigned __stdcall MidiWorker(void *arg)
